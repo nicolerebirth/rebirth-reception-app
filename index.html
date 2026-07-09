@@ -306,6 +306,8 @@ async function saveUrl() { try { await store.set('url', S.url); } catch{} flash(
 async function submitNew() {
   if (_submitting) return;
   _submitting = true;
+  // ボタンを即座に無効化（タップ連打対策）
+  document.querySelectorAll('.btn-r, .btn-green').forEach(b => { b.disabled = true; b.style.opacity = '0.5'; });
   S.busy=true; render();
   const f = S.f;
   const pOn = f.svs[SVC.findIndex(x=>x.id==='prepaid')]?.on;
@@ -335,6 +337,8 @@ async function submitNew() {
 async function submitVisit() {
   if (_submitting) return;
   _submitting = true;
+  // ボタンを即座に無効化（タップ連打対策）
+  document.querySelectorAll('.btn-r, .btn-green').forEach(b => { b.disabled = true; b.style.opacity = '0.5'; });
   S.busy=true; render();
   const useCard = S.vf.useCard && S.sel && S.sel.prepaidNum && (S.sel.prepaidUsed||0)<4;
   const pIdx = SVC.findIndex(x=>x.id==='prepaid');
@@ -387,6 +391,9 @@ async function submitEdit() {
 
 // ── Payment completion ────────────────────────────────────────────────────────
 async function completePayment() {
+  if (_submitting) return;
+  _submitting = true;
+  document.querySelectorAll('.btn-r, .btn-green').forEach(b => { b.disabled = true; b.style.opacity = '0.5'; });
   const c = S.sel; if(!c) return;
   const vidx = S.payVidx;
   const v = (c.visits||[])[vidx]; if(!v) return;
