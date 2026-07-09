@@ -105,6 +105,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 </div>
 <script>
 'use strict';
+// 二重送信防止フラグ
+let _submitting = false;
 // ═══════════════════════════════════════════════════════════
 //  REBIRTH CAR COATING CENTER — Reception System v2.0
 // ═══════════════════════════════════════════════════════════
@@ -302,6 +304,8 @@ async function saveUrl() { try { await store.set('url', S.url); } catch{} flash(
 
 // ── Submit functions ──────────────────────────────────────────────────────────
 async function submitNew() {
+  if (_submitting) return;
+  _submitting = true;
   S.busy=true; render();
   const f = S.f;
   const pOn = f.svs[SVC.findIndex(x=>x.id==='prepaid')]?.on;
@@ -317,15 +321,20 @@ async function submitNew() {
       usedCard:false, prepaidVisitNum:null, pay:payData}]
   };
   await postToSheets({type:'new', ...rec, services:rec.visits[0].svcs.join(', '), memo:rec.visits[0].memo,
-    estimate:payData.est, deposit:payData.dep, depositMethod:payData.depMeth});
+    estimate:payData.est, deposit:payData.dep,
+    depositMethod:payData.depMeth, depositStaff:payData.depStaff||'',
+    depositNote:payData.depNote||''});
   S.cx.push(rec);
   await saveCx();
   S.savedInfo = {type:'new', name:rec.fn+' '+rec.ln, card:rec.prepaidNum, svcs:rec.visits[0].svcs, date:rec.firstVisit, staff:rec.staff};
   S.f = {fn:'',ln:'',p1:'',p2:'',p3:'',dt:td(),st:'',addr:'',email:'',mdl:'',col:'',plt:'',svd:td(),svs:ms(),m1:'',m2:'',m3:'',prepaidNum:'',confirmedCard:'',pay:initPay()};
+  _submitting = false;
   S.busy=false; go('saved');
 }
 
 async function submitVisit() {
+  if (_submitting) return;
+  _submitting = true;
   S.busy=true; render();
   const useCard = S.vf.useCard && S.sel && S.sel.prepaidNum && (S.sel.prepaidUsed||0)<4;
   const pIdx = SVC.findIndex(x=>x.id==='prepaid');
@@ -340,10 +349,15 @@ async function submitVisit() {
   await postToSheets({
     type:'return', id:S.sel.id,
     fn:S.sel.fn||'', ln:S.sel.ln||'', phone:S.sel.phone||'',
-    email:S.sel.email||'', mdl:S.sel.mdl||'', col:S.sel.col||'', plt:S.sel.plt||'',
+    email:S.sel.email||'', addr:S.sel.addr||'',
+    mdl:S.sel.mdl||'', col:S.sel.col||'', plt:S.sel.plt||'',
     prepaidNum:S.sel.prepaidNum||'',
+    prepaidUsed:S.sel.prepaidUsed||0,
     ...v, services:v.svcs.join(', '),
-    estimate:payData.est, deposit:payData.dep, depositMethod:payData.depMeth
+    estimate:payData.est, deposit:payData.dep,
+    depositMethod:payData.depMeth||'',
+    depositStaff:payData.depStaff||'',
+    depositNote:payData.depNote||''
   });
   S.cx = S.cx.map(c => {
     if (c.id!==S.sel.id) return c;
@@ -358,6 +372,7 @@ async function submitVisit() {
     svcs:v.svcs, date:v.date, staff:v.staff,
     useCard:!!useCard, prepaidVisitNum:pvn, buyingCard:buyCard?S.vf.newCardNum.trim():null};
   S.vf = {svd:td(),st:'',svs:ms(),m1:'',m2:'',m3:'',useCard:false,newCardNum:'',confirmedCard:'',pay:initPay()};
+  _submitting = false;
   S.busy=false; go('saved');
 }
 
@@ -417,6 +432,7 @@ async function completePayment() {
     paymentNote:updPay.payNote||'',
     paymentDate:payDate
   });
+  _submitting = false;
   flash('Payment completed! ✅');
   go('receipt');
 }
