@@ -866,7 +866,9 @@ function receiptScr() {
   const rcpNo = 'RBC-'+c.id.slice(-6)+'-'+(vidx+1);
   return '<div style="padding:16px">'
     +'<div style="display:flex;gap:10px;margin-bottom:16px">'
-    +'<button class="btn-g" onclick="go(\'prof\')"><i class="ti ti-arrow-left"></i> Back</button>'
+    +'<button class="btn-green" onclick="go(\'home\')" style="margin-bottom:10px"><svg width="22" height="22" viewBox="0 0 22 22" fill="white"><path d="M9 2L2 9l7 7V11h6V9H9V2z"/></svg> Back to home</button>'
+    +'<div style="display:flex;gap:10px;margin-bottom:10px">'
+    +'<button class="btn-g" onclick="go(\'prof\')"><i class="ti ti-arrow-left"></i> Profile</button>'
     +'<button class="btn-r" style="flex:1" onclick="window.print()"><i class="ti ti-printer"></i> Print Receipt</button>'
     +'</div>'
     +'<div id="receipt-box" style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;max-width:400px;margin:0 auto;font-family:Arial,sans-serif">'
