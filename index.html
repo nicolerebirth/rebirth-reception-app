@@ -401,11 +401,21 @@ async function completePayment() {
   await postToSheets({
     type:'payment', id:c.id,
     fn:c.fn||'', ln:c.ln||'', phone:c.phone||'',
-    mdl:c.mdl||'', plt:c.plt||'',
-    visitDate:v.date, services:(v.svcs||[]).join(', '),
-    estimate:updPay.est||'', deposit:updPay.dep||'',
-    finalAmount:updPay.final||'', paymentMethod:updPay.payMeth||'',
-    paymentStaff:updPay.payStaff||'', paymentDate:payDate
+    email:c.email||'', addr:c.addr||'',
+    mdl:c.mdl||'', col:c.col||'', plt:c.plt||'',
+    visitDate:v.date, staff:v.staff||'',
+    services:(v.svcs||[]).join(', '),
+    estimate:updPay.est||'',
+    deposit:updPay.dep||'',
+    depositMethod:updPay.depMeth||'',
+    depositStaff:updPay.depStaff||'',
+    depositNote:updPay.depNote||'',
+    finalAmount:updPay.final||'',
+    balance:String(Math.max(0,parseFloat(updPay.final||updPay.est||0)-parseFloat(updPay.dep||0))),
+    paymentMethod:updPay.payMeth||'',
+    paymentStaff:updPay.payStaff||'',
+    paymentNote:updPay.payNote||'',
+    paymentDate:payDate
   });
   flash('Payment completed! ✅');
   go('receipt');
