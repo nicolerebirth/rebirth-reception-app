@@ -71,7 +71,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .sec{font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.07em;margin-bottom:14px}
 .del-banner{background:#fef2f2;border:2px solid #fca5a5;border-radius:12px;padding:20px;margin-top:14px;text-align:center}
 .card-amber{background:#fffbeb;border:2.5px solid #d97706;border-radius:12px;padding:18px;margin-bottom:14px}
-@media print{button{display:none!important}body{background:#fff;padding:0}
+@media print{button,.no-print{display:none!important}body{background:#fff;padding:0}
 .app{border:none;box-shadow:none;max-width:100%;margin:0}
 #receipt-box{border:none!important;box-shadow:none!important;max-width:100%!important;margin:0!important;padding:10px!important}}
 </style>
@@ -864,47 +864,55 @@ function receiptScr() {
   const fin  = parseFloat(p.final||p.est||0);
   const remain = Math.max(0, fin-dep);
   const rcpNo = 'RBC-'+c.id.slice(-6)+'-'+(vidx+1);
-  return '<div style="padding:16px">'
-    +'<div style="display:flex;gap:10px;margin-bottom:16px">'
-    +'<button class="btn-green" onclick="go(\'home\')" style="margin-bottom:10px"><svg width="22" height="22" viewBox="0 0 22 22" fill="white"><path d="M9 2L2 9l7 7V11h6V9H9V2z"/></svg> Back to home</button>'
-    +'<div style="display:flex;gap:10px;margin-bottom:10px">'
-    +'<button class="btn-g" onclick="go(\'prof\')"><i class="ti ti-arrow-left"></i> Profile</button>'
-    +'<button class="btn-r" style="flex:1" onclick="window.print()"><i class="ti ti-printer"></i> Print Receipt</button>'
-    +'</div>'
-    +'<div id="receipt-box" style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;max-width:400px;margin:0 auto;font-family:Arial,sans-serif">'
+
+  // Compact button bar (won't print)
+  const btnBar = '<div class="no-print" style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">'
+    +'<button onclick="go('home')" style="background:#16a34a;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px"><svg width="16" height="16" viewBox="0 0 22 22" fill="white"><path d="M9 2L2 9l7 7V11h6V9H9V2z"/></svg> Home</button>'
+    +'<button onclick="go('prof')" style="background:none;border:1px solid #cbd5e1;border-radius:8px;padding:10px 16px;font-size:14px;cursor:pointer;color:#64748b;font-family:inherit">← Profile</button>'
+    +'<button onclick="window.print()" style="background:#C41010;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;flex:1;justify-content:center">🖨 Print Receipt</button>'
+    +'</div>';
+
+  // Receipt content
+  const rcpt = '<div id="receipt-box" style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:28px;max-width:420px;margin:0 auto;font-family:Arial,sans-serif">'
+    // Header
     +'<div style="text-align:center;margin-bottom:16px;padding-bottom:16px;border-bottom:2px solid #111">'
     +'<div style="font-style:italic;font-weight:900;font-size:28px;color:#111;letter-spacing:-1px;font-family:Georgia,serif">REB<span style="color:#C41010">i</span>RTH</div>'
     +'<div style="background:#C41010;color:#fff;font-size:8px;font-weight:700;letter-spacing:.25em;padding:2px 10px;display:inline-block;margin:4px 0;font-style:italic">CAR COATING CENTER INC.</div>'
     +'<div style="font-size:11px;color:#64748b;line-height:1.6;margin-top:6px">4A Naga Road Pulang Lupa Dos Las Pinas City Metro Manila<br>Tel: (02) 3986472</div>'
     +'</div>'
+    // Receipt No
     +'<div style="text-align:center;margin-bottom:14px">'
-    +'<div style="font-size:16px;font-weight:700;color:#111;text-transform:uppercase;letter-spacing:2px">Official Receipt</div>'
-    +'<div style="font-size:11px;color:#64748b">Receipt No.: '+rcpNo+'</div>'
-    +'<div style="font-size:11px;color:#64748b">Date: '+esc(p.payDate||v.date||'')+' '+esc(p.payTime||'')+'</div>'
+    +'<div style="font-size:15px;font-weight:700;color:#111;text-transform:uppercase;letter-spacing:2px">Official Receipt</div>'
+    +'<div style="font-size:11px;color:#64748b;margin-top:4px">No.: '+rcpNo+' &nbsp;|&nbsp; '+esc(p.payDate||v.date||'')+' '+esc(p.payTime||'')+'</div>'
     +'</div>'
-    +'<div style="background:#f8fafc;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px">'
-    +'<div style="font-weight:700;font-size:14px;margin-bottom:4px">'+esc(c.fn)+' '+esc(c.ln)+'</div>'
-    +(c.phone?'<div style="color:#64748b">📞 '+esc(c.phone)+'</div>':'')
-    +(c.mdl?'<div style="color:#64748b">🚗 '+esc(c.mdl)+(c.col?' ('+esc(c.col)+')':'')+(c.plt?' | 🔖 '+esc(c.plt):'')+'</div>':'')
+    // Customer
+    +'<div style="background:#f8fafc;border-radius:8px;padding:10px 14px;margin-bottom:14px">'
+    +'<div style="font-weight:700;font-size:15px;margin-bottom:4px">'+esc(c.fn)+' '+esc(c.ln)+'</div>'
+    +(c.phone?'<div style="font-size:12px;color:#64748b">📞 '+esc(c.phone)+'</div>':'')
+    +(c.mdl?'<div style="font-size:12px;color:#64748b">🚗 '+esc(c.mdl)+(c.col?' ('+esc(c.col)+')':'')+(c.plt?' &nbsp;|&nbsp; 🔖 '+esc(c.plt):'')+'</div>':'')
     +'</div>'
-    +'<div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#64748b;margin-bottom:6px">Services Rendered</div>'
-    +(v.svcs||[]).map(s=>'<div style="font-size:13px;padding:4px 0;border-bottom:0.5px solid #f1f5f9">✓ '+esc(s)+'</div>').join('')
-    +'<div style="margin-top:14px;border-top:1.5px solid #e2e8f0;padding-top:10px">'
-    +(dep>0?'<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span>Estimate:</span><span>'+fmt(fin)+'</span></div>'
-    +'<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;color:#1d4ed8"><span>Deposit paid'+(p.depMeth?' ('+esc(p.depMeth)+')':'')+':</span><span>− '+fmt(dep)+'</span></div>':'')
-    +'<div style="display:flex;justify-content:space-between;font-size:16px;font-weight:900;border-top:2px solid #111;padding-top:8px;margin-top:4px"><span>TOTAL PAID:</span><span style="color:#16a34a">'+fmt(fin)+'</span></div>'
-    +(dep>0?'<div style="display:flex;justify-content:space-between;font-size:13px;margin-top:4px;color:#64748b"><span>Balance paid:</span><span>'+fmt(remain)+'</span></div>':'')
+    // Services
+    +'<div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#64748b;margin-bottom:6px;letter-spacing:.05em">Services Rendered</div>'
+    +(v.svcs||[]).map(s=>'<div style="font-size:13px;padding:5px 0;border-bottom:1px solid #f1f5f9;color:#111">✓ '+esc(s)+'</div>').join('')
+    // Payment breakdown
+    +'<div style="margin-top:16px;border-top:2px solid #e2e8f0;padding-top:12px">'
+    +'<div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:8px"><span style="color:#64748b">見積額 / Estimate:</span><span style="font-weight:600">'+fmt(fin)+'</span></div>'
+    +(dep>0?'<div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:8px"><span style="color:#1d4ed8">頭金 / Deposit paid'+(p.depMeth?' ('+esc(p.depMeth)+')':'')+':</span><span style="font-weight:600;color:#1d4ed8">− '+fmt(dep)+'</span></div>':'')
+    +'<div style="display:flex;justify-content:space-between;font-size:16px;font-weight:900;border-top:2px solid #111;padding-top:10px;margin-top:4px"><span>残金 / Balance paid:</span><span style="color:#16a34a">'+fmt(remain)+'</span></div>'
+    +'<div style="display:flex;justify-content:space-between;font-size:15px;font-weight:700;border-top:1px solid #e2e8f0;padding-top:8px;margin-top:8px"><span>合計 / TOTAL:</span><span style="color:#111">'+fmt(fin)+'</span></div>'
     +'</div>'
-    +'<div style="margin-top:12px;padding:10px 12px;background:#f0fdf4;border-radius:8px;font-size:12px">'
-    +'<div><strong>Payment method:</strong> '+esc(p.payMeth||'—')+'</div>'
+    // Payment info
+    +'<div style="margin-top:12px;padding:10px 14px;background:#f0fdf4;border-radius:8px;font-size:13px">'
+    +'<div style="margin-bottom:4px"><strong>Payment method:</strong> '+esc(p.payMeth||'—')+'</div>'
     +'<div><strong>Received by:</strong> '+esc(p.payStaff||'—')+'</div>'
-    +(dep>0&&p.depMeth?'<div style="color:#64748b;margin-top:4px">Deposit via '+esc(p.depMeth)+(p.depStaff?' by '+esc(p.depStaff):'')+(p.depDate?' on '+esc(p.depDate):'')+'</div>':'')
-    +(p.depNote?'<div style="color:#64748b">Deposit ref: '+esc(p.depNote)+'</div>':'')
-    +(p.payNote?'<div style="color:#64748b">Payment ref: '+esc(p.payNote)+'</div>':'')
+    +(dep>0?'<div style="color:#1d4ed8;margin-top:6px;font-size:12px">Deposit: '+fmt(dep)+' via '+esc(p.depMeth||'—')+(p.depStaff?' by '+esc(p.depStaff):'')+(p.depDate?' on '+esc(p.depDate):'')+'</div>':'')
+    +(p.payNote?'<div style="color:#64748b;font-size:12px;margin-top:4px">Ref: '+esc(p.payNote)+'</div>':'')
     +'</div>'
     +(v.usedCard&&v.prepaidVisitNum?'<div style="margin-top:8px;padding:8px 12px;background:#fffbeb;border-radius:8px;font-size:12px;color:#92400e">🃏 Prepaid card used — Visit '+v.prepaidVisitNum+' of 4'+(v.prepaidVisitNum===4?' ★ FREE':'')+'</div>':'')
-    +'<div style="text-align:center;margin-top:16px;padding-top:12px;border-top:1px dashed #e2e8f0;font-size:11px;color:#94a3b8">Thank you for choosing Rebirth Car Coating Center!<br>We look forward to serving you again.</div>'
-    +'</div></div>';
+    +'<div style="text-align:center;margin-top:16px;padding-top:12px;border-top:1px dashed #e2e8f0;font-size:11px;color:#94a3b8">Thank you for choosing Rebirth Car Coating Center!</div>'
+    +'</div>';
+
+  return '<div style="padding:16px">'+btnBar+rcpt+'</div>';
 }
 
 function settingsScr() {
