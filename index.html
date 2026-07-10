@@ -419,9 +419,16 @@ async function completePayment() {
     fn:c.fn||'', ln:c.ln||'', phone:c.phone||'',
     mdl:c.mdl||'', plt:c.plt||'',
     visitDate:v.date, services:(v.svcs||[]).join(', '),
+    email:c.email||'', addr:c.addr||'',
+    col:c.col||'',
     estimate:updPay.est||'', deposit:updPay.dep||'',
+    depositMethod:updPay.depMeth||'',
+    depositStaff:updPay.depStaff||'',
+    depositNote:updPay.depNote||'',
     finalAmount:updPay.final||'', paymentMethod:updPay.payMeth||'',
-    paymentStaff:updPay.payStaff||'', paymentDate:payDate
+    paymentStaff:updPay.payStaff||'',
+    paymentNote:updPay.payNote||'',
+    paymentDate:payDate
   });
   flash('Payment completed! ✅');
   go('receipt');
