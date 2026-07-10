@@ -328,7 +328,10 @@ async function submitNew() {
       usedCard:false, prepaidVisitNum:null, pay:payData}]
   };
   await postToSheets({type:'new', ...rec, services:rec.visits[0].svcs.join(', '), memo:rec.visits[0].memo,
-    estimate:payData.est, deposit:payData.dep, depositMethod:payData.depMeth});
+    estimate:payData.est, deposit:payData.dep,
+    depositMethod:payData.depMeth||'',
+    depositStaff:payData.depStaff||'',
+    depositNote:payData.depNote||''});
   S.cx.push(rec);
   await saveCx();
   S.savedInfo = {type:'new', name:rec.fn+' '+rec.ln, card:rec.prepaidNum, svcs:rec.visits[0].svcs, date:rec.firstVisit, staff:rec.staff};
@@ -357,7 +360,10 @@ async function submitVisit() {
     email:S.sel.email||'', mdl:S.sel.mdl||'', col:S.sel.col||'', plt:S.sel.plt||'',
     prepaidNum:S.sel.prepaidNum||'',
     ...v, services:v.svcs.join(', '),
-    estimate:payData.est, deposit:payData.dep, depositMethod:payData.depMeth
+    estimate:payData.est, deposit:payData.dep,
+    depositMethod:payData.depMeth||'',
+    depositStaff:payData.depStaff||'',
+    depositNote:payData.depNote||''
   });
   S.cx = S.cx.map(c => {
     if (c.id!==S.sel.id) return c;
@@ -387,7 +393,10 @@ async function submitEdit() {
 
 // ── Payment completion ────────────────────────────────────────────────────────
 async function completePayment() {
-  const c = S.sel; if(!c) return;
+  if (_submitting) return;
+  _submitting = true;
+  document.querySelectorAll('.btn-r').forEach(function(b){b.disabled=true;b.style.opacity='0.5';});
+  const c = S.sel; if(!c) { _submitting=false; return; }
   const vidx = S.payVidx;
   const v = (c.visits||[])[vidx]; if(!v) return;
   const p = v.pay || {};
@@ -430,6 +439,7 @@ async function completePayment() {
     paymentNote:updPay.payNote||'',
     paymentDate:payDate
   });
+  _submitting = false;
   flash('Payment completed! ✅');
   go('receipt');
 }
