@@ -71,7 +71,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .sec{font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.07em;margin-bottom:14px}
 .del-banner{background:#fef2f2;border:2px solid #fca5a5;border-radius:12px;padding:20px;margin-top:14px;text-align:center}
 .card-amber{background:#fffbeb;border:2.5px solid #d97706;border-radius:12px;padding:18px;margin-bottom:14px}
-@media print{button,.no-print{display:none!important}body{background:#fff;padding:0}
+@media print{button{display:none!important}body{background:#fff;padding:0}
 .app{border:none;box-shadow:none;max-width:100%;margin:0}
 #receipt-box{border:none!important;box-shadow:none!important;max-width:100%!important;margin:0!important;padding:10px!important}}
 </style>
@@ -105,7 +105,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 </div>
 <script>
 'use strict';
-// 二重送信防止フラグ
 let _submitting = false;
 // ═══════════════════════════════════════════════════════════
 //  REBIRTH CAR COATING CENTER — Reception System v2.0
@@ -166,10 +165,7 @@ let S = {
 (async () => {
   try { const r=await store.get('cx'); if(r) S.cx=JSON.parse(r.value); } catch{}
   try { const r=await store.get('url'); if(r) S.url=r.value; } catch{}
-  try { render(); } catch(e) {
-    var b=document.getElementById('body');
-    if(b) b.innerHTML='<div style="padding:20px;color:red;font-size:14px"><strong>Init Error:</strong> '+e.message+'</div>';
-  }
+  render();
 })();
 
 // ── Helper functions ──────────────────────────────────────────────────────────
@@ -203,7 +199,7 @@ function openCx(id, from) { S.sel=S.cx.find(c=>c.id===id)||null; S.prevScr=from|
 function openPwList() { S.pw=''; S.pwErr=false; go('pwList'); }
 function openPwSettings() { S.pw=''; S.pwErr=false; go('pwSettings'); }
 function checkPwSettings() {
-  const el = document.getElementById('pw-set-inp');
+  var el = document.getElementById('pw-set-inp');
   if ((el?el.value:S.pw) === 'rebirth') { S.pw=''; S.pwErr=false; go('settings'); }
   else { S.pwErr=true; if(el) el.value=''; S.pw=''; render(); }
 }
@@ -262,9 +258,7 @@ function val3() {
   if (S.f.svs[SVC.findIndex(x=>x.id==='prepaid')]?.on && !S.f.prepaidNum.trim()) {
     S.err='Enter a card number and tap "Register card number".'; render(); return;
   }
-  if (S.f.pay.dep && S.f.pay.depMeth && !S.f.pay.depNote) {
-    S.err = refLabel(S.f.pay.depMeth)+' is required for deposit.'; render(); return;
-  }
+  if (S.f.pay.dep && S.f.pay.depMeth && !S.f.pay.depNote) { S.err=refLabel(S.f.pay.depMeth)+' is required.'; render(); return; }
   S.err=''; go('newConf');
 }
 function valVf() {
@@ -278,9 +272,7 @@ function valVf() {
   if (S.vf.svs[SVC.findIndex(x=>x.id==='prepaid')]?.on && !S.vf.newCardNum.trim()) {
     S.err='Enter a card number and tap "Register card number".'; render(); return;
   }
-  if (S.vf.pay.dep && S.vf.pay.depMeth && !S.vf.pay.depNote) {
-    S.err = refLabel(S.vf.pay.depMeth)+' is required for deposit.'; render(); return;
-  }
+  if (S.vf.pay.dep && S.vf.pay.depMeth && !S.vf.pay.depNote) { S.err=refLabel(S.vf.pay.depMeth)+' is required.'; render(); return; }
   S.err=''; go('retConf');
 }
 
@@ -321,8 +313,6 @@ async function saveUrl() { try { await store.set('url', S.url); } catch{} flash(
 async function submitNew() {
   if (_submitting) return;
   _submitting = true;
-  // ボタンを即座に無効化（タップ連打対策）
-  document.querySelectorAll('.btn-r, .btn-green').forEach(b => { b.disabled = true; b.style.opacity = '0.5'; });
   S.busy=true; render();
   const f = S.f;
   const pOn = f.svs[SVC.findIndex(x=>x.id==='prepaid')]?.on;
@@ -338,9 +328,7 @@ async function submitNew() {
       usedCard:false, prepaidVisitNum:null, pay:payData}]
   };
   await postToSheets({type:'new', ...rec, services:rec.visits[0].svcs.join(', '), memo:rec.visits[0].memo,
-    estimate:payData.est, deposit:payData.dep,
-    depositMethod:payData.depMeth, depositStaff:payData.depStaff||'',
-    depositNote:payData.depNote||''});
+    estimate:payData.est, deposit:payData.dep, depositMethod:payData.depMeth});
   S.cx.push(rec);
   await saveCx();
   S.savedInfo = {type:'new', name:rec.fn+' '+rec.ln, card:rec.prepaidNum, svcs:rec.visits[0].svcs, date:rec.firstVisit, staff:rec.staff};
@@ -352,8 +340,6 @@ async function submitNew() {
 async function submitVisit() {
   if (_submitting) return;
   _submitting = true;
-  // ボタンを即座に無効化（タップ連打対策）
-  document.querySelectorAll('.btn-r, .btn-green').forEach(b => { b.disabled = true; b.style.opacity = '0.5'; });
   S.busy=true; render();
   const useCard = S.vf.useCard && S.sel && S.sel.prepaidNum && (S.sel.prepaidUsed||0)<4;
   const pIdx = SVC.findIndex(x=>x.id==='prepaid');
@@ -368,15 +354,10 @@ async function submitVisit() {
   await postToSheets({
     type:'return', id:S.sel.id,
     fn:S.sel.fn||'', ln:S.sel.ln||'', phone:S.sel.phone||'',
-    email:S.sel.email||'', addr:S.sel.addr||'',
-    mdl:S.sel.mdl||'', col:S.sel.col||'', plt:S.sel.plt||'',
+    email:S.sel.email||'', mdl:S.sel.mdl||'', col:S.sel.col||'', plt:S.sel.plt||'',
     prepaidNum:S.sel.prepaidNum||'',
-    prepaidUsed:S.sel.prepaidUsed||0,
     ...v, services:v.svcs.join(', '),
-    estimate:payData.est, deposit:payData.dep,
-    depositMethod:payData.depMeth||'',
-    depositStaff:payData.depStaff||'',
-    depositNote:payData.depNote||''
+    estimate:payData.est, deposit:payData.dep, depositMethod:payData.depMeth
   });
   S.cx = S.cx.map(c => {
     if (c.id!==S.sel.id) return c;
@@ -406,9 +387,6 @@ async function submitEdit() {
 
 // ── Payment completion ────────────────────────────────────────────────────────
 async function completePayment() {
-  if (_submitting) return;
-  _submitting = true;
-  document.querySelectorAll('.btn-r, .btn-green').forEach(b => { b.disabled = true; b.style.opacity = '0.5'; });
   const c = S.sel; if(!c) return;
   const vidx = S.payVidx;
   const v = (c.visits||[])[vidx]; if(!v) return;
@@ -419,7 +397,7 @@ async function completePayment() {
   const remain = Math.max(0, fin-dep);
   if (remain>0 && !pf.payMeth)   { S.err='Please select payment method.'; render(); return; }
   if (remain>0 && !pf.payStaff)  { S.err='Please select staff who received payment.'; render(); return; }
-  if (remain>0 && !pf.payNote)   { S.err=refLabel(pf.payMeth)+' is required.'; render(); return; }
+  if (remain>0 && !pf.payNote) { S.err=refLabel(pf.payMeth)+' is required.'; render(); return; }
   const now = new Date();
   const payDate = now.toISOString().split('T')[0];
   const payTime = now.toTimeString().slice(0,5);
@@ -439,23 +417,12 @@ async function completePayment() {
   await postToSheets({
     type:'payment', id:c.id,
     fn:c.fn||'', ln:c.ln||'', phone:c.phone||'',
-    email:c.email||'', addr:c.addr||'',
-    mdl:c.mdl||'', col:c.col||'', plt:c.plt||'',
-    visitDate:v.date, staff:v.staff||'',
-    services:(v.svcs||[]).join(', '),
-    estimate:updPay.est||'',
-    deposit:updPay.dep||'',
-    depositMethod:updPay.depMeth||'',
-    depositStaff:updPay.depStaff||'',
-    depositNote:updPay.depNote||'',
-    finalAmount:updPay.final||'',
-    balance:String(Math.max(0,parseFloat(updPay.final||updPay.est||0)-parseFloat(updPay.dep||0))),
-    paymentMethod:updPay.payMeth||'',
-    paymentStaff:updPay.payStaff||'',
-    paymentNote:updPay.payNote||'',
-    paymentDate:payDate
+    mdl:c.mdl||'', plt:c.plt||'',
+    visitDate:v.date, services:(v.svcs||[]).join(', '),
+    estimate:updPay.est||'', deposit:updPay.dep||'',
+    finalAmount:updPay.final||'', paymentMethod:updPay.payMeth||'',
+    paymentStaff:updPay.payStaff||'', paymentDate:payDate
   });
-  _submitting = false;
   flash('Payment completed! ✅');
   go('receipt');
 }
@@ -519,7 +486,7 @@ function paySection(isV) {
     +STAFF.map(s => '<option value="'+s+'"'+(p.depStaff===s?' selected':'')+'>'+s+'</option>').join('')
     +'</select></div>'
     +'</div>'
-    +(p.depMeth?'<div class="field"><label style="font-weight:600;color:#C41010">'+refLabel(p.depMeth)+' <span style="color:#C41010">*</span></label><input class="inp" style="color:#111;background:#fff;border-color:'+(p.depNote?'#16a34a':'#C41010')+';border-width:2px" value="'+esc(p.depNote)+'" placeholder="Required..." oninput="'+onin+'(\'depNote\',this.value)"></div>':'')
+    +(p.depMeth?'<div class="field"><label style="font-weight:600;color:#C41010">'+refLabel(p.depMeth)+' *</label><input class="inp" style="color:#111;background:#fff;border:2px solid '+(p.depNote?'#16a34a':'#C41010')+'" value="'+esc(p.depNote)+'" placeholder="Enter ref number..." oninput="'+onin+'(\'depNote\',this.value)"></div>':'')
     +(p.est ? '<div style="margin-top:12px;padding:10px 14px;background:#dcfce7;border-radius:8px;font-size:14px;font-weight:600;color:#166534">'+fmt(fin)+(dep>0?' − Deposit '+fmt(dep)+' = Balance '+fmt(bal):'')+'</div>' : '')
     +'</div>';
 }
@@ -584,10 +551,10 @@ function pBadge(vn) {
 function payBadge(pay) {
   if (!pay||!pay.est) return '';
   const colors = {pending:['#fef3c7','#92400e','⏳'],deposit:['#dbeafe','#1e40af','🏦'],completed:['#dcfce7','#166534','✅']};
-  const labels = {pending:'Unpaid',deposit:'Deposit received',completed:'Paid'};
+  const labels = {pending:'Pending',deposit:'Deposit received',completed:'PAID'};
   const st = pay.status||'pending';
   const [bg,fc,ic] = colors[st]||colors.pending;
-  return '<span style="background:'+bg+';color:'+fc+';font-size:12px;font-weight:700;padding:3px 10px;border-radius:12px">'+ic+' '+labels[st]+'</span>';
+  return '<span style="background:'+bg+';color:'+fc+';font-size:12px;font-weight:700;padding:3px 10px;border-radius:12px">'+ic+' '+labels[st]+' '+fmt(pay.final||pay.est)+'</span>';
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -610,7 +577,7 @@ function homeScr() {
     +'<div style="display:flex;align-items:center;gap:14px"><div class="hico" style="background:#f1f5f9;width:48px;height:48px;margin:0;border-radius:12px;flex-shrink:0"><i class="ti ti-users" style="font-size:24px;color:#64748b"></i></div>'
     +'<div><div style="font-size:16px;font-weight:600;margin-bottom:3px">Customer list</div><div style="font-size:13px;color:#94a3b8;display:flex;align-items:center;gap:6px"><i class="ti ti-lock" style="font-size:13px"></i>Staff access only</div></div></div>'
     +'<i class="ti ti-arrow-right" style="color:#94a3b8;font-size:20px;flex-shrink:0"></i></div>'
-    +'<div style="text-align:right"><button class="btn-g" style="font-size:13px;padding:10px 18px" onclick="openPwSettings()"><i class="ti ti-settings" style="font-size:15px"></i> Settings</button></div>'
+    +'<div style="text-align:right"><button class="btn-g" style="font-size:13px;padding:10px 18px" onclick="go(\'settings\')"><i class="ti ti-settings" style="font-size:15px"></i> Settings</button></div>'
     +'</div>';
 }
 
@@ -622,18 +589,6 @@ function pwListScr() {
     +(S.pwErr?'<div style="background:#fef2f2;color:#dc2626;padding:11px 18px;border-radius:8px;font-size:14px;margin-bottom:16px;max-width:320px;margin-left:auto;margin-right:auto">Incorrect password.</div>':'')
     +'<input id="pw-inp" type="password" class="inp" style="max-width:300px;text-align:center;font-size:24px;letter-spacing:8px;margin:0 auto 18px;display:block" placeholder="••••••••" onkeydown="if(event.key===\'Enter\')checkPw()" oninput="S.pw=this.value">'
     +'<button class="btn-r" style="min-width:220px;font-size:16px;margin-bottom:18px" onclick="checkPw()">Access records →</button><br>'
-    +'<button class="btn-sm" style="margin:0 auto;display:inline-flex" onclick="go(\'home\')"><i class="ti ti-arrow-left"></i> Back to home</button>'
-    +'</div>';
-}
-
-function pwSettingsScr() {
-  return '<div style="padding:50px 28px 40px;text-align:center">'
-    +'<div style="width:68px;height:68px;border-radius:18px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;margin:0 auto 20px"><i class="ti ti-settings" style="font-size:34px;color:#64748b"></i></div>'
-    +'<div style="font-size:20px;font-weight:600;margin-bottom:7px">Settings</div>'
-    +'<div style="font-size:14px;color:#64748b;margin-bottom:28px">Staff access only.</div>'
-    +(S.pwErr?'<div style="background:#fef2f2;color:#dc2626;padding:11px 18px;border-radius:8px;font-size:14px;margin-bottom:16px;max-width:320px;margin-left:auto;margin-right:auto">Incorrect password.</div>':'')
-    +'<input id="pw-set-inp" type="password" class="inp" style="max-width:300px;text-align:center;font-size:24px;letter-spacing:8px;margin:0 auto 18px;display:block" placeholder="••••••••" onkeydown="if(event.key===\'Enter\')checkPwSettings()" oninput="S.pw=this.value">'
-    +'<button class="btn-r" style="min-width:220px;font-size:16px;margin-bottom:18px" onclick="checkPwSettings()">Open Settings →</button><br>'
     +'<button class="btn-sm" style="margin:0 auto;display:inline-flex" onclick="go(\'home\')"><i class="ti ti-arrow-left"></i> Back to home</button>'
     +'</div>';
 }
@@ -715,20 +670,28 @@ function profScr() {
 }
 
 function editScr() {
-  const ef = S.ef;
+  var ef = S.ef;
+  var colorOpts = ['White','Black','Silver','Red','Blue','Gray'];
+  var isCC = ef.col && !colorOpts.includes(ef.col);
+  var colDD = '<select class="inp" style="color:#111" oninput="var v=this.value;if(v===\'Other\'){sef(\'col\',\'\');render();}else{sef(\'col\',v);}">'+'<option value="">Select color...</option>'+colorOpts.map(function(c){return '<option value="'+c+'"'+(ef.col===c?' selected':'')+'>'+c+'</option>';}).join('')+'<option value="Other"'+(isCC?' selected':'')+'>Other (type below)</option></select>'+(isCC?'<input class="inp" style="color:#111;background:#fff;margin-top:8px" value="'+esc(ef.col)+'" placeholder="Enter color..." oninput="sef(\'col\',this.value)">':'');
   return '<div style="padding:20px"><button class="btn-sm" onclick="go(\'prof\')" style="margin-bottom:14px"><i class="ti ti-arrow-left"></i> Back</button>'
     +'<div class="card"><div class="sec">Customer information</div>'
     +'<div class="g2" style="margin-bottom:14px"><div class="field"><label>First name<span class="req">*</span></label><input class="inp" value="'+esc(ef.fn)+'" oninput="sef(\'fn\',this.value)"></div><div class="field"><label>Last name<span class="req">*</span></label><input class="inp" value="'+esc(ef.ln)+'" oninput="sef(\'ln\',this.value)"></div></div>'
-    +'<div class="field" style="margin-bottom:14px"><label>Phone<span class="req">*</span></label><div style="display:flex;gap:8px;align-items:center"><input class="inp" style="width:94px;text-align:center" maxlength="4" value="'+esc(ef.p1)+'" oninput="sef(\'p1\',this.value)"><span style="color:#94a3b8;font-size:20px">–</span><input class="inp" style="width:74px;text-align:center" maxlength="3" value="'+esc(ef.p2)+'" oninput="sef(\'p2\',this.value)"><span style="color:#94a3b8;font-size:20px">–</span><input class="inp" style="width:84px;text-align:center" maxlength="4" value="'+esc(ef.p3)+'" oninput="sef(\'p3\',this.value)"></div></div>'
+    +'<div class="field" style="margin-bottom:14px"><label>Phone<span class="req">*</span></label><div style="display:flex;gap:8px;align-items:center"><input class="inp" style="width:94px;text-align:center" maxlength="4" value="'+esc(ef.p1)+'" oninput="sef(\'p1\',this.value)"><span style="color:#94a3b8;font-size:20px">\u2013</span><input class="inp" style="width:74px;text-align:center" maxlength="3" value="'+esc(ef.p2)+'" oninput="sef(\'p2\',this.value)"><span style="color:#94a3b8;font-size:20px">\u2013</span><input class="inp" style="width:84px;text-align:center" maxlength="4" value="'+esc(ef.p3)+'" oninput="sef(\'p3\',this.value)"></div></div>'
     +'<div class="field" style="margin-bottom:14px"><label>Address</label><input class="inp" value="'+esc(ef.addr)+'" oninput="sef(\'addr\',this.value)" placeholder="Street, City, Province"></div>'
     +'<div class="field"><label>Email</label><input type="email" class="inp" value="'+esc(ef.email)+'" oninput="sef(\'email\',this.value)"></div>'
     +'<div class="dvdr"></div><div class="sec">Vehicle</div>'
-    +'<div class="g2" style="margin-bottom:14px"><div class="field"><label>Model</label><input class="inp" value="'+esc(ef.mdl)+'" oninput="sef(\'mdl\',this.value)" placeholder="Toyota Vios..."></div><div class="field"><label>Color</label>'+colorSelect(ef.col,"function(v){if(v!=='__other__'){S.ef.col=v;render();}}")+'  </div></div>'
+    +'<div class="g2" style="margin-bottom:14px"><div class="field"><label>Model</label><input class="inp" value="'+esc(ef.mdl)+'" oninput="sef(\'mdl\',this.value)" placeholder="Toyota Vios..."></div>'
+    +'<div class="field"><label>Color</label>'+colDD+'</div></div>'
     +'<div class="field"><label>License plate</label><input class="inp" value="'+esc(ef.plt)+'" oninput="sef(\'plt\',this.value)" placeholder="ABC 1234"></div></div>'
-    +'<div class="card-amber"><div style="font-size:16px;font-weight:700;color:#92400e;margin-bottom:4px">🃏 Maintenance Prepaid Card</div><div style="font-size:12px;color:#b45309;margin-bottom:14px">4 visits · 1–3 paid · 4 FREE</div>'
+    +'<div class="card-amber"><div style="font-size:16px;font-weight:700;color:#92400e;margin-bottom:4px">\uD83C\uDFAB Maintenance Prepaid Card</div><div style="font-size:12px;color:#b45309;margin-bottom:14px">4 visits \u00b7 1\u20133 paid \u00b7 4 FREE</div>'
     +'<div class="g2"><div class="field"><label style="color:#78350f">Card number</label><input class="card-num-input" style="font-size:16px;letter-spacing:1px;margin-bottom:0" value="'+esc(ef.prepaidNum||'')+'" oninput="sef(\'prepaidNum\',this.value)" placeholder="e.g. 12345"></div>'
     +'<div class="field"><label style="color:#78350f">Times used</label><select class="inp" style="border-color:#d97706;border-width:2px;color:#111" oninput="sef(\'prepaidUsed\',parseInt(this.value))">'
-    +'<option value="0"'+(ef.prepaidUsed===0?' selected':'')+'>0/4</option><option value="1"'+(ef.prepaidUsed===1?' selected':'')+'>1/4</option><option value="2"'+(ef.prepaidUsed===2?' selected':'')+'>2/4</option><option value="3"'+(ef.prepaidUsed===3?' selected':'')+'>3/4 — next FREE ★</option><option value="4"'+(ef.prepaidUsed===4?' selected':'')+'>4/4 — complete</option>'
+    +'<option value="0"'+(ef.prepaidUsed===0?' selected':'')+'>0/4</option>'
+    +'<option value="1"'+(ef.prepaidUsed===1?' selected':'')+'>1/4</option>'
+    +'<option value="2"'+(ef.prepaidUsed===2?' selected':'')+'>2/4</option>'
+    +'<option value="3"'+(ef.prepaidUsed===3?' selected':'')+'>3/4 \u2014 next FREE \u2605</option>'
+    +'<option value="4"'+(ef.prepaidUsed===4?' selected':'')+'>4/4 \u2014 complete</option>'
     +'</select></div></div></div>'
     +(S.err?'<div class="errbox">'+S.err+'</div>':'')
     +'<div class="acts"><button class="btn-g" onclick="go(\'prof\')">Cancel</button><button class="btn-r" onclick="submitEdit()">Save changes</button></div></div>';
@@ -748,10 +711,14 @@ function new1Scr() {
 }
 
 function new2Scr() {
+  var co = ['White','Black','Silver','Red','Blue','Gray'];
+  var ioN = S.f.col && !co.includes(S.f.col);
+  var csel = '<select class="inp" style="color:#111" oninput="var v=this.value;if(v===\'__other__\'){sf(\'col\',\'\');render();}else{sf(\'col\',v);}"><option value="">Select color...</option>'+co.map(function(c){return '<option value="'+c+'"'+(S.f.col===c?' selected':'')+'>'+c+'</option>';}).join('')+'<option value="__other__"'+(ioN?' selected':'')+'>Other (type below)</option></select>'+(ioN?'<input class="inp" style="color:#111;background:#fff;margin-top:8px" value="'+esc(S.f.col)+'" placeholder="Enter color..." oninput="sf(\'col\',this.value)">':'');
   return '<div style="padding:20px">'+stepBar(2)
     +'<div class="card"><div class="sec">Vehicle information</div>'
-    +'<div class="g2" style="margin-bottom:14px"><div class="field"><label>Model / make</label><input class="inp" value="'+esc(S.f.mdl)+'" placeholder="Toyota Vios..." oninput="sf(\'mdl\',this.value)"></div><div class="field"><label>Color</label>'+colorSelect(S.f.col,"function(v){if(v!=='__other__'){S.f.col=v;render();}}")+'  margin-bottom:14px"><div class="field"><label>Model / make</label><input class="inp" value="'+esc(S.f.mdl)+'" placeholder="Toyota Vios..." oninput="sf(\'mdl\',this.value)"></div><div class="field"><label>Color</label>'+colorSelect(S.f.col,"function(v){if(v!=='__other__'){S.f.col=v;render();}}")+'  </div></div>'
-    +'<div class="field"><label>License plate</label><input class="inp" value="'+esc(S.f.plt)+'" placeholder="ABC 1234" oninput="sf(\'plt\',this.value)"></div></div>'
+    +'<div class="g2" style="margin-bottom:14px"><div class="field"><label>Model / make</label><input class="inp" value="'+esc(S.f.mdl)+'" placeholder="Toyota Vios..." oninput="sf(\'mdl\',this.value)"></div>'
+    +'<div class="field"><label>Color</label>'+csel+'</div></div>'
+    +'<div class="field" style="margin-bottom:14px"><label>License plate</label><input class="inp" value="'+esc(S.f.plt)+'" placeholder="ABC 1234" oninput="sf(\'plt\',this.value)"></div></div>'
     +'<div class="acts"><button class="btn-g" onclick="go(\'new1\')">← Back</button><button class="btn-r" onclick="go(\'new3\')">Next: Services →</button></div></div>';
 }
 
@@ -883,87 +850,74 @@ function payScr() {
     +'<div style="font-size:30px;font-weight:900;color:'+(remain>0?'#ea580c':'#16a34a')+'">'+fmt(remain)+'</div>'
     +'</div>'
     +(remain>0?'<div class="g2" style="margin-bottom:12px"><div class="field"><label style="font-weight:600">Payment method <span style="color:#C41010">*</span></label><select class="inp" style="color:#111" oninput="ppf(\'payMeth\',this.value)"><option value="">Select...</option>'+PAY_METHODS.map(m=>'<option value="'+m+'"'+(pf.payMeth===m?' selected':'')+'>'+m+'</option>').join('')+'</select></div><div class="field"><label style="font-weight:600">Received by <span style="color:#C41010">*</span></label><select class="inp" style="color:#111" oninput="ppf(\'payStaff\',this.value)"><option value="">Select...</option>'+STAFF.map(s=>'<option value="'+s+'"'+(pf.payStaff===s?' selected':'')+'>'+s+'</option>').join('')+'</select></div></div>':'')
-    +(remain>0?'<div class="field"><label style="font-weight:600;color:#C41010">'+refLabel(pf.payMeth)+' <span style="color:#C41010">*</span></label><input class="inp" style="color:#111;background:#fff;border-color:'+(pf.payNote?'#16a34a':'#C41010')+';border-width:2px" value="'+esc(pf.payNote||'')+'" placeholder="Required..." oninput="ppf(\'payNote\',this.value)"></div>':'')
+    +(remain>0?'<div class="field"><label style="font-weight:600;color:#C41010">'+refLabel(pf.payMeth)+' *</label><input class="inp" style="color:#111;background:#fff;border:2px solid '+(pf.payNote?'#16a34a':'#C41010')+'" value="'+esc(pf.payNote||'')+'" placeholder="Enter ref number..." oninput="ppf(\'payNote\',this.value)"></div>':'')
     +(S.err?'<div class="errbox" style="margin-top:12px">'+S.err+'</div>':'')
     +'</div>'
     +'<div class="acts"><button class="btn-g" onclick="go(\'prof\')">Cancel</button><button class="btn-r" style="font-size:16px;padding:14px 28px" onclick="completePayment()"><i class="ti ti-check" style="font-size:18px"></i> Mark as PAID</button></div></div>';
 }
 
 function receiptScr() {
-  var c = S.sel; if(!c) return "";
-  var vs = c.visits||[];
-  var vidx = S.payVidx!=null ? S.payVidx : vs.length-1;
-  var v = vs[vidx]||{}; if(!v.svcs) return "";
-  var p = v.pay||{};
-  var dep = parseFloat(p.dep||0);
-  var fin = parseFloat(p.final||p.est||0);
-  var remain = Math.max(0, fin-dep);
-  var rcpNo = "RBC-"+c.id.slice(-6)+"-"+(vidx+1);
-  var h = [];
-  h.push("<div style=\"padding:16px\">");
-  // Buttons (hidden when printing)
-  h.push("<div class=\"no-print\" style=\"display:flex;gap:8px;margin-bottom:14px\">");
-  h.push("<button onclick=\"go(&apos;home&apos;)\" style=\"background:#16a34a;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit\">&#127968; Home</button>");
-  h.push("<button onclick=\"go(&apos;prof&apos;)\" style=\"background:none;border:1px solid #cbd5e1;border-radius:8px;padding:10px 16px;font-size:14px;cursor:pointer;color:#64748b;font-family:inherit\">&larr; Profile</button>");
-  h.push("<button onclick=\"window.print()\" style=\"background:#C41010;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;flex:1\">&#128424; Print Receipt</button>");
-  h.push("</div>");
-  // Receipt box
-  h.push("<div id=\"receipt-box\" style=\"background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;max-width:420px;margin:0 auto;font-family:Arial,sans-serif\">");
-  // Header
-  h.push("<div style=\"text-align:center;margin-bottom:16px;padding-bottom:16px;border-bottom:2px solid #111\">");
-  h.push("<div style=\"font-style:italic;font-weight:900;font-size:28px;color:#111;letter-spacing:-1px;font-family:Georgia,serif\">REB<span style=\"color:#C41010\">i</span>RTH</div>");
-  h.push("<div style=\"background:#C41010;color:#fff;font-size:8px;font-weight:700;letter-spacing:.25em;padding:2px 10px;display:inline-block;margin:4px 0;font-style:italic\">CAR COATING CENTER INC.</div>");
-  h.push("<div style=\"font-size:11px;color:#64748b;line-height:1.6;margin-top:6px\">4A Naga Road Pulang Lupa Dos Las Pinas City Metro Manila<br>Tel: (02) 3986472</div>");
-  h.push("</div>");
-  // Receipt number
-  h.push("<div style=\"text-align:center;margin-bottom:14px\">");
-  h.push("<div style=\"font-size:15px;font-weight:700;color:#111;text-transform:uppercase;letter-spacing:2px\">Official Receipt</div>");
-  h.push("<div style=\"font-size:11px;color:#64748b;margin-top:4px\">No.: "+rcpNo+" &nbsp;|&nbsp; "+esc(p.payDate||v.date||"")+" "+esc(p.payTime||"")+"</div>");
-  h.push("</div>");
-  // Customer info
-  h.push("<div style=\"background:#f8fafc;border-radius:8px;padding:10px 14px;margin-bottom:14px\">");
-  h.push("<div style=\"font-weight:700;font-size:15px;margin-bottom:4px\">"+esc(c.fn)+" "+esc(c.ln)+"</div>");
-  if(c.phone) h.push("<div style=\"font-size:12px;color:#64748b\">&#128222; "+esc(c.phone)+"</div>");
-  if(c.mdl){
-    var veh = esc(c.mdl)+(c.col?" ("+esc(c.col)+")":"")+(c.plt?" | "+esc(c.plt):"");
-    h.push("<div style=\"font-size:12px;color:#64748b\">&#128663; "+veh+"</div>");
-  }
-  h.push("</div>");
-  // Services
-  h.push("<div style=\"font-size:11px;font-weight:700;text-transform:uppercase;color:#64748b;margin-bottom:6px\">Services Rendered</div>");
-  (v.svcs||[]).forEach(function(s){ h.push("<div style=\"font-size:13px;padding:5px 0;border-bottom:1px solid #f1f5f9\">&#10003; "+esc(s)+"</div>"); });
-  // Payment breakdown
-  h.push("<div style=\"margin-top:16px;border-top:2px solid #e2e8f0;padding-top:12px\">");
-  h.push("<div style=\"display:flex;justify-content:space-between;font-size:14px;margin-bottom:8px\"><span style=\"color:#64748b\">&#35211;&#31278;&#39069; Estimate:</span><span style=\"font-weight:600\">"+fmt(fin)+"</span></div>");
-  if(dep>0){
-    var depMethTxt = p.depMeth ? " ("+esc(p.depMeth)+")" : "";
-    h.push("<div style=\"display:flex;justify-content:space-between;font-size:14px;margin-bottom:8px;color:#1d4ed8\"><span>&#39640;&#37329; Deposit"+depMethTxt+":</span><span style=\"font-weight:600\">&minus; "+fmt(dep)+"</span></div>");
-  }
-  h.push("<div style=\"display:flex;justify-content:space-between;font-size:16px;font-weight:900;border-top:2px solid #111;padding-top:10px;margin-top:4px\"><span>&#27231;&#37329; Balance paid:</span><span style=\"color:#16a34a\">"+fmt(remain)+"</span></div>");
-  h.push("<div style=\"display:flex;justify-content:space-between;font-size:15px;font-weight:700;border-top:1px solid #e2e8f0;padding-top:8px;margin-top:8px\"><span>&#21512;&#35336; TOTAL:</span><span>"+fmt(fin)+"</span></div>");
-  h.push("</div>");
-  // Payment method
-  h.push("<div style=\"margin-top:12px;padding:10px 14px;background:#f0fdf4;border-radius:8px;font-size:13px\">");
-  h.push("<div style=\"margin-bottom:4px\"><strong>Payment method:</strong> "+esc(p.payMeth||"—")+"</div>");
-  h.push("<div><strong>Received by:</strong> "+esc(p.payStaff||"—")+"</div>");
-  if(dep>0 && p.depMeth){
-    var depInfo = "Deposit via "+esc(p.depMeth)+(p.depStaff?" by "+esc(p.depStaff):"")+(p.depDate?" on "+esc(p.depDate):"");
-    h.push("<div style=\"color:#1d4ed8;margin-top:6px;font-size:12px\">"+depInfo+"</div>");
-  }
-  if(p.payNote) h.push("<div style=\"color:#64748b;font-size:12px;margin-top:4px\">Ref: "+esc(p.payNote)+"</div>");
-  h.push("</div>");
-  // Prepaid card
-  if(v.usedCard && v.prepaidVisitNum){
-    var free = v.prepaidVisitNum===4 ? " FREE VISIT!" : "";
-    h.push("<div style=\"margin-top:8px;padding:8px 12px;background:#fffbeb;border-radius:8px;font-size:12px;color:#92400e\">Prepaid card used &mdash; Visit "+v.prepaidVisitNum+" of 4"+free+"</div>");
-  }
-  // Footer
-  h.push("<div style=\"text-align:center;margin-top:16px;padding-top:12px;border-top:1px dashed #e2e8f0;font-size:11px;color:#94a3b8\">Thank you for choosing Rebirth Car Coating Center!</div>");
-  h.push("</div>");
-  h.push("</div>");
-  return h.join("");
+  const c = S.sel; if(!c) return '';
+  const vs   = c.visits||[];
+  const vidx = S.payVidx!=null ? S.payVidx : vs.length-1;
+  const v    = vs[vidx]||{}; if(!v.svcs) return '';
+  const p    = v.pay||{};
+  const dep  = parseFloat(p.dep||0);
+  const fin  = parseFloat(p.final||p.est||0);
+  const remain = Math.max(0, fin-dep);
+  const rcpNo = 'RBC-'+c.id.slice(-6)+'-'+(vidx+1);
+  return '<div style="padding:16px">'
+    +'<div style="display:flex;gap:10px;margin-bottom:16px">'
+    +'<button class="btn-g" onclick="go(\'prof\')"><i class="ti ti-arrow-left"></i> Back</button>'
+    +'<button class="btn-r" style="flex:1" onclick="window.print()"><i class="ti ti-printer"></i> Print Receipt</button>'
+    +'</div>'
+    +'<div id="receipt-box" style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;max-width:400px;margin:0 auto;font-family:Arial,sans-serif">'
+    +'<div style="text-align:center;margin-bottom:16px;padding-bottom:16px;border-bottom:2px solid #111">'
+    +'<div style="font-style:italic;font-weight:900;font-size:28px;color:#111;letter-spacing:-1px;font-family:Georgia,serif">REB<span style="color:#C41010">i</span>RTH</div>'
+    +'<div style="background:#C41010;color:#fff;font-size:8px;font-weight:700;letter-spacing:.25em;padding:2px 10px;display:inline-block;margin:4px 0;font-style:italic">CAR COATING CENTER INC.</div>'
+    +'<div style="font-size:11px;color:#64748b;line-height:1.6;margin-top:6px">4A Naga Road Pulang Lupa Dos Las Pinas City Metro Manila<br>Tel: (02) 3986472</div>'
+    +'</div>'
+    +'<div style="text-align:center;margin-bottom:14px">'
+    +'<div style="font-size:16px;font-weight:700;color:#111;text-transform:uppercase;letter-spacing:2px">Official Receipt</div>'
+    +'<div style="font-size:11px;color:#64748b">Receipt No.: '+rcpNo+'</div>'
+    +'<div style="font-size:11px;color:#64748b">Date: '+esc(p.payDate||v.date||'')+' '+esc(p.payTime||'')+'</div>'
+    +'</div>'
+    +'<div style="background:#f8fafc;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px">'
+    +'<div style="font-weight:700;font-size:14px;margin-bottom:4px">'+esc(c.fn)+' '+esc(c.ln)+'</div>'
+    +(c.phone?'<div style="color:#64748b">📞 '+esc(c.phone)+'</div>':'')
+    +(c.mdl?'<div style="color:#64748b">🚗 '+esc(c.mdl)+(c.col?' ('+esc(c.col)+')':'')+(c.plt?' | 🔖 '+esc(c.plt):'')+'</div>':'')
+    +'</div>'
+    +'<div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#64748b;margin-bottom:6px">Services Rendered</div>'
+    +(v.svcs||[]).map(s=>'<div style="font-size:13px;padding:4px 0;border-bottom:0.5px solid #f1f5f9">✓ '+esc(s)+'</div>').join('')
+    +'<div style="margin-top:14px;border-top:1.5px solid #e2e8f0;padding-top:10px">'
+    +(dep>0?'<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span>Estimate:</span><span>'+fmt(fin)+'</span></div>'
+    +'<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;color:#1d4ed8"><span>Deposit paid'+(p.depMeth?' ('+esc(p.depMeth)+')':'')+':</span><span>− '+fmt(dep)+'</span></div>':'')
+    +'<div style="display:flex;justify-content:space-between;font-size:16px;font-weight:900;border-top:2px solid #111;padding-top:8px;margin-top:4px"><span>TOTAL PAID:</span><span style="color:#16a34a">'+fmt(fin)+'</span></div>'
+    +(dep>0?'<div style="display:flex;justify-content:space-between;font-size:13px;margin-top:4px;color:#64748b"><span>Balance paid:</span><span>'+fmt(remain)+'</span></div>':'')
+    +'</div>'
+    +'<div style="margin-top:12px;padding:10px 12px;background:#f0fdf4;border-radius:8px;font-size:12px">'
+    +'<div><strong>Payment method:</strong> '+esc(p.payMeth||'—')+'</div>'
+    +'<div><strong>Received by:</strong> '+esc(p.payStaff||'—')+'</div>'
+    +(dep>0&&p.depMeth?'<div style="color:#64748b;margin-top:4px">Deposit via '+esc(p.depMeth)+(p.depStaff?' by '+esc(p.depStaff):'')+(p.depDate?' on '+esc(p.depDate):'')+'</div>':'')
+    +(p.depNote?'<div style="color:#64748b">Deposit ref: '+esc(p.depNote)+'</div>':'')
+    +(p.payNote?'<div style="color:#64748b">Payment ref: '+esc(p.payNote)+'</div>':'')
+    +'</div>'
+    +(v.usedCard&&v.prepaidVisitNum?'<div style="margin-top:8px;padding:8px 12px;background:#fffbeb;border-radius:8px;font-size:12px;color:#92400e">🃏 Prepaid card used — Visit '+v.prepaidVisitNum+' of 4'+(v.prepaidVisitNum===4?' ★ FREE':'')+'</div>':'')
+    +'<div style="text-align:center;margin-top:16px;padding-top:12px;border-top:1px dashed #e2e8f0;font-size:11px;color:#94a3b8">Thank you for choosing Rebirth Car Coating Center!<br>We look forward to serving you again.</div>'
+    +'</div></div>';
 }
 
+function pwSettingsScr() {
+  return '<div style="padding:50px 28px 40px;text-align:center">'
+    +'<div style="width:68px;height:68px;border-radius:18px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;margin:0 auto 20px"><i class="ti ti-settings" style="font-size:34px;color:#64748b"></i></div>'
+    +'<div style="font-size:20px;font-weight:600;margin-bottom:7px">Settings</div>'
+    +'<div style="font-size:14px;color:#64748b;margin-bottom:28px">Staff access only.</div>'
+    +(S.pwErr?'<div style="background:#fef2f2;color:#dc2626;padding:11px 18px;border-radius:8px;font-size:14px;margin-bottom:16px">Incorrect password.</div>':'')
+    +'<input id="pw-set-inp" type="password" class="inp" style="max-width:300px;text-align:center;font-size:24px;letter-spacing:8px;margin:0 auto 18px;display:block" placeholder="••••••••" onkeydown="if(event.key===\'Enter\')checkPwSettings()" oninput="S.pw=this.value">'
+    +'<button class="btn-r" style="min-width:220px;font-size:16px;margin-bottom:18px" onclick="checkPwSettings()">Open Settings →</button><br>'
+    +'<button class="btn-sm" style="margin:0 auto;display:inline-flex" onclick="go(\'home\')"><i class="ti ti-arrow-left"></i> Back to home</button>'
+    +'</div>';
+}
 function settingsScr() {
   return '<div style="padding:20px"><button class="btn-sm" onclick="go(\'home\')" style="margin-bottom:14px"><i class="ti ti-arrow-left"></i> Home</button>'
     +'<div class="card"><div class="sec">Google Sheets sync</div>'
@@ -974,35 +928,19 @@ function settingsScr() {
     +'</div></div>';
 }
 
+// ── Render ────────────────────────────────────────────────────────────────────
 
-// Get ref label based on payment method
 function refLabel(method) {
   if (!method) return 'Ref #';
-  if (method.toLowerCase().includes('gcash')) return 'GCash Ref #';
-  if (method.toLowerCase().includes('bank')) return 'Bank Ref #';
-  if (method.toLowerCase().includes('credit') || method.toLowerCase().includes('card')) return 'Card Ref #';
+  var m = method.toLowerCase();
+  if (m.indexOf('gcash') >= 0) return 'GCash Ref #';
+  if (m.indexOf('bank') >= 0) return 'Bank Ref #';
+  if (m.indexOf('credit') >= 0 || m.indexOf('card') >= 0) return 'Card Ref #';
   return 'OR #';
 }
-
-// Car color dropdown helper
-function colorSelect(val, onchange) {
-  const colors = ['White','Black','Silver','Red','Blue','Gray'];
-  const isOther = val && !colors.includes(val);
-  return '<div style="display:flex;flex-direction:column;gap:8px">'
-    +'<select class="inp" style="color:#111" oninput="'+onchange+'(this.value)">'
-    +'<option value="">Select color...</option>'
-    +colors.map(c=>'<option value="'+c+'"'+(val===c?' selected':'')+'>'+c+'</option>').join('')
-    +'<option value="__other__"'+(isOther?' selected':'')+'>Other (type below)</option>'
-    +'</select>'
-    +(isOther?'<input class="inp" style="color:#111;background:#fff" value="'+esc(val)+'" placeholder="Enter color..." oninput="'+onchange+'(this.value)">':'')
-    +'</div>';
-}
-
-// ── Render ────────────────────────────────────────────────────────────────────
 function render() {
   const b = document.getElementById('body');
   if (!b) return;
-  try {
   let h = '';
   if (S.toast) h += '<div class="tb tb-'+S.toast.t+'">'+(S.toast.t==='ok'?'✓ ':S.toast.t==='err'?'✕ ':'')+S.toast.msg+'</div>';
   const m = {
@@ -1015,9 +953,6 @@ function render() {
   };
   h += (m[S.scr]||homeScr)();
   b.innerHTML = h;
-  } catch(err) {
-    b.innerHTML = '<div style="padding:20px;color:red;font-size:14px;word-break:break-all"><strong>Error:</strong> '+err.message+'<br><br>Screen: '+S.scr+'</div>';
-  }
 }
 </script>
 </body>
