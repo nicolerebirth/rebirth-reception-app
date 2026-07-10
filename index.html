@@ -166,7 +166,10 @@ let S = {
 (async () => {
   try { const r=await store.get('cx'); if(r) S.cx=JSON.parse(r.value); } catch{}
   try { const r=await store.get('url'); if(r) S.url=r.value; } catch{}
-  render();
+  try { render(); } catch(e) {
+    var b=document.getElementById('body');
+    if(b) b.innerHTML='<div style="padding:20px;color:red;font-size:14px"><strong>Init Error:</strong> '+e.message+'</div>';
+  }
 })();
 
 // ── Helper functions ──────────────────────────────────────────────────────────
@@ -198,6 +201,12 @@ function tog(i, isV) {
 function setOpt(i, o, isV) { const a=isV?S.vf.svs:S.f.svs; a[i]={...a[i],opt:a[i].opt===o?'':o}; render(); }
 function openCx(id, from) { S.sel=S.cx.find(c=>c.id===id)||null; S.prevScr=from||'ret'; S.confirmDel=false; go('prof'); }
 function openPwList() { S.pw=''; S.pwErr=false; go('pwList'); }
+function openPwSettings() { S.pw=''; S.pwErr=false; go('pwSettings'); }
+function checkPwSettings() {
+  const el = document.getElementById('pw-set-inp');
+  if ((el?el.value:S.pw) === 'rebirth') { S.pw=''; S.pwErr=false; go('settings'); }
+  else { S.pwErr=true; if(el) el.value=''; S.pw=''; render(); }
+}
 function checkPw() {
   const el = document.getElementById('pw-inp');
   if ((el?el.value:S.pw) === 'rebirth') { S.pw=''; S.pwErr=false; S.lq=''; S.ls='name'; S.lStaff='all'; go('list'); }
@@ -610,6 +619,18 @@ function pwListScr() {
     +'</div>';
 }
 
+function pwSettingsScr() {
+  return '<div style="padding:50px 28px 40px;text-align:center">'
+    +'<div style="width:68px;height:68px;border-radius:18px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;margin:0 auto 20px"><i class="ti ti-settings" style="font-size:34px;color:#64748b"></i></div>'
+    +'<div style="font-size:20px;font-weight:600;margin-bottom:7px">Settings</div>'
+    +'<div style="font-size:14px;color:#64748b;margin-bottom:28px">Staff access only.</div>'
+    +(S.pwErr?'<div style="background:#fef2f2;color:#dc2626;padding:11px 18px;border-radius:8px;font-size:14px;margin-bottom:16px;max-width:320px;margin-left:auto;margin-right:auto">Incorrect password.</div>':'')
+    +'<input id="pw-set-inp" type="password" class="inp" style="max-width:300px;text-align:center;font-size:24px;letter-spacing:8px;margin:0 auto 18px;display:block" placeholder="••••••••" onkeydown="if(event.key===\'Enter\')checkPwSettings()" oninput="S.pw=this.value">'
+    +'<button class="btn-r" style="min-width:220px;font-size:16px;margin-bottom:18px" onclick="checkPwSettings()">Open Settings →</button><br>'
+    +'<button class="btn-sm" style="margin:0 auto;display:inline-flex" onclick="go(\'home\')"><i class="ti ti-arrow-left"></i> Back to home</button>'
+    +'</div>';
+}
+
 function listScr() {
   const q = S.lq.toLowerCase();
   let cx = [...S.cx].filter(c => {
@@ -950,6 +971,7 @@ function settingsScr() {
 function render() {
   const b = document.getElementById('body');
   if (!b) return;
+  try {
   let h = '';
   if (S.toast) h += '<div class="tb tb-'+S.toast.t+'">'+(S.toast.t==='ok'?'✓ ':S.toast.t==='err'?'✕ ':'')+S.toast.msg+'</div>';
   const m = {
@@ -958,10 +980,13 @@ function render() {
     new1:new1Scr, new2:new2Scr, new3:new3Scr, newConf:newConfScr,
     retVisit:retVisitScr, retConf:retConfScr,
     saved:savedScr, settings:settingsScr,
-    pay:payScr, receipt:receiptScr
+    pay:payScr, receipt:receiptScr, pwSettings:pwSettingsScr
   };
   h += (m[S.scr]||homeScr)();
   b.innerHTML = h;
+  } catch(err) {
+    b.innerHTML = '<div style="padding:20px;color:red;font-size:14px;word-break:break-all"><strong>Error:</strong> '+err.message+'<br><br>Screen: '+S.scr+'</div>';
+  }
 }
 </script>
 </body>
