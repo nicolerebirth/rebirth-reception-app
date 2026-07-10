@@ -262,6 +262,9 @@ function val3() {
   if (S.f.svs[SVC.findIndex(x=>x.id==='prepaid')]?.on && !S.f.prepaidNum.trim()) {
     S.err='Enter a card number and tap "Register card number".'; render(); return;
   }
+  if (S.f.pay.dep && S.f.pay.depMeth && !S.f.pay.depNote) {
+    S.err = refLabel(S.f.pay.depMeth)+' is required for deposit.'; render(); return;
+  }
   S.err=''; go('newConf');
 }
 function valVf() {
@@ -274,6 +277,9 @@ function valVf() {
   if (ce && ce.value.trim()) S.vf.newCardNum = ce.value.trim();
   if (S.vf.svs[SVC.findIndex(x=>x.id==='prepaid')]?.on && !S.vf.newCardNum.trim()) {
     S.err='Enter a card number and tap "Register card number".'; render(); return;
+  }
+  if (S.vf.pay.dep && S.vf.pay.depMeth && !S.vf.pay.depNote) {
+    S.err = refLabel(S.vf.pay.depMeth)+' is required for deposit.'; render(); return;
   }
   S.err=''; go('retConf');
 }
@@ -413,6 +419,7 @@ async function completePayment() {
   const remain = Math.max(0, fin-dep);
   if (remain>0 && !pf.payMeth)   { S.err='Please select payment method.'; render(); return; }
   if (remain>0 && !pf.payStaff)  { S.err='Please select staff who received payment.'; render(); return; }
+  if (remain>0 && !pf.payNote)   { S.err=refLabel(pf.payMeth)+' is required.'; render(); return; }
   const now = new Date();
   const payDate = now.toISOString().split('T')[0];
   const payTime = now.toTimeString().slice(0,5);
@@ -512,7 +519,7 @@ function paySection(isV) {
     +STAFF.map(s => '<option value="'+s+'"'+(p.depStaff===s?' selected':'')+'>'+s+'</option>').join('')
     +'</select></div>'
     +'</div>'
-    +'<div class="field"><label>Deposit note (GCash ref / bank details)</label><input class="inp" style="color:#111;background:#fff" value="'+esc(p.depNote)+'" placeholder="Reference number..." oninput="'+onin+'(\'depNote\',this.value)"></div>'
+    +(p.depMeth?'<div class="field"><label style="font-weight:600;color:#C41010">'+refLabel(p.depMeth)+' <span style="color:#C41010">*</span></label><input class="inp" style="color:#111;background:#fff;border-color:'+(p.depNote?'#16a34a':'#C41010')+';border-width:2px" value="'+esc(p.depNote)+'" placeholder="Required..." oninput="'+onin+'(\'depNote\',this.value)"></div>':'')
     +(p.est ? '<div style="margin-top:12px;padding:10px 14px;background:#dcfce7;border-radius:8px;font-size:14px;font-weight:600;color:#166534">'+fmt(fin)+(dep>0?' − Deposit '+fmt(dep)+' = Balance '+fmt(bal):'')+'</div>' : '')
     +'</div>';
 }
@@ -577,10 +584,10 @@ function pBadge(vn) {
 function payBadge(pay) {
   if (!pay||!pay.est) return '';
   const colors = {pending:['#fef3c7','#92400e','⏳'],deposit:['#dbeafe','#1e40af','🏦'],completed:['#dcfce7','#166534','✅']};
-  const labels = {pending:'Pending',deposit:'Deposit received',completed:'PAID'};
+  const labels = {pending:'Unpaid',deposit:'Deposit received',completed:'Paid'};
   const st = pay.status||'pending';
   const [bg,fc,ic] = colors[st]||colors.pending;
-  return '<span style="background:'+bg+';color:'+fc+';font-size:12px;font-weight:700;padding:3px 10px;border-radius:12px">'+ic+' '+labels[st]+' '+fmt(pay.final||pay.est)+'</span>';
+  return '<span style="background:'+bg+';color:'+fc+';font-size:12px;font-weight:700;padding:3px 10px;border-radius:12px">'+ic+' '+labels[st]+'</span>';
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -716,7 +723,7 @@ function editScr() {
     +'<div class="field" style="margin-bottom:14px"><label>Address</label><input class="inp" value="'+esc(ef.addr)+'" oninput="sef(\'addr\',this.value)" placeholder="Street, City, Province"></div>'
     +'<div class="field"><label>Email</label><input type="email" class="inp" value="'+esc(ef.email)+'" oninput="sef(\'email\',this.value)"></div>'
     +'<div class="dvdr"></div><div class="sec">Vehicle</div>'
-    +'<div class="g2" style="margin-bottom:14px"><div class="field"><label>Model</label><input class="inp" value="'+esc(ef.mdl)+'" oninput="sef(\'mdl\',this.value)" placeholder="Toyota Vios..."></div><div class="field"><label>Color</label><input class="inp" value="'+esc(ef.col)+'" oninput="sef(\'col\',this.value)" placeholder="White, Black..."></div></div>'
+    +'<div class="g2" style="margin-bottom:14px"><div class="field"><label>Model</label><input class="inp" value="'+esc(ef.mdl)+'" oninput="sef(\'mdl\',this.value)" placeholder="Toyota Vios..."></div><div class="field"><label>Color</label>'+colorSelect(ef.col,"function(v){if(v!=='__other__'){S.ef.col=v;render();}}")+'  </div></div>'
     +'<div class="field"><label>License plate</label><input class="inp" value="'+esc(ef.plt)+'" oninput="sef(\'plt\',this.value)" placeholder="ABC 1234"></div></div>'
     +'<div class="card-amber"><div style="font-size:16px;font-weight:700;color:#92400e;margin-bottom:4px">🃏 Maintenance Prepaid Card</div><div style="font-size:12px;color:#b45309;margin-bottom:14px">4 visits · 1–3 paid · 4 FREE</div>'
     +'<div class="g2"><div class="field"><label style="color:#78350f">Card number</label><input class="card-num-input" style="font-size:16px;letter-spacing:1px;margin-bottom:0" value="'+esc(ef.prepaidNum||'')+'" oninput="sef(\'prepaidNum\',this.value)" placeholder="e.g. 12345"></div>'
@@ -743,7 +750,7 @@ function new1Scr() {
 function new2Scr() {
   return '<div style="padding:20px">'+stepBar(2)
     +'<div class="card"><div class="sec">Vehicle information</div>'
-    +'<div class="g2" style="margin-bottom:14px"><div class="field"><label>Model / make</label><input class="inp" value="'+esc(S.f.mdl)+'" placeholder="Toyota Vios..." oninput="sf(\'mdl\',this.value)"></div><div class="field"><label>Color</label><input class="inp" value="'+esc(S.f.col)+'" placeholder="White, Black..." oninput="sf(\'col\',this.value)"></div></div>'
+    +'<div class="g2" style="margin-bottom:14px"><div class="field"><label>Model / make</label><input class="inp" value="'+esc(S.f.mdl)+'" placeholder="Toyota Vios..." oninput="sf(\'mdl\',this.value)"></div><div class="field"><label>Color</label>'+colorSelect(S.f.col,"function(v){if(v!=='__other__'){S.f.col=v;render();}}")+'  margin-bottom:14px"><div class="field"><label>Model / make</label><input class="inp" value="'+esc(S.f.mdl)+'" placeholder="Toyota Vios..." oninput="sf(\'mdl\',this.value)"></div><div class="field"><label>Color</label>'+colorSelect(S.f.col,"function(v){if(v!=='__other__'){S.f.col=v;render();}}")+'  </div></div>'
     +'<div class="field"><label>License plate</label><input class="inp" value="'+esc(S.f.plt)+'" placeholder="ABC 1234" oninput="sf(\'plt\',this.value)"></div></div>'
     +'<div class="acts"><button class="btn-g" onclick="go(\'new1\')">← Back</button><button class="btn-r" onclick="go(\'new3\')">Next: Services →</button></div></div>';
 }
@@ -876,7 +883,7 @@ function payScr() {
     +'<div style="font-size:30px;font-weight:900;color:'+(remain>0?'#ea580c':'#16a34a')+'">'+fmt(remain)+'</div>'
     +'</div>'
     +(remain>0?'<div class="g2" style="margin-bottom:12px"><div class="field"><label style="font-weight:600">Payment method <span style="color:#C41010">*</span></label><select class="inp" style="color:#111" oninput="ppf(\'payMeth\',this.value)"><option value="">Select...</option>'+PAY_METHODS.map(m=>'<option value="'+m+'"'+(pf.payMeth===m?' selected':'')+'>'+m+'</option>').join('')+'</select></div><div class="field"><label style="font-weight:600">Received by <span style="color:#C41010">*</span></label><select class="inp" style="color:#111" oninput="ppf(\'payStaff\',this.value)"><option value="">Select...</option>'+STAFF.map(s=>'<option value="'+s+'"'+(pf.payStaff===s?' selected':'')+'>'+s+'</option>').join('')+'</select></div></div>':'')
-    +(remain>0?'<div class="field"><label>Payment note (optional)</label><input class="inp" style="color:#111;background:#fff" value="'+esc(pf.payNote||'')+'" placeholder="GCash ref / bank details..." oninput="ppf(\'payNote\',this.value)"></div>':'')
+    +(remain>0?'<div class="field"><label style="font-weight:600;color:#C41010">'+refLabel(pf.payMeth)+' <span style="color:#C41010">*</span></label><input class="inp" style="color:#111;background:#fff;border-color:'+(pf.payNote?'#16a34a':'#C41010')+';border-width:2px" value="'+esc(pf.payNote||'')+'" placeholder="Required..." oninput="ppf(\'payNote\',this.value)"></div>':'')
     +(S.err?'<div class="errbox" style="margin-top:12px">'+S.err+'</div>':'')
     +'</div>'
     +'<div class="acts"><button class="btn-g" onclick="go(\'prof\')">Cancel</button><button class="btn-r" style="font-size:16px;padding:14px 28px" onclick="completePayment()"><i class="ti ti-check" style="font-size:18px"></i> Mark as PAID</button></div></div>';
@@ -965,6 +972,30 @@ function settingsScr() {
     +'<div class="field" style="margin-bottom:12px"><label>Apps Script URL</label><input class="inp" style="color:#111" value="'+esc(S.url)+'" placeholder="https://script.google.com/macros/s/..." oninput="S.url=this.value"></div>'
     +'<div style="text-align:right"><button class="btn-r" onclick="saveUrl()">Save URL</button></div>'
     +'</div></div>';
+}
+
+
+// Get ref label based on payment method
+function refLabel(method) {
+  if (!method) return 'Ref #';
+  if (method.toLowerCase().includes('gcash')) return 'GCash Ref #';
+  if (method.toLowerCase().includes('bank')) return 'Bank Ref #';
+  if (method.toLowerCase().includes('credit') || method.toLowerCase().includes('card')) return 'Card Ref #';
+  return 'OR #';
+}
+
+// Car color dropdown helper
+function colorSelect(val, onchange) {
+  const colors = ['White','Black','Silver','Red','Blue','Gray'];
+  const isOther = val && !colors.includes(val);
+  return '<div style="display:flex;flex-direction:column;gap:8px">'
+    +'<select class="inp" style="color:#111" oninput="'+onchange+'(this.value)">'
+    +'<option value="">Select color...</option>'
+    +colors.map(c=>'<option value="'+c+'"'+(val===c?' selected':'')+'>'+c+'</option>').join('')
+    +'<option value="__other__"'+(isOther?' selected':'')+'>Other (type below)</option>'
+    +'</select>'
+    +(isOther?'<input class="inp" style="color:#111;background:#fff" value="'+esc(val)+'" placeholder="Enter color..." oninput="'+onchange+'(this.value)">':'')
+    +'</div>';
 }
 
 // ── Render ────────────────────────────────────────────────────────────────────
