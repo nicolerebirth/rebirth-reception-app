@@ -137,7 +137,8 @@ const esc  = s => s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').repla
 const fmt  = n => n ? '₱' + parseFloat(n).toLocaleString('en-PH',{minimumFractionDigits:2}) : '₱0.00';
 const initPay = () => ({
   est:'', dep:'', depMeth:'', depStaff:'', depDate:td(), depNote:'',
-  final:'', payMeth:'', payStaff:'', payNote:'', payDate:'', status:'pending'
+  final:'', payMeth:'', payStaff:'', payNote:'', payDate:'', status:'pending',
+  signature:'', signedAt:''
 });
 
 const pill    = (lbl,on,fn,sz=13) => `<button onclick="${fn}" style="padding:9px 18px;border-radius:24px;font-size:${sz}px;cursor:pointer;border:2.5px solid ${on?R:'#cbd5e1'};background:${on?R:'#fff'};color:${on?'#fff':'#64748b'};font-weight:${on?700:400};font-family:inherit;min-height:46px">${lbl}</button>`;
@@ -884,9 +885,10 @@ function receiptScr() {
   const remain = Math.max(0, fin-dep);
   const rcpNo = 'RBC-'+c.id.slice(-6)+'-'+(vidx+1);
   return '<div style="padding:16px">'
+    +'<button style="width:100%;padding:13px;background:#16a34a;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:10px;font-family:inherit" onclick="go(\\\'home\\\')">&#127968; Back to home</button>'
     +'<div style="display:flex;gap:10px;margin-bottom:16px">'
     +'<button class="btn-g" onclick="go(\'prof\')"><i class="ti ti-arrow-left"></i> Back</button>'
-    +'<button class="btn-r" style="flex:1" onclick="window.print()"><i class="ti ti-printer"></i> Print Receipt</button>'
+    +(p.signedAt?'<button class="btn-r" style="flex:1" onclick="window.print()"><i class="ti ti-printer"></i> Print Receipt</button>':'<button style="flex:1;padding:10px 16px;background:#94a3b8;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;font-family:inherit">Sign first to print</button>')
     +'</div>'
     +'<div id="receipt-box" style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;max-width:400px;margin:0 auto;font-family:Arial,sans-serif">'
     +'<div style="text-align:center;margin-bottom:16px;padding-bottom:16px;border-bottom:2px solid #111">'
@@ -920,6 +922,21 @@ function receiptScr() {
     +(p.payNote?'<div style="color:#64748b">Payment ref: '+esc(p.payNote)+'</div>':'')
     +'</div>'
     +(v.usedCard&&v.prepaidVisitNum?'<div style="margin-top:8px;padding:8px 12px;background:#fffbeb;border-radius:8px;font-size:12px;color:#92400e">🃏 Prepaid card used — Visit '+v.prepaidVisitNum+' of 4'+(v.prepaidVisitNum===4?' ★ FREE':'')+'</div>':'')
+    // Signature section
+    +(p.signedAt
+      ? '<div style="margin-top:16px;padding-top:14px;border-top:2px dashed #e2e8f0">'
+        +'<div style="font-size:12px;font-weight:700;color:#166534;margin-bottom:8px">✅ Customer Signature</div>'
+        +(p.signature?'<img src="'+p.signature+'" style="width:100%;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc">':'')
+        +'<div style="font-size:11px;color:#64748b;margin-top:6px">'+esc(p.signedAt)+'</div>'
+        +'</div>'
+      : '<div style="margin-top:16px;padding-top:14px;border-top:2px dashed #C41010">'
+        +'<div style="font-size:14px;font-weight:700;color:#C41010;margin-bottom:10px">✍️ Customer Signature (Required)</div>'
+        +'<canvas id="sig-canvas" width="380" height="150" style="width:100%;height:150px;border:2px solid #cbd5e1;border-radius:8px;background:#fff;touch-action:none;display:block;margin-bottom:10px"></canvas>'
+        +'<div style="display:flex;gap:10px">'
+        +'<button onclick="clearSignature()" style="flex:1;padding:10px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;cursor:pointer;font-family:inherit;font-size:14px;min-height:44px">Clear</button>'
+        +'<button onclick="confirmSignature()" style="flex:2;padding:10px;background:#C41010;color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-size:14px;font-weight:700;min-height:44px">✅ Confirm Signature</button>'
+        +'</div></div>'
+    )
     +'<div style="text-align:center;margin-top:16px;padding-top:12px;border-top:1px dashed #e2e8f0;font-size:11px;color:#94a3b8">Thank you for choosing Rebirth Car Coating Center!<br>We look forward to serving you again.</div>'
     +'</div></div>';
 }
@@ -954,6 +971,91 @@ function refLabel(method) {
   if (m.indexOf('credit') >= 0 || m.indexOf('card') >= 0) return 'Card Ref #';
   return 'OR #';
 }
+
+// ── Signature functions ────────────────────────────────────────
+function initSignature() {
+  var canvas = document.getElementById('sig-canvas');
+  if (!canvas || canvas._initialized) return;
+  canvas._initialized = true;
+  var ctx = canvas.getContext('2d');
+  ctx.strokeStyle = '#111';
+  ctx.lineWidth = 2.5;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  var drawing = false;
+
+  function getPos(e) {
+    var rect = canvas.getBoundingClientRect();
+    var touch = e.touches ? e.touches[0] : e;
+    return {
+      x: (touch.clientX - rect.left) * (canvas.width / rect.width),
+      y: (touch.clientY - rect.top) * (canvas.height / rect.height)
+    };
+  }
+  canvas.addEventListener('touchstart', function(e){
+    e.preventDefault(); drawing=true;
+    var p=getPos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y);
+  },{passive:false});
+  canvas.addEventListener('touchmove', function(e){
+    e.preventDefault(); if(!drawing)return;
+    var p=getPos(e); ctx.lineTo(p.x,p.y); ctx.stroke();
+  },{passive:false});
+  canvas.addEventListener('touchend', function(){drawing=false;});
+  canvas.addEventListener('mousedown', function(e){
+    drawing=true; var p=getPos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y);
+  });
+  canvas.addEventListener('mousemove', function(e){
+    if(!drawing)return; var p=getPos(e); ctx.lineTo(p.x,p.y); ctx.stroke();
+  });
+  canvas.addEventListener('mouseup', function(){drawing=false;});
+  canvas.addEventListener('mouseleave', function(){drawing=false;});
+}
+
+function clearSignature() {
+  var canvas = document.getElementById('sig-canvas');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+async function confirmSignature() {
+  var canvas = document.getElementById('sig-canvas');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var pixels = ctx.getImageData(0,0,canvas.width,canvas.height).data;
+  var hasContent = false;
+  for (var i=3; i<pixels.length; i+=4) { if(pixels[i]>0){hasContent=true;break;} }
+  if (!hasContent) { alert('Please sign before confirming.'); return; }
+
+  var sigData = canvas.toDataURL('image/png');
+  var now = new Date();
+  var sigText = 'Signed \u2713 ' + now.toISOString().split('T')[0] + ' ' + now.toTimeString().slice(0,5);
+
+  var c = S.sel; if(!c) return;
+  var vidx = S.payVidx!=null ? S.payVidx : (c.visits||[]).length-1;
+
+  S.cx = S.cx.map(function(cx){
+    if(cx.id!==c.id) return cx;
+    return Object.assign({},cx,{visits:cx.visits.map(function(v,i){
+      if(i!==vidx) return v;
+      return Object.assign({},v,{pay:Object.assign({},v.pay,{signature:sigData,signedAt:sigText})});
+    })});
+  });
+  S.sel = S.cx.find(function(x){return x.id===c.id;});
+  await saveCx();
+
+  await postToSheets({
+    type:'signature',
+    id:c.id,
+    fn:c.fn||'', ln:c.ln||'',
+    visitDate:(c.visits||[])[vidx]?c.visits[vidx].date:'',
+    signedAt:sigText
+  });
+
+  flash('Signature saved! \u2713');
+  render();
+}
+
 function render() {
   const b = document.getElementById('body');
   if (!b) return;
@@ -969,6 +1071,7 @@ function render() {
   };
   h += (m[S.scr]||homeScr)();
   b.innerHTML = h;
+  if (S.scr === 'receipt') { setTimeout(function(){initSignature();}, 50); }
 }
 </script>
 </body>
