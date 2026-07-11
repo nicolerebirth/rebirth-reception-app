@@ -903,7 +903,7 @@ function receiptScr() {
     +'<button style="width:100%;padding:13px;background:#16a34a;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:10px;font-family:inherit" onclick="go(\'home\')"><i clas">&#127968; Back to home</button>'
     +'<div style="display:flex;gap:10px;margin-bottom:16px">'
     +'<button class="btn-g" onclick="go(\'prof\')"><i class="ti ti-arrow-left"></i> Back</button>'
-    +(p.signedAt?'<button class="btn-r" style="flex:1" onclick="window.print()"><i class="ti ti-printer"></i> Print Receipt</button>':'<button class="btn-r" style="flex:1" onclick="window.print()" title="No signature yet"><i class="ti ti-printer"></i> Print (no signature)</button>')
+    +(p.signedAt?'<button class="btn-r" style="flex:1" onclick="window.print()"><i class="ti ti-printer"></i> Print Receipt</button>':'<button disabled style="flex:1;padding:10px 16px;background:#94a3b8;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;font-family:inherit">Sign first to print</button>')
     +'</div>'
     +'<div id="receipt-box" style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;max-width:400px;margin:0 auto;font-family:Arial,sans-serif">'
     +'<div style="text-align:center;margin-bottom:16px;padding-bottom:16px;border-bottom:2px solid #111">'
@@ -950,7 +950,6 @@ function receiptScr() {
         +'<div style="display:flex;gap:10px">'
         +'<button onclick="clearSignature()" style="flex:1;padding:10px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;cursor:pointer;font-family:inherit;font-size:14px;min-height:44px">Clear</button>'
         +'<button onclick="confirmSignature()" style="flex:2;padding:10px;background:#C41010;color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-size:14px;font-weight:700;min-height:44px">✅ Confirm Signature</button>'
-        +'<button onclick="skipSignature()" style="width:100%;padding:10px;border:1px solid #94a3b8;border-radius:8px;background:#fff;cursor:pointer;font-family:inherit;font-size:13px;color:#64748b;margin-top:8px;min-height:40px">Skip signature (online payment)</button>'
         +'</div></div>'
     )
     +'<div style="text-align:center;margin-top:16px;padding-top:12px;border-top:1px dashed #e2e8f0;font-size:11px;color:#94a3b8">Thank you for choosing Rebirth Car Coating Center!<br>We look forward to serving you again.</div>'
