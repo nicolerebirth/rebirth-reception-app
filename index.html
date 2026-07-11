@@ -297,6 +297,18 @@ async function pushToSheets() {
   } catch { S.syncing=false; flash('Push failed. Check URL.','err'); }
   render();
 }
+
+// 自動バックアップ（サイレント）
+async function silentPush() {
+  if (!S.url) return;
+  try {
+    await fetch(S.url, {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      body: JSON.stringify({type:'push_all', json:JSON.stringify(S.cx)})
+    });
+  } catch(e) { console.warn('Auto backup:', e); }
+}
 async function pullFromSheets() {
   if (!S.url) { flash('No URL configured.','err'); return; }
   S.syncing=true; render();
@@ -335,6 +347,7 @@ async function submitNew() {
     depositNote:payData.depNote||''});
   S.cx.push(rec);
   await saveCx();
+  await silentPush(); // 自動バックアップ
   S.savedInfo = {type:'new', name:rec.fn+' '+rec.ln, card:rec.prepaidNum, svcs:rec.visits[0].svcs, date:rec.firstVisit, staff:rec.staff};
   S.f = {fn:'',ln:'',p1:'',p2:'',p3:'',dt:td(),st:'',addr:'',email:'',mdl:'',col:'',plt:'',svd:td(),svs:ms(),m1:'',m2:'',m3:'',prepaidNum:'',confirmedCard:'',pay:initPay()};
   _submitting = false;
@@ -375,6 +388,7 @@ async function submitVisit() {
   });
   S.sel = S.cx.find(c=>c.id===S.sel.id);
   await saveCx();
+  await silentPush(); // 自動バックアップ
   S.savedInfo = {type:'return', name:S.sel.fn+' '+S.sel.ln, selId:S.sel.id,
     svcs:v.svcs, date:v.date, staff:v.staff,
     useCard:!!useCard, prepaidVisitNum:pvn, buyingCard:buyCard?S.vf.newCardNum.trim():null};
@@ -424,6 +438,7 @@ async function completePayment() {
   });
   S.sel = S.cx.find(x=>x.id===c.id);
   await saveCx();
+  await silentPush(); // 自動バックアップ
   await postToSheets({
     type:'payment', id:c.id,
     fn:c.fn||'', ln:c.ln||'', phone:c.phone||'',
@@ -885,7 +900,7 @@ function receiptScr() {
   const remain = Math.max(0, fin-dep);
   const rcpNo = 'RBC-'+c.id.slice(-6)+'-'+(vidx+1);
   return '<div style="padding:16px">'
-    +'<button style="width:100%;padding:13px;background:#16a34a;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:10px;font-family:inherit" onclick="go(\\\'home\\\')">&#127968; Back to home</button>'
+    +'<button style="width:100%;padding:13px;background:#16a34a;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:10px;font-family:inherit" onclick="go(\'home\')"><i clas">&#127968; Back to home</button>'
     +'<div style="display:flex;gap:10px;margin-bottom:16px">'
     +'<button class="btn-g" onclick="go(\'prof\')"><i class="ti ti-arrow-left"></i> Back</button>'
     +(p.signedAt?'<button class="btn-r" style="flex:1" onclick="window.print()"><i class="ti ti-printer"></i> Print Receipt</button>':'<button style="flex:1;padding:10px 16px;background:#94a3b8;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;font-family:inherit">Sign first to print</button>')
@@ -1043,6 +1058,7 @@ async function confirmSignature() {
   });
   S.sel = S.cx.find(function(x){return x.id===c.id;});
   await saveCx();
+  await silentPush(); // 自動バックアップ
 
   await postToSheets({
     type:'signature',
