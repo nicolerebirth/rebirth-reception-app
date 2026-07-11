@@ -512,10 +512,10 @@ function paySection(isV) {
     +'<div class="field"><label>Date received</label><input type="date" class="inp" style="color:#111" value="'+esc(p.depDate)+'" oninput="'+onin+'(\'depDate\',this.value)"></div>'
     +'</div>'
     +'<div class="g2" style="margin-bottom:10px">'
-    +'<div class="field"><label>Deposit method</label><select class="inp" style="color:#111" oninput="'+onin+'(\'depMeth\',this.value)"><option value="">Select...</option>'
+    +'<div class="field"><label>Deposit method</label><select class="inp" style="color:#111" onchange="'+onin+'(\'depMeth\',this.value)"><option value="">Select...</option>'
     +PAY_METHODS.map(m => '<option value="'+m+'"'+(p.depMeth===m?' selected':'')+'>'+m+'</option>').join('')
     +'</select></div>'
-    +'<div class="field"><label>Received by</label><select class="inp" style="color:#111" oninput="'+onin+'(\'depStaff\',this.value)"><option value="">Select...</option>'
+    +'<div class="field"><label>Received by</label><select class="inp" style="color:#111" onchange="'+onin+'(\'depStaff\',this.value)"><option value="">Select...</option>'
     +STAFF.map(s => '<option value="'+s+'"'+(p.depStaff===s?' selected':'')+'>'+s+'</option>').join('')
     +'</select></div>'
     +'</div>'
