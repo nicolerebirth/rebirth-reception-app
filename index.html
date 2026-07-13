@@ -156,7 +156,7 @@ let S = {
   f:  {fn:'',ln:'',p1:'',p2:'',p3:'',dt:td(),st:'',addr:'',email:'',mdl:'',col:'',plt:'',svd:td(),svs:ms(),m1:'',m2:'',m3:'',prepaidNum:'',confirmedCard:'',prepaidUsedInit:0,pay:initPay()},
   vf: {svd:td(),st:'',svs:ms(),m1:'',m2:'',m3:'',useCard:false,newCardNum:'',confirmedCard:'',pay:initPay()},
   ef: {fn:'',ln:'',p1:'',p2:'',p3:'',addr:'',email:'',mdl:'',col:'',plt:'',prepaidNum:'',prepaidUsed:0},
-  pf: initPay(), payVidx: null,
+  pf: initPay(), payVidx: null, depInfo: null,
   sel:null, prevScr:'ret', sb:'ln', sq:'', res:[],
   lq:'', ls:'name', lStaff:'all',
   pw:'', pwErr:false, confirmDel:false, savedInfo:null,
@@ -351,7 +351,24 @@ async function submitNew() {
   S.savedInfo = {type:'new', name:rec.fn+' '+rec.ln, card:rec.prepaidNum, svcs:rec.visits[0].svcs, date:rec.firstVisit, staff:rec.staff};
   S.f = {fn:'',ln:'',p1:'',p2:'',p3:'',dt:td(),st:'',addr:'',email:'',mdl:'',col:'',plt:'',svd:td(),svs:ms(),m1:'',m2:'',m3:'',prepaidNum:'',confirmedCard:'',prepaidUsedInit:0,pay:initPay()};
   _submitting = false;
-  S.busy=false; go('saved');
+  S.busy=false;
+  // Go to deposit receipt if deposit was paid
+  if (payData.dep && parseFloat(payData.dep) > 0 && payData.depMeth) {
+    S.depInfo = {
+      fn: rec.fn, ln: rec.ln, phone: rec.phone,
+      mdl: rec.mdl, plt: rec.plt, date: f.svd,
+      services: rec.visits[0].svcs.join(', '),
+      dep: parseFloat(payData.dep),
+      depMeth: payData.depMeth,
+      depStaff: payData.depStaff||'',
+      depNote: payData.depNote||'',
+      balance: Math.max(0, parseFloat(payData.est||0) - parseFloat(payData.dep||0)),
+      signature: '', signedAt: ''
+    };
+    go('depReceipt');
+  } else {
+    go('saved');
+  }
 }
 
 async function submitVisit() {
@@ -514,13 +531,13 @@ function paySection(isV) {
     +'<label style="color:#166534;font-weight:600">Estimate amount ₱ <span style="color:#C41010">*</span></label>'
     +'<input type="number" class="inp" style="color:#111;background:#fff;font-size:20px;font-weight:700;border-color:#16a34a;border-width:2px" value="'+esc(p.est)+'" placeholder="0.00" oninput="'+onin+'(\'est\',this.value)">'
     +'</div>'
-    +'<div style="border-top:1px solid #bbf7d0;padding-top:12px;margin-bottom:12px;font-size:14px;font-weight:600;color:#166534">🏦 Deposit received (optional)</div>'
+    +'<div style="border-top:1px solid #bbf7d0;padding-top:12px;margin-bottom:12px;font-size:14px;font-weight:600;color:#166534">🏦 Down Payment received (optional)</div>'
     +'<div class="g2" style="margin-bottom:10px">'
-    +'<div class="field"><label>Deposit ₱</label><input type="number" class="inp" style="color:#111;background:#fff" value="'+esc(p.dep)+'" placeholder="0" oninput="'+onin+'(\'dep\',this.value)"></div>'
+    +'<div class="field"><label>Down Payment ₱</label><input type="number" class="inp" style="color:#111;background:#fff" value="'+esc(p.dep)+'" placeholder="0" oninput="'+onin+'(\'dep\',this.value)"></div>'
     +'<div class="field"><label>Date received</label><input type="date" class="inp" style="color:#111" value="'+esc(p.depDate)+'" oninput="'+onin+'(\'depDate\',this.value)"></div>'
     +'</div>'
     +'<div class="g2" style="margin-bottom:10px">'
-    +'<div class="field"><label>Deposit method</label><select class="inp" style="color:#111" onchange="'+onin+'(\'depMeth\',this.value)"><option value="">Select...</option>'
+    +'<div class="field"><label>Down Payment method</label><select class="inp" style="color:#111" onchange="'+onin+'(\'depMeth\',this.value)"><option value="">Select...</option>'
     +PAY_METHODS.map(m => '<option value="'+m+'"'+(p.depMeth===m?' selected':'')+'>'+m+'</option>').join('')
     +'</select></div>'
     +'<div class="field"><label>Received by</label><select class="inp" style="color:#111" onchange="'+onin+'(\'depStaff\',this.value)"><option value="">Select...</option>'
@@ -592,7 +609,7 @@ function pBadge(vn) {
 function payBadge(pay) {
   if (!pay||!pay.est) return '';
   const colors = {pending:['#fef3c7','#92400e','⏳'],deposit:['#dbeafe','#1e40af','🏦'],completed:['#dcfce7','#166534','✅']};
-  const labels = {pending:'Unpaid',deposit:'Deposit received',completed:'Paid'};
+  const labels = {pending:'Unpaid',deposit:'Down Payment received',completed:'Paid'};
   const st = pay.status||'pending';
   const [bg,fc,ic] = colors[st]||colors.pending;
   return '<span style="background:'+bg+';color:'+fc+';font-size:12px;font-weight:700;padding:3px 10px;border-radius:12px">'+ic+' '+labels[st]+' '+fmt(pay.final||pay.est)+'</span>';
@@ -885,13 +902,13 @@ function payScr() {
     +'<div class="field" style="margin-bottom:14px"><label style="font-weight:600">Final amount ₱ (edit if different from estimate)</label>'
     +'<input type="number" class="inp" style="color:#111;background:#fff;font-size:22px;font-weight:700;border-color:#16a34a;border-width:2px" value="'+(pf.final||p.est||'')+'" placeholder="0.00" oninput="ppf(\'final\',this.value);render()">'
     +'</div>'
-    +(dep>0?'<div style="padding:10px 14px;background:#eff6ff;border-radius:8px;margin-bottom:14px;font-size:14px;color:#1d4ed8">🏦 Deposit already received: <strong>'+fmt(dep)+'</strong>'+(p.depMeth?' via '+esc(p.depMeth):'')+(p.depStaff?' by '+esc(p.depStaff):'')+'</div>':'')
+    +(dep>0?'<div style="padding:10px 14px;background:#eff6ff;border-radius:8px;margin-bottom:14px;font-size:14px;color:#1d4ed8">🏦 Down Payment already received: <strong>'+fmt(dep)+'</strong>'+(p.depMeth?' via '+esc(p.depMeth):'')+(p.depStaff?' by '+esc(p.depStaff):'')+'</div>':'')
     +'<div style="padding:16px;background:'+(remain>0?'#fff7ed':'#dcfce7')+';border:2px solid '+(remain>0?'#f97316':'#16a34a')+';border-radius:10px;margin-bottom:14px;text-align:center">'
     +'<div style="font-size:13px;color:#64748b;margin-bottom:4px">'+(remain>0?'Balance to collect':'Fully covered by deposit')+'</div>'
     +'<div style="font-size:30px;font-weight:900;color:'+(remain>0?'#ea580c':'#16a34a')+'">'+fmt(remain)+'</div>'
     +'</div>'
     +(remain>0?'<div class="g2" style="margin-bottom:12px"><div class="field"><label style="font-weight:600">Payment method <span style="color:#C41010">*</span></label><select class="inp" style="color:#111" oninput="ppf(\'payMeth\',this.value)"><option value="">Select...</option>'+PAY_METHODS.map(m=>'<option value="'+m+'"'+(pf.payMeth===m?' selected':'')+'>'+m+'</option>').join('')+'</select></div><div class="field"><label style="font-weight:600">Received by <span style="color:#C41010">*</span></label><select class="inp" style="color:#111" oninput="ppf(\'payStaff\',this.value)"><option value="">Select...</option>'+STAFF.map(s=>'<option value="'+s+'"'+(pf.payStaff===s?' selected':'')+'>'+s+'</option>').join('')+'</select></div></div>':'')
-    +(remain>0?'<div class="field"><label style="font-weight:600;color:#C41010">'+refLabel(pf.payMeth)+' *</label><input class="inp" style="color:#111;background:#fff;border:2px solid '+(pf.payNote?'#16a34a':'#C41010')+'" value="'+esc(pf.payNote||'')+'" placeholder="Enter ref number..." oninput="ppf(\'payNote\',this.value)"></div>':'')
+    +(remain>0?'<div class="field"><label style="font-weight:600;color:#C41010">'+refLabel(pf.payMeth)+' *</label><input class="inp" style="color:#111;background:#fff;border:2px solid '+(pf.payNote?'#16a34a':'#C41010')+'" value="'+esc(pf.payNote||'')+'" placeholder="Enter ref number..." oninput="ppf(\'payNote\',this.value);render()"></div>':'')
     +(S.err?'<div class="errbox" style="margin-top:12px">'+S.err+'</div>':'')
     +'</div>'
     +'<div class="acts"><button class="btn-g" onclick="go(\'prof\')">Cancel</button><button class="btn-r" style="font-size:16px;padding:14px 28px" onclick="completePayment()"><i class="ti ti-check" style="font-size:18px"></i> Mark as PAID</button></div></div>';
@@ -933,14 +950,14 @@ function receiptScr() {
     +(v.svcs||[]).map(s=>'<div style="font-size:13px;padding:4px 0;border-bottom:0.5px solid #f1f5f9">✓ '+esc(s)+'</div>').join('')
     +'<div style="margin-top:14px;border-top:1.5px solid #e2e8f0;padding-top:10px">'
     +(dep>0?'<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span>Estimate:</span><span>'+fmt(fin)+'</span></div>'
-    +'<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;color:#1d4ed8"><span>Deposit paid'+(p.depMeth?' ('+esc(p.depMeth)+')':'')+':</span><span>− '+fmt(dep)+'</span></div>':'')
+    +'<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;color:#1d4ed8"><span>Down Payment paid'+(p.depMeth?' ('+esc(p.depMeth)+')':'')+':</span><span>− '+fmt(dep)+'</span></div>':'')
     +'<div style="display:flex;justify-content:space-between;font-size:16px;font-weight:900;border-top:2px solid #111;padding-top:8px;margin-top:4px"><span>TOTAL PAID:</span><span style="color:#16a34a">'+fmt(fin)+'</span></div>'
     +(dep>0?'<div style="display:flex;justify-content:space-between;font-size:13px;margin-top:4px;color:#64748b"><span>Balance paid:</span><span>'+fmt(remain)+'</span></div>':'')
     +'</div>'
     +'<div style="margin-top:12px;padding:10px 12px;background:#f0fdf4;border-radius:8px;font-size:12px">'
     +'<div><strong>Payment method:</strong> '+esc(p.payMeth||'—')+'</div>'
     +'<div><strong>Received by:</strong> '+esc(p.payStaff||'—')+'</div>'
-    +(dep>0&&p.depMeth?'<div style="color:#64748b;margin-top:4px">Deposit via '+esc(p.depMeth)+(p.depStaff?' by '+esc(p.depStaff):'')+(p.depDate?' on '+esc(p.depDate):'')+'</div>':'')
+    +(dep>0&&p.depMeth?'<div style="color:#64748b;margin-top:4px">Down Payment via '+esc(p.depMeth)+(p.depStaff?' by '+esc(p.depStaff):'')+(p.depDate?' on '+esc(p.depDate):'')+'</div>':'')
     +(p.depNote?'<div style="color:#64748b">Deposit ref: '+esc(p.depNote)+'</div>':'')
     +(p.payNote?'<div style="color:#64748b">Payment ref: '+esc(p.payNote)+'</div>':'')
     +'</div>'
@@ -996,10 +1013,12 @@ function refLabel(method) {
 }
 
 // ── Signature functions ────────────────────────────────────────
-function initSignature() {
-  var canvas = document.getElementById('sig-canvas');
+function initSignature(canvasId) {
+  var id = canvasId || 'sig-canvas';
+  var canvas = document.getElementById(id);
   if (!canvas || canvas._initialized) return;
   canvas._initialized = true;
+  canvas._id = id;
   var ctx = canvas.getContext('2d');
   ctx.strokeStyle = '#111';
   ctx.lineWidth = 2.5;
@@ -1034,6 +1053,127 @@ function initSignature() {
   canvas.addEventListener('mouseleave', function(){drawing=false;});
 }
 
+async 
+// ── Deposit Signature functions ────────────────────────────────
+function clearDepSignature() {
+  var canvas = document.getElementById('dep-sig-canvas');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+async function confirmDepSignature() {
+  var canvas = document.getElementById('dep-sig-canvas');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var pixels = ctx.getImageData(0,0,canvas.width,canvas.height).data;
+  var hasContent = false;
+  for (var i=3; i<pixels.length; i+=4) { if(pixels[i]>0){hasContent=true;break;} }
+  if (!hasContent) { alert('Please sign before confirming.'); return; }
+
+  var sigData = canvas.toDataURL('image/png');
+  var now = new Date();
+  var sigText = 'Signed \u2713 ' + now.toISOString().split('T')[0] + ' ' + now.toTimeString().slice(0,5);
+
+  if (S.depInfo) {
+    S.depInfo.signature = sigData;
+    S.depInfo.signedAt = sigText;
+  }
+
+  await postToSheets({
+    type:'deposit',
+    date: S.depInfo ? S.depInfo.date : '',
+    fn: S.depInfo ? S.depInfo.fn : '',
+    ln: S.depInfo ? S.depInfo.ln : '',
+    phone: S.depInfo ? S.depInfo.phone : '',
+    mdl: S.depInfo ? S.depInfo.mdl : '',
+    plt: S.depInfo ? S.depInfo.plt : '',
+    services: S.depInfo ? S.depInfo.services : '',
+    amount: S.depInfo ? S.depInfo.dep : 0,
+    method: S.depInfo ? S.depInfo.depMeth : '',
+    receivedBy: S.depInfo ? S.depInfo.depStaff : '',
+    note: S.depInfo ? S.depInfo.depNote : '',
+    balance: S.depInfo ? S.depInfo.balance : 0,
+    signedAt: sigText
+  });
+
+  flash('Down Payment receipt signed! \u2713');
+  render();
+}
+
+// ── Deposit Receipt Screen ──────────────────────────────────────
+function depReceiptScr() {
+  var info = S.depInfo;
+  if (!info) { go('home'); return ''; }
+  var h = [];
+  h.push('<div style="padding:16px">');
+  h.push('<div class="no-print" style="display:flex;gap:8px;margin-bottom:14px">');
+  h.push('<button onclick="go(\'saved\')" style="background:#16a34a;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">&#127968; Skip & Home</button>');
+  if (info.signedAt) {
+    h.push('<button onclick="window.print()" style="background:#C41010;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;flex:1">&#128424; Print Down Payment Receipt</button>');
+  }
+  h.push('</div>');
+
+  h.push('<div id="dep-receipt-box" style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;max-width:420px;margin:0 auto;font-family:Arial,sans-serif">');
+
+  // Header
+  h.push('<div style="text-align:center;margin-bottom:16px;padding-bottom:16px;border-bottom:2px solid #111">');
+  h.push('<div style="font-style:italic;font-weight:900;font-size:28px;color:#111;letter-spacing:-1px;font-family:Georgia,serif">REB<span style="color:#C41010">i</span>RTH</div>');
+  h.push('<div style="background:#C41010;color:#fff;font-size:8px;font-weight:700;letter-spacing:.25em;padding:2px 10px;display:inline-block;margin:4px 0;font-style:italic">CAR COATING CENTER INC.</div>');
+  h.push('<div style="font-size:11px;color:#64748b;line-height:1.6;margin-top:6px">4A Naga Road Pulang Lupa Dos Las Pinas City Metro Manila<br>Tel: (02) 3986472</div>');
+  h.push('</div>');
+
+  // Title
+  h.push('<div style="text-align:center;margin-bottom:14px">');
+  h.push('<div style="font-size:15px;font-weight:700;color:#111;text-transform:uppercase;letter-spacing:2px">Deposit Receipt</div>');
+  h.push('<div style="font-size:11px;color:#64748b;margin-top:4px">Date: ' + esc(info.date||'') + '</div>');
+  h.push('</div>');
+
+  // Customer info
+  h.push('<div style="background:#f8fafc;border-radius:8px;padding:10px 14px;margin-bottom:14px">');
+  h.push('<div style="font-weight:700;font-size:15px;margin-bottom:4px">' + esc(info.fn||'') + ' ' + esc(info.ln||'') + '</div>');
+  if (info.phone) h.push('<div style="font-size:12px;color:#64748b">&#128222; ' + esc(info.phone) + '</div>');
+  if (info.mdl) h.push('<div style="font-size:12px;color:#64748b">&#128663; ' + esc(info.mdl) + (info.plt?' | &#128278; '+esc(info.plt):'') + '</div>');
+  h.push('</div>');
+
+  // Services
+  h.push('<div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#64748b;margin-bottom:6px">Services</div>');
+  var svcs = (info.services||'').split(', ');
+  svcs.forEach(function(s){ if(s) h.push('<div style="font-size:13px;padding:4px 0;border-bottom:1px solid #f1f5f9">&#10003; ' + esc(s) + '</div>'); });
+
+  // Deposit details
+  h.push('<div style="margin-top:16px;border-top:2px solid #e2e8f0;padding-top:12px">');
+  h.push('<div style="display:flex;justify-content:space-between;font-size:16px;font-weight:900;margin-bottom:8px"><span>Down Payment Paid:</span><span style="color:#1d4ed8">' + fmt(info.dep) + '</span></div>');
+  h.push('<div style="font-size:13px;color:#64748b;margin-bottom:4px"><strong>Method:</strong> ' + esc(info.depMeth||'—') + '</div>');
+  h.push('<div style="font-size:13px;color:#64748b;margin-bottom:4px"><strong>Received by:</strong> ' + esc(info.depStaff||'—') + '</div>');
+  if (info.depNote) h.push('<div style="font-size:13px;color:#64748b"><strong>Ref#:</strong> ' + esc(info.depNote) + '</div>');
+  h.push('<div style="margin-top:10px;padding:8px 12px;background:#eff6ff;border-radius:8px;font-size:13px;font-weight:600;color:#1e40af">Balance remaining: ' + fmt(info.balance) + '</div>');
+  h.push('</div>');
+
+  // Signature
+  h.push('<div style="margin-top:16px;padding-top:14px;border-top:2px dashed ' + (info.signedAt?'#16a34a':'#C41010') + '">');
+  if (info.signedAt) {
+    h.push('<div style="font-size:12px;font-weight:700;color:#166534;margin-bottom:8px">&#9989; Customer Signature</div>');
+    if (info.signature) h.push('<img src="' + info.signature + '" style="width:100%;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc">');
+    h.push('<div style="font-size:11px;color:#64748b;margin-top:6px">' + esc(info.signedAt) + '</div>');
+    h.push('<div style="margin-top:14px;text-align:center">');
+    h.push('<button onclick="go(\'saved\')" style="background:#16a34a;color:#fff;border:none;border-radius:8px;padding:14px 28px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;width:100%">&#10003; Done - Back to Home</button>');
+    h.push('</div>');
+  } else {
+    h.push('<div style="font-size:14px;font-weight:700;color:#C41010;margin-bottom:10px">&#9997;&#65039; Customer Signature (Required)</div>');
+    h.push('<canvas id="dep-sig-canvas" width="380" height="150" style="width:100%;height:150px;border:2px solid #cbd5e1;border-radius:8px;background:#fff;touch-action:none;display:block;margin-bottom:10px"></canvas>');
+    h.push('<div style="display:flex;gap:10px">');
+    h.push('<button onclick="clearDepSignature()" style="flex:1;padding:10px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;cursor:pointer;font-family:inherit;font-size:14px;min-height:44px">Clear</button>');
+    h.push('<button onclick="confirmDepSignature()" style="flex:2;padding:10px;background:#C41010;color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-size:14px;font-weight:700;min-height:44px">&#9989; Confirm Signature</button>');
+    h.push('</div>');
+  }
+  h.push('</div>');
+
+  h.push('<div style="text-align:center;margin-top:16px;padding-top:12px;border-top:1px dashed #e2e8f0;font-size:11px;color:#94a3b8">Thank you for choosing Rebirth Car Coating Center!</div>');
+  h.push('</div>');
+  h.push('</div>');
+  return h.join('');
+}
 async function skipSignature() {
   var c = S.sel; if(!c) return;
   var vidx = S.payVidx!=null ? S.payVidx : (c.visits||[]).length-1;
@@ -1110,11 +1250,12 @@ function render() {
     new1:new1Scr, new2:new2Scr, new3:new3Scr, newConf:newConfScr,
     retVisit:retVisitScr, retConf:retConfScr,
     saved:savedScr, settings:settingsScr,
-    pay:payScr, receipt:receiptScr, pwSettings:pwSettingsScr
+    pay:payScr, receipt:receiptScr, pwSettings:pwSettingsScr, depReceipt:depReceiptScr
   };
   h += (m[S.scr]||homeScr)();
   b.innerHTML = h;
-  if (S.scr === 'receipt') { setTimeout(function(){initSignature();}, 50); }
+  if (S.scr === 'receipt') { setTimeout(function(){initSignature('sig-canvas');}, 50); }
+    if (S.scr === 'depReceipt') { setTimeout(function(){initSignature('dep-sig-canvas');}, 50); }
 }
 </script>
 </body>
