@@ -357,6 +357,7 @@ async function submitNew() {
   if (payData.dep && parseFloat(payData.dep) > 0 && payData.depMeth) {
     S.depInfo = {
       fn: rec.fn, ln: rec.ln, phone: rec.phone,
+      appId: rec.id,
       mdl: rec.mdl, plt: rec.plt, date: f.svd,
       services: rec.visits[0].svcs.join(', '),
       dep: parseFloat(payData.dep),
@@ -417,6 +418,7 @@ async function submitVisit() {
   if (vPay && vPay.dep && parseFloat(vPay.dep) > 0 && vPay.depMeth) {
     S.depInfo = {
       fn: S.sel.fn, ln: S.sel.ln, phone: S.sel.phone||'',
+      appId: S.sel.id,
       mdl: S.sel.mdl||'', plt: S.sel.plt||'', date: S.vf.svd,
       services: v.svcs.join(', '),
       dep: parseFloat(vPay.dep),
@@ -1104,6 +1106,7 @@ async function confirmDepSignature() {
   await postToSheets({
     type:'deposit',
     date: S.depInfo ? S.depInfo.date : '',
+    appId: S.depInfo ? S.depInfo.appId : '',
     fn: S.depInfo ? S.depInfo.fn : '',
     ln: S.depInfo ? S.depInfo.ln : '',
     phone: S.depInfo ? S.depInfo.phone : '',
