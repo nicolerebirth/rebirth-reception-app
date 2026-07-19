@@ -1115,7 +1115,8 @@ async function confirmDepSignature() {
     receivedBy: S.depInfo ? S.depInfo.depStaff : '',
     note: S.depInfo ? S.depInfo.depNote : '',
     balance: S.depInfo ? S.depInfo.balance : 0,
-    signedAt: sigText
+    signedAt: sigText,
+    signatureImage: sigData
   });
 
   _submitting = false;
@@ -1314,7 +1315,7 @@ async function submitExisting() {
   await saveCx();
   await silentPush();
   await postToSheets({
-    type:'new', ...rec,
+    type:'existing_customer', ...rec,
     services: (ex.svcTypes&&ex.svcTypes.length) ? '[Past: '+(ex.svcTypes.join(', '))+(ex.svcOther?' / '+ex.svcOther:'')+']' : '[Existing customer]',
     estimate:'', deposit:'',
     depositMethod:'', depositStaff:'', depositNote:'',
@@ -1389,7 +1390,8 @@ async function confirmSignature() {
     id:c.id,
     fn:c.fn||'', ln:c.ln||'',
     visitDate:(c.visits||[])[vidx]?c.visits[vidx].date:'',
-    signedAt:sigText
+    signedAt:sigText,
+    signatureImage:sigData
   });
 
   _submitting = false;
