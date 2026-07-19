@@ -157,6 +157,7 @@ let S = {
   vf: {svd:td(),st:'',svs:ms(),m1:'',m2:'',m3:'',useCard:false,newCardNum:'',confirmedCard:'',pay:initPay()},
   ef: {fn:'',ln:'',p1:'',p2:'',p3:'',addr:'',email:'',mdl:'',col:'',plt:'',prepaidNum:'',prepaidUsed:0},
   pf: initPay(), payVidx: null, depInfo: null,
+  ex:{fn:'',ln:'',p1:'',p2:'',p3:'',addr:'',email:'',mdl:'',col:'',plt:'',svcType:'',prepaidNum:'',prepaidUsedInit:0,confirmedCard:''},
   sel:null, prevScr:'ret', sb:'ln', sq:'', res:[],
   lq:'', ls:'name', lStaff:'all',
   pw:'', pwErr:false, confirmDel:false, savedInfo:null,
@@ -648,6 +649,10 @@ function homeScr() {
     +'<div style="font-size:17px;font-weight:600;margin-bottom:5px">Returning customer</div>'
     +'<div style="font-size:13px;color:#64748b">Look up a previous visitor</div></div>'
     +'</div>'
+    +'<div class="hcard" onclick="go(\'existing\')" style="padding:16px 20px;display:flex;align-items:center;justify-content:space-between;text-align:left;margin-bottom:12px">'
+    +'<div style="display:flex;align-items:center;gap:14px"><div class="hico" style="background:#7c3aed;width:48px;height:48px;margin:0;border-radius:12px;flex-shrink:0"><i class="ti ti-clipboard-list" style="font-size:24px;color:#fff"></i></div>'
+    +'<div><div style="font-size:16px;font-weight:600;margin-bottom:3px">Register existing customer</div><div style="font-size:13px;color:#94a3b8">Past customer not yet in system</div></div></div>'
+    +'<i class="ti ti-arrow-right" style="color:#94a3b8;font-size:20px;flex-shrink:0"></i></div>'
     +'<div class="hcard" onclick="openPwList()" style="padding:16px 20px;display:flex;align-items:center;justify-content:space-between;text-align:left;margin-bottom:12px">'
     +'<div style="display:flex;align-items:center;gap:14px"><div class="hico" style="background:#f1f5f9;width:48px;height:48px;margin:0;border-radius:12px;flex-shrink:0"><i class="ti ti-users" style="font-size:24px;color:#64748b"></i></div>'
     +'<div><div style="font-size:16px;font-weight:600;margin-bottom:3px">Customer list</div><div style="font-size:13px;color:#94a3b8;display:flex;align-items:center;gap:6px"><i class="ti ti-lock" style="font-size:13px"></i>Staff access only</div></div></div>'
@@ -1191,6 +1196,132 @@ function depReceiptScr() {
   h.push('</div>');
   return h.join('');
 }
+async 
+// ── Register Existing Customer ─────────────────────────────────
+function existingScr() {
+  var ex = S.ex;
+  var svcOpts = ['PPF','Ceramic Coating','Tint','Paint & Body','Other'];
+  var colOpts = ['White','Black','Silver','Red','Blue','Gray'];
+  var isOtherCol = ex.col && !colOpts.includes(ex.col);
+  var colVal = (isOtherCol && ex.col !== '__other__') ? ex.col : '';
+  var colSel = '<select class="inp" style="color:#111" onchange="var v=this.value;if(v===\'__other__\'){S.ex.col=\'__other__\';render();}else{S.ex.col=v;}">'
+    +'<option value="">Select color...</option>'
+    +colOpts.map(function(c){return '<option value="'+c+'"'+(ex.col===c?' selected':'')+'>'+c+'</option>';}).join('')
+    +'<option value="__other__"'+(isOtherCol?' selected':'')+'>Other (type below)</option></select>'
+    +(isOtherCol?'<input class="inp" style="color:#111;background:#fff;margin-top:8px" value="'+esc(colVal)+'" placeholder="Enter color..." oninput="S.ex.col=this.value">':'');
+
+  var hasPrepaid = ex.prepaidNum && ex.confirmedCard;
+
+  return '<div style="padding:20px">'
+    +'<button class="btn-sm" onclick="go(\'home\')" style="margin-bottom:14px"><i class="ti ti-arrow-left"></i> Back</button>'
+    +'<div style="background:#f3f0ff;border:2px solid #7c3aed;border-radius:12px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:10px">'
+    +'<i class="ti ti-clipboard-list" style="font-size:22px;color:#7c3aed;flex-shrink:0"></i>'
+    +'<div><div style="font-size:15px;font-weight:700;color:#5b21b6">Register Existing Customer</div>'
+    +'<div style="font-size:13px;color:#7c3aed">Past customer not yet in system</div></div></div>'
+
+    // Customer Info
+    +'<div class="card"><div class="sec">Customer information</div>'
+    +'<div class="g2" style="margin-bottom:14px"><div class="field"><label>First name<span class="req">*</span></label><input class="inp" value="'+esc(ex.fn)+'" placeholder="Juan" oninput="S.ex.fn=this.value"></div>'
+    +'<div class="field"><label>Last name<span class="req">*</span></label><input class="inp" value="'+esc(ex.ln)+'" placeholder="dela Cruz" oninput="S.ex.ln=this.value"></div></div>'
+    +'<div class="field" style="margin-bottom:14px"><label>Phone<span class="req">*</span></label>'
+    +'<div style="display:flex;gap:8px;align-items:center">'
+    +'<input class="inp" id="ex-p1" style="width:94px;text-align:center" maxlength="4" value="'+esc(ex.p1)+'" placeholder="0912" oninput="S.ex.p1=this.value.replace(/\\D/g,\'\');if(this.value.length===4)document.getElementById(\'ex-p2\').focus()">'
+    +'<span style="color:#94a3b8;font-size:22px">–</span>'
+    +'<input class="inp" id="ex-p2" style="width:74px;text-align:center" maxlength="3" value="'+esc(ex.p2)+'" placeholder="345" oninput="S.ex.p2=this.value.replace(/\\D/g,\'\');if(this.value.length===3)document.getElementById(\'ex-p3\').focus()">'
+    +'<span style="color:#94a3b8;font-size:22px">–</span>'
+    +'<input class="inp" id="ex-p3" style="width:84px;text-align:center" maxlength="4" value="'+esc(ex.p3)+'" placeholder="6789" oninput="S.ex.p3=this.value.replace(/\\D/g,\'\')"></div></div>'
+    +'<div class="g2"><div class="field" style="margin-bottom:12px"><label>Email</label><input type="email" class="inp" value="'+esc(ex.email)+'" placeholder="email@example.com" oninput="S.ex.email=this.value"></div>'
+    +'<div class="field"><label>Address</label><input class="inp" value="'+esc(ex.addr)+'" placeholder="City, Province" oninput="S.ex.addr=this.value"></div></div></div>'
+
+    // Vehicle Info
+    +'<div class="card"><div class="sec">Vehicle information</div>'
+    +'<div class="g2" style="margin-bottom:14px"><div class="field"><label>Model / make</label><input class="inp" value="'+esc(ex.mdl)+'" placeholder="Toyota Vios..." oninput="S.ex.mdl=this.value"></div>'
+    +'<div class="field"><label>Color</label>'+colSel+'</div></div>'
+    +'<div class="field"><label>License plate</label><input class="inp" value="'+esc(ex.plt)+'" placeholder="ABC 1234" oninput="S.ex.plt=this.value"></div></div>'
+
+    // Past Service
+    +'<div class="card"><div class="sec">Past service type</div>'
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">'
+    +svcOpts.map(function(s){
+      var on = ex.svcType===s;
+      return '<button onclick="S.ex.svcType=\''+s+'\'" style="padding:10px 16px;border-radius:8px;font-size:14px;cursor:pointer;border:2.5px solid '+(on?'#7c3aed':'#e2e8f0')+';background:'+(on?'#7c3aed':'#fff')+';color:'+(on?'#fff':'#64748b')+';font-weight:'+(on?700:400)+';font-family:inherit;min-height:44px">'+s+'</button>';
+    }).join('')
+    +'</div>'
+    +'<div style="font-size:12px;color:#94a3b8">Select the main past service</div></div>'
+
+    // Prepaid Card
+    +'<div class="card-amber"><div style="font-size:16px;font-weight:700;color:#92400e;margin-bottom:4px">🃏 Maintenance Prepaid Card</div>'
+    +'<div style="font-size:12px;color:#b45309;margin-bottom:14px">Leave blank if customer has no card</div>'
+    +'<div style="font-size:13px;color:#78350f;font-weight:500;margin-bottom:8px">① Card number (if any)</div>'
+    +'<input type="text" id="cinp-ex" class="card-num-input" placeholder="e.g. 12345" value="'+esc(ex.prepaidNum)+'" oninput="S.ex.prepaidNum=this.value" autocomplete="off">'
+    +'<button type="button" onclick="confirmExCard()" style="width:100%;padding:14px;background:'+(hasPrepaid?'#15803d':'#d97706')+';color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;min-height:52px;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px">'
+    +(hasPrepaid?'<span>✓</span> Card registered':'<span>🃏</span> Register card number')+'</button>'
+    +(hasPrepaid?'<div style="margin-top:10px;padding:10px 14px;border-radius:8px;background:#f0fdf4;border:2px solid #16a34a;font-size:13px;font-weight:700;color:#166534">✓ Card #'+esc(ex.confirmedCard)+' registered</div>':'')
+
+    // Times used
+    +(ex.confirmedCard?'<div style="margin-top:14px;border-top:1px solid #fde68a;padding-top:12px">'
+    +'<div style="font-size:13px;font-weight:600;color:#92400e;margin-bottom:10px">② Times already used</div>'
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap">'
+    +[0,1,2,3].map(function(n){
+      var on = ex.prepaidUsedInit===n;
+      return '<button type="button" onclick="S.ex.prepaidUsedInit='+n+';render()" style="padding:10px 18px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;border:2.5px solid '+(on?'#d97706':'#e2e8f0')+';background:'+(on?'#d97706':'#fff')+';color:'+(on?'#fff':'#64748b')+';font-family:inherit;min-height:44px">'+n+'/4'+(n===3?' ★':'')+'</button>';
+    }).join('')+'</div></div>':'')
+    +'</div>'
+
+    +(S.err?'<div class="errbox">'+S.err+'</div>':'')
+    +'<div class="acts"><button class="btn-g" onclick="go(\'home\')">Cancel</button>'
+    +'<button class="btn-r" style="background:#7c3aed;font-size:15px" onclick="submitExisting()">Register customer →</button></div></div>';
+}
+
+function confirmExCard() {
+  var el = document.getElementById('cinp-ex');
+  var val = (el?el.value:'').trim();
+  if (!val) { alert('Please enter a card number first.'); return; }
+  S.ex.prepaidNum = val;
+  S.ex.confirmedCard = val;
+  render();
+}
+
+async function submitExisting() {
+  var ex = S.ex;
+  if (!ex.fn.trim()||!ex.ln.trim()) { S.err='First and last name required.'; render(); return; }
+  if (!ex.p1||!ex.p2||!ex.p3)      { S.err='Phone number required.'; render(); return; }
+
+  var rec = {
+    id: Date.now()+'',
+    fn:ex.fn, ln:ex.ln,
+    p1:ex.p1, p2:ex.p2, p3:ex.p3,
+    phone: ex.p1+'-'+ex.p2+'-'+ex.p3,
+    firstVisit: td(),
+    staff: 'System',
+    addr: ex.addr||'',
+    email: ex.email||'',
+    mdl: ex.mdl||'',
+    col: ex.col||'',
+    plt: ex.plt||'',
+    prepaidNum: ex.confirmedCard||'',
+    prepaidUsed: ex.confirmedCard ? (ex.prepaidUsedInit||0) : 0,
+    visits: []
+  };
+
+  S.cx.push(rec);
+  await saveCx();
+  await silentPush();
+  await postToSheets({
+    type:'new', ...rec,
+    services: ex.svcType ? '[Past: '+ex.svcType+']' : '[Existing customer]',
+    estimate:'', deposit:'',
+    depositMethod:'', depositStaff:'', depositNote:'',
+    memo: 'Registered from existing customer list'
+      +(ex.svcType?' | Past service: '+ex.svcType:'')
+  });
+
+  S.ex = {fn:'',ln:'',p1:'',p2:'',p3:'',addr:'',email:'',mdl:'',col:'',plt:'',
+    svcType:'',prepaidNum:'',prepaidUsedInit:0,confirmedCard:''};
+  S.err='';
+  flash('✅ '+rec.fn+' '+rec.ln+' registered!');
+  go('home');
+}
 async function skipSignature() {
   var c = S.sel; if(!c) return;
   var vidx = S.payVidx!=null ? S.payVidx : (c.visits||[]).length-1;
@@ -1271,7 +1402,7 @@ function render() {
     new1:new1Scr, new2:new2Scr, new3:new3Scr, newConf:newConfScr,
     retVisit:retVisitScr, retConf:retConfScr,
     saved:savedScr, settings:settingsScr,
-    pay:payScr, receipt:receiptScr, pwSettings:pwSettingsScr, depReceipt:depReceiptScr
+    pay:payScr, receipt:receiptScr, pwSettings:pwSettingsScr, depReceipt:depReceiptScr, existing:existingScr
   };
   h += (m[S.scr]||homeScr)();
   b.innerHTML = h;
