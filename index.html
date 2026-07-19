@@ -157,7 +157,7 @@ let S = {
   vf: {svd:td(),st:'',svs:ms(),m1:'',m2:'',m3:'',useCard:false,newCardNum:'',confirmedCard:'',pay:initPay()},
   ef: {fn:'',ln:'',p1:'',p2:'',p3:'',addr:'',email:'',mdl:'',col:'',plt:'',prepaidNum:'',prepaidUsed:0},
   pf: initPay(), payVidx: null, depInfo: null,
-  ex:{fn:'',ln:'',p1:'',p2:'',p3:'',addr:'',email:'',mdl:'',col:'',plt:'',svcType:'',prepaidNum:'',prepaidUsedInit:0,confirmedCard:''},
+  ex:{fn:'',ln:'',p1:'',p2:'',p3:'',addr:'',email:'',mdl:'',col:'',plt:'',svcTypes:[],svcOther:'',prepaidNum:'',prepaidUsedInit:0,confirmedCard:''},
   sel:null, prevScr:'ret', sb:'ln', sq:'', res:[],
   lq:'', ls:'name', lStaff:'all',
   pw:'', pwErr:false, confirmDel:false, savedInfo:null,
@@ -1241,13 +1241,19 @@ function existingScr() {
 
     // Past Service
     +'<div class="card"><div class="sec">Past service type</div>'
-    +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">'
-    +svcOpts.map(function(s){
-      var on = ex.svcType===s;
-      return '<button onclick="S.ex.svcType=\''+s+'\'" style="padding:10px 16px;border-radius:8px;font-size:14px;cursor:pointer;border:2.5px solid '+(on?'#7c3aed':'#e2e8f0')+';background:'+(on?'#7c3aed':'#fff')+';color:'+(on?'#fff':'#64748b')+';font-weight:'+(on?700:400)+';font-family:inherit;min-height:44px">'+s+'</button>';
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">'
++['PPF','Ceramic Coating','Tint','Paint & Body','Other'].map(function(s){
+      var on = (S.ex.svcTypes||[]).includes(s);
+      return '<button type="button" onclick="(function(){var ts=S.ex.svcTypes||[];var idx=ts.indexOf(\''+s+'\');if(idx>=0)ts.splice(idx,1);else ts.push(\''+s+'\');S.ex.svcTypes=ts;render();})()" style="padding:10px 16px;border-radius:8px;font-size:14px;cursor:pointer;border:2.5px solid '+(on?'\'#7c3aed\'':'\'#e2e8f0\'')+';background:'+(on?'\'#7c3aed\'':'\'#fff\'')+';color:'+(on?'\'#fff\'':'\'#64748b\'')+';font-weight:'+(on?700:400)+';font-family:inherit;min-height:44px">'
+        +(on?'✓ ':'')+s+'</button>';
     }).join('')
     +'</div>'
-    +'<div style="font-size:12px;color:#94a3b8">Select the main past service</div></div>'
+    +((S.ex.svcTypes||[]).includes('Other')?
+      '<div class="field" style="margin-top:4px">'
+      +'<label style="font-size:13px;color:#7c3aed;font-weight:600">Other (please specify)</label>'
+      +'<input class="inp" value="'+esc(S.ex.svcOther||'')+'" placeholder="Describe the past service..." oninput="S.ex.svcOther=this.value">'
+      +'</div>':'')  
+    +'<div style="font-size:12px;color:#94a3b8;margin-top:8px">Multiple selection OK</div></div>'
 
     // Prepaid Card
     +'<div class="card-amber"><div style="font-size:16px;font-weight:700;color:#92400e;margin-bottom:4px">🃏 Maintenance Prepaid Card</div>'
@@ -1309,15 +1315,15 @@ async function submitExisting() {
   await silentPush();
   await postToSheets({
     type:'new', ...rec,
-    services: ex.svcType ? '[Past: '+ex.svcType+']' : '[Existing customer]',
+    services: (ex.svcTypes&&ex.svcTypes.length) ? '[Past: '+(ex.svcTypes.join(', '))+(ex.svcOther?' / '+ex.svcOther:'')+']' : '[Existing customer]',
     estimate:'', deposit:'',
     depositMethod:'', depositStaff:'', depositNote:'',
     memo: 'Registered from existing customer list'
-      +(ex.svcType?' | Past service: '+ex.svcType:'')
+      +((ex.svcTypes&&ex.svcTypes.length)?' | Past: '+ex.svcTypes.join(', ')+(ex.svcOther?' / '+ex.svcOther:''):'')
   });
 
   S.ex = {fn:'',ln:'',p1:'',p2:'',p3:'',addr:'',email:'',mdl:'',col:'',plt:'',
-    svcType:'',prepaidNum:'',prepaidUsedInit:0,confirmedCard:''};
+    svcTypes:[],svcOther:'',prepaidNum:'',prepaidUsedInit:0,confirmedCard:''};
   S.err='';
   flash('✅ '+rec.fn+' '+rec.ln+' registered!');
   go('home');
