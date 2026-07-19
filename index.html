@@ -414,18 +414,19 @@ async function submitVisit() {
   S.vf = {svd:td(),st:'',svs:ms(),m1:'',m2:'',m3:'',useCard:false,newCardNum:'',confirmedCard:'',pay:initPay()};
   _submitting = false;
   S.busy=false;
+  render();
   // Go to down payment receipt if down payment was paid
-  if (vPay && vPay.dep && parseFloat(vPay.dep) > 0 && vPay.depMeth) {
+  if (payData && payData.dep && parseFloat(payData.dep) > 0 && payData.depMeth) {
     S.depInfo = {
       fn: S.sel.fn, ln: S.sel.ln, phone: S.sel.phone||'',
       appId: S.sel.id,
-      mdl: S.sel.mdl||'', plt: S.sel.plt||'', date: S.vf.svd,
+      mdl: S.sel.mdl||'', plt: S.sel.plt||'', date: v.date,
       services: v.svcs.join(', '),
-      dep: parseFloat(vPay.dep),
-      depMeth: vPay.depMeth,
-      depStaff: vPay.depStaff||'',
-      depNote: vPay.depNote||'',
-      balance: Math.max(0, parseFloat(vPay.est||0) - parseFloat(vPay.dep||0)),
+      dep: parseFloat(payData.dep),
+      depMeth: payData.depMeth,
+      depStaff: payData.depStaff||'',
+      depNote: payData.depNote||'',
+      balance: Math.max(0, parseFloat(payData.est||0) - parseFloat(payData.dep||0)),
       signature: '', signedAt: ''
     };
     go('depReceipt');
