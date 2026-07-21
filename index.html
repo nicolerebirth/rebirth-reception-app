@@ -976,9 +976,9 @@ function receiptScr() {
     +'<div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#64748b;margin-bottom:6px">Services Rendered</div>'
     +(v.svcs||[]).map(s=>'<div style="font-size:13px;padding:4px 0;border-bottom:0.5px solid #f1f5f9">✓ '+esc(s)+'</div>').join('')
     +'<div style="margin-top:14px;border-top:1.5px solid #e2e8f0;padding-top:10px">'
-    +'<div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:8px"><span style="color:#64748b">Estimate:</span><span style="font-weight:600">'+fmt(fin)+'</span></div>'
-    +(dep>0?'<div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:8px;color:#1d4ed8"><span>Down Payment:</span><span style="font-weight:600">₱'+fmt(dep)+'</span></div>':'')
-    +(dep>0?'<div style="display:flex;justify-content:space-between;font-size:15px;font-weight:700;border-top:1.5px solid #e2e8f0;padding-top:8px;margin-top:4px"><span>Balance received:</span><span style="color:#16a34a">'+fmt(remain)+'</span></div>':'<div style="display:flex;justify-content:space-between;font-size:15px;font-weight:700;border-top:1.5px solid #e2e8f0;padding-top:8px;margin-top:4px"><span>Total received:</span><span style="color:#16a34a">'+fmt(fin)+'</span></div>')
+    +'<div style="display:flex;justify-content:space-between;align-items:baseline;font-size:14px;margin-bottom:8px"><span style="color:#64748b">Estimate:</span><span style="font-weight:600;text-align:right">'+fmt(fin)+'</span></div>'
+    +(dep>0?'<div style="display:flex;justify-content:space-between;align-items:baseline;font-size:14px;margin-bottom:8px"><span style="color:#1d4ed8">Down Payment:</span><span style="font-weight:600;color:#1d4ed8;text-align:right">'+fmt(dep)+'</span></div>':'')
+    +(dep>0?'<div style="display:flex;justify-content:space-between;align-items:baseline;font-size:16px;font-weight:800;border-top:2px solid #111;padding-top:10px;margin-top:6px"><span>Balance received:</span><span style="color:#16a34a;text-align:right">'+fmt(remain)+'</span></div>':'<div style="display:flex;justify-content:space-between;align-items:baseline;font-size:16px;font-weight:800;border-top:2px solid #111;padding-top:10px;margin-top:6px"><span>Total received:</span><span style="color:#16a34a;text-align:right">'+fmt(fin)+'</span></div>')
 
     +'</div>'
     +'<div style="margin-top:12px;padding:10px 12px;background:#f0fdf4;border-radius:8px;font-size:12px">'
