@@ -929,12 +929,9 @@ function payScr() {
     +'<div style="font-size:44px;font-weight:900;color:#C41010">'+fmt(remain)+'</div>'
     +'</div>'
     +'<div style="height:1px;background:#e2e8f0;margin:4px 0 12px"></div>'
-    +'<div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;margin-bottom:6px">'
+    +'<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">'
     +'<span style="color:#64748b">Estimate:</span>'
-    +'<div style="display:flex;align-items:center;gap:8px"><span style="font-weight:600">'+fmt(fin)+'</span>'
-    +'<button onclick="S.pf.editAmt=!S.pf.editAmt;render()" style="font-size:11px;padding:3px 8px;border:1px solid #94a3b8;border-radius:6px;background:'+(S.pf&&S.pf.editAmt?'#f1f5f9':'#fff')+';cursor:pointer;color:#64748b;font-family:inherit">'+(S.pf&&S.pf.editAmt?'&#10006; Close':'&#9998; Edit')+'</button>'
-    +'</div></div>'
-    +(S.pf&&S.pf.editAmt?'<input type="number" class="inp" style="color:#111;background:#fff;font-size:15px;font-weight:600;border-color:#16a34a;border-width:2px;margin-bottom:10px" value="'+(pf.final||p.est||'')+'"\'  placeholder="0.00" oninput="ppf(\\\'final\\\',this.value);render()">':'')
+    +'<span style="font-weight:600">'+fmt(fin)+'</span></div>'
     +(dep>0?'<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;color:#1d4ed8"><span>Down Payment'+(p.depMeth?' ('+esc(p.depMeth)+')':'')+' :</span><span style="font-weight:600">&#8722; '+fmt(dep)+'</span></div>':'')
     +'</div>'
     +(remain>0?'<div class="g2" style="margin-bottom:12px"><div class="field"><label style="font-weight:600">Payment method <span style="color:#C41010">*</span></label><select class="inp" style="color:#111" onchange="ppf(\'payMeth\',this.value)"><option value="">Select...</option>'+PAY_METHODS.map(m=>'<option value="'+m+'"'+(pf.payMeth===m?' selected':'')+'>'+m+'</option>').join('')+'</select></div><div class="field"><label style="font-weight:600">Received by <span style="color:#C41010">*</span></label><select class="inp" style="color:#111" onchange="ppf(\'payStaff\',this.value)"><option value="">Select...</option>'+STAFF.map(s=>'<option value="'+s+'"'+(pf.payStaff===s?' selected':'')+'>'+s+'</option>').join('')+'</select></div></div>':'')
@@ -1443,6 +1440,7 @@ async function confirmSignature() {
   flash('Signature saved! \u2713');
   render();
 }
+
 
 
 function btnLoading(el, fn) {
