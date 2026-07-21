@@ -833,7 +833,7 @@ function newConfScr() {
     +([S.f.m1,S.f.m2,S.f.m3].filter(Boolean).length?'<div class="dvdr"></div><div style="background:#f1f5f9;border-radius:8px;padding:10px 12px;font-size:13px;color:#475569">📝 '+[S.f.m1,S.f.m2,S.f.m3].filter(Boolean).map(m=>esc(m)).join('<br>')+'</div>':'')
     +(pay.est?'<div class="dvdr"></div><div style="background:#dcfce7;border:1px solid #16a34a;border-radius:8px;padding:10px 14px;font-size:14px;font-weight:700;color:#166534">💰 Estimate: '+fmt(pay.est)+(parseFloat(pay.dep||0)>0?' | Deposit: '+fmt(pay.dep)+' via '+esc(pay.depMeth||''):'')+'</div>':'')
     +'</div>'
-    +'<div class="acts"><button class="btn-g" onclick="go(\'new3\')">← Edit</button><button class="btn-r" style="font-size:16px;padding:14px 28px" onclick="submitNew()" '+(S.busy?'disabled':'')+'>'+(S.busy?'Saving...':'<i class="ti ti-check" style="font-size:18px"></i> Register now')+'</button></div></div>';
+    +'<div class="acts"><button class="btn-g" onclick="go(\'new3\')">← Edit</button><button class="btn-r" style="font-size:16px;padding:14px 28px" onclick="btnLoading(this,submitNew)" '+(S.busy?'disabled':'')+'>'+(S.busy?'Saving...':'<i class="ti ti-check" style="font-size:18px"></i> Register now')+'</button></div></div>';
 }
 
 function retVisitScr() {
@@ -885,7 +885,7 @@ function retConfScr() {
     +([S.vf.m1,S.vf.m2,S.vf.m3].filter(Boolean).length?'<div style="margin-top:10px;background:#f1f5f9;border-radius:8px;padding:10px 12px;font-size:13px;color:#475569">📝 '+[S.vf.m1,S.vf.m2,S.vf.m3].filter(Boolean).map(m=>esc(m)).join('<br>')+'</div>':'')
     +(pay.est?'<div style="margin-top:10px;background:#dcfce7;border:1px solid #16a34a;border-radius:8px;padding:10px 14px;font-size:14px;font-weight:700;color:#166534">💰 Estimate: '+fmt(pay.est)+(parseFloat(pay.dep||0)>0?' | Deposit: '+fmt(pay.dep):'')+'</div>':'')
     +'</div>'
-    +'<div class="acts"><button class="btn-g" onclick="go(\'retVisit\')">← Edit</button><button class="btn-r" style="font-size:16px;padding:14px 28px" onclick="submitVisit()" '+(S.busy?'disabled':'')+'>'+(S.busy?'Saving...':'<i class="ti ti-check" style="font-size:18px"></i> Save visit')+'</button></div></div>';
+    +'<div class="acts"><button class="btn-g" onclick="go(\'retVisit\')">← Edit</button><button class="btn-r" style="font-size:16px;padding:14px 28px" onclick="btnLoading(this,submitVisit)" '+(S.busy?'disabled':'')+'>'+(S.busy?'Saving...':'<i class="ti ti-check" style="font-size:18px"></i> Save visit')+'</button></div></div>';
 }
 
 function savedScr() {
@@ -923,16 +923,25 @@ function payScr() {
     +'<div class="card">'
     +'<div style="font-size:12px;font-weight:600;text-transform:uppercase;color:#94a3b8;margin-bottom:10px">📋 Services</div>'
     +'<div style="margin-bottom:10px">'+(v.svcs||[]).map(s=>'<span class="stag">✓ '+esc(s)+'</span>').join('')+'</div>'
-    +'<div class="dvdr"></div>'
-    +'<div class="field" style="margin-bottom:14px"><label style="font-weight:600">Final amount ₱ (edit if different from estimate)</label>'
-    +'<input type="number" class="inp" style="color:#111;background:#fff;font-size:22px;font-weight:700;border-color:#16a34a;border-width:2px" value="'+(pf.final||p.est||'')+'" placeholder="0.00" oninput="ppf(\'final\',this.value);render()">'
+    +'<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:16px">'
+    +'<div style="text-align:center;padding:8px 0 14px">'
+    +'<div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:#64748b;margin-bottom:4px">Balance to pay</div>'
+    +'<div style="font-size:44px;font-weight:900;color:#C41010">'+fmt(remain)+'</div>'
     +'</div>'
-    +(dep>0?'<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px;margin-bottom:14px">'+'<div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:8px"><span style="color:#64748b">Estimate:</span><span style="font-weight:600">'+fmt(fin)+'</span></div>'+'<div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:8px;color:#1d4ed8"><span>Down Payment received'+(p.depMeth?' ('+esc(p.depMeth)+')':'')+':</span><span style="font-weight:600">− '+fmt(dep)+'</span></div>'+'<div style="height:1px;background:#e2e8f0;margin:8px 0"></div>'+'<div style="display:flex;justify-content:space-between;font-size:18px;font-weight:900"><span>Balance to pay:</span><span style="color:#ea580c">'+fmt(remain)+'</span></div>'+'</div>':'')
+    +'<div style="height:1px;background:#e2e8f0;margin:4px 0 12px"></div>'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;margin-bottom:6px">'
+    +'<span style="color:#64748b">Estimate:</span>'
+    +'<div style="display:flex;align-items:center;gap:8px"><span style="font-weight:600">'+fmt(fin)+'</span>'
+    +'<button onclick="S.pf.editAmt=!S.pf.editAmt;render()" style="font-size:11px;padding:3px 8px;border:1px solid #94a3b8;border-radius:6px;background:'+(S.pf&&S.pf.editAmt?'#f1f5f9':'#fff')+';cursor:pointer;color:#64748b;font-family:inherit">'+(S.pf&&S.pf.editAmt?'&#10006; Close':'&#9998; Edit')+'</button>'
+    +'</div></div>'
+    +(S.pf&&S.pf.editAmt?'<input type="number" class="inp" style="color:#111;background:#fff;font-size:15px;font-weight:600;border-color:#16a34a;border-width:2px;margin-bottom:10px" value="'+(pf.final||p.est||'')+'"\'  placeholder="0.00" oninput="ppf(\\\'final\\\',this.value);render()">':'')
+    +(dep>0?'<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;color:#1d4ed8"><span>Down Payment'+(p.depMeth?' ('+esc(p.depMeth)+')':'')+' :</span><span style="font-weight:600">&#8722; '+fmt(dep)+'</span></div>':'')
+    +'</div>'
     +(remain>0?'<div class="g2" style="margin-bottom:12px"><div class="field"><label style="font-weight:600">Payment method <span style="color:#C41010">*</span></label><select class="inp" style="color:#111" onchange="ppf(\'payMeth\',this.value)"><option value="">Select...</option>'+PAY_METHODS.map(m=>'<option value="'+m+'"'+(pf.payMeth===m?' selected':'')+'>'+m+'</option>').join('')+'</select></div><div class="field"><label style="font-weight:600">Received by <span style="color:#C41010">*</span></label><select class="inp" style="color:#111" onchange="ppf(\'payStaff\',this.value)"><option value="">Select...</option>'+STAFF.map(s=>'<option value="'+s+'"'+(pf.payStaff===s?' selected':'')+'>'+s+'</option>').join('')+'</select></div></div>':'')
     +(remain>0?'<div class="field"><label style="font-weight:600;color:#C41010">'+refLabel(pf.payMeth)+' *</label><input class="inp" style="color:#111;background:#fff;border:2px solid '+(pf.payNote?'#16a34a':'#C41010')+'" value="'+esc(pf.payNote||'')+'" placeholder="Enter ref number..." oninput="ppf(\'payNote\',this.value)"></div>':'')
     +(S.err?'<div class="errbox" style="margin-top:12px">'+S.err+'</div>':'')
     +'</div>'
-    +'<div class="acts"><button class="btn-g" onclick="go(\'prof\')">Cancel</button><button class="btn-r" style="font-size:16px;padding:14px 28px" onclick="completePayment()"><i class="ti ti-check" style="font-size:18px"></i> Mark as PAID</button></div></div>';
+    +'<div class="acts"><button class="btn-g" onclick="go(\'prof\')">Cancel</button><button class="btn-r" style="font-size:16px;padding:14px 28px" onclick="btnLoading(this,completePayment)"><i class="ti ti-check" style="font-size:18px"></i> Mark as PAID</button></div></div>';
 }
 
 function receiptScr() {
@@ -995,7 +1004,7 @@ function receiptScr() {
         +'<canvas id="sig-canvas" width="380" height="150" style="width:100%;height:150px;border:2px solid #cbd5e1;border-radius:8px;background:#fff;touch-action:none;display:block;margin-bottom:10px"></canvas>'
         +'<div style="display:flex;gap:10px">'
         +'<button onclick="clearSignature()" style="flex:1;padding:10px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;cursor:pointer;font-family:inherit;font-size:14px;min-height:44px">Clear</button>'
-        +'<button onclick="confirmSignature()" style="flex:2;padding:10px;background:#C41010;color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-size:14px;font-weight:700;min-height:44px">✅ Confirm Signature</button>'
+        +'<button onclick="btnLoading(this,confirmSignature)" style="flex:2;padding:10px;background:#C41010;color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-size:14px;font-weight:700;min-height:44px">✅ Confirm Signature</button>'
         +'</div></div>'
     )
     +'<div style="text-align:center;margin-top:16px;padding-top:12px;border-top:1px dashed #e2e8f0;font-size:11px;color:#94a3b8">Thank you for choosing Rebirth Car Coating Center!<br>We look forward to serving you again.</div>'
@@ -1220,7 +1229,7 @@ function depReceiptScr() {
     h.push('<canvas id="dep-sig-canvas" width="380" height="150" style="width:100%;height:150px;border:2px solid #cbd5e1;border-radius:8px;background:#fff;touch-action:none;display:block;margin-bottom:10px"></canvas>');
     h.push('<div style="display:flex;gap:10px">');
     h.push('<button onclick="clearDepSignature()" style="flex:1;padding:10px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;cursor:pointer;font-family:inherit;font-size:14px;min-height:44px">Clear</button>');
-    h.push('<button onclick="confirmDepSignature()" style="flex:2;padding:10px;background:#C41010;color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-size:14px;font-weight:700;min-height:44px">&#9989; Confirm Signature</button>');
+    h.push('<button onclick="btnLoading(this,confirmDepSignature)" style="flex:2;padding:10px;background:#C41010;color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-size:14px;font-weight:700;min-height:44px">&#9989; Confirm Signature</button>');
     h.push('</div>');
     h.push('<button onclick="skipDepSignature()" style="width:100%;padding:10px;border:1px solid #94a3b8;border-radius:8px;background:#f8fafc;cursor:pointer;font-family:inherit;font-size:13px;color:#64748b;margin-top:8px;min-height:40px">📱 Online Payment — Skip Signature</button>');
   }
@@ -1312,7 +1321,7 @@ function existingScr() {
 
     +(S.err?'<div class="errbox">'+S.err+'</div>':'')
     +'<div class="acts"><button class="btn-g" onclick="go(\'home\')">Cancel</button>'
-    +'<button class="btn-r" style="background:#7c3aed;font-size:15px" onclick="submitExisting()">Register customer →</button></div></div>';
+    +'<button class="btn-r" style="background:#7c3aed;font-size:15px" onclick="btnLoading(this,submitExisting)">Register customer →</button></div></div>';
 }
 
 function confirmExCard() {
@@ -1435,6 +1444,13 @@ async function confirmSignature() {
   render();
 }
 
+
+function btnLoading(el, fn) {
+  el.style.background = '#94a3b8';
+  el.style.pointerEvents = 'none';
+  el.textContent = 'Processing...';
+  fn();
+}
 function render() {
   const b = document.getElementById('body');
   if (!b) return;
