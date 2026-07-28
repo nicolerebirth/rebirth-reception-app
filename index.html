@@ -562,7 +562,7 @@ function paySection(isV) {
   return '<div class="pay-sec">'
     +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">'
     +'<div style="font-size:16px;font-weight:700;color:#166534">💰 Payment</div>'
-    +'<button type="button" onclick="toggleNoPayment(isV)" class="btn-nopay'+(p.noPayment?' active':'')+'">'+(p.noPayment?'✅ NO PAYMENT':'🚫 No Payment')+'</button>'
+    +'<button type="button" onclick="toggleNoPayment('+(isV?'true':'false')+')" class="btn-nopay'+(p.noPayment?' active':'')+'">'+(p.noPayment?'✅ NO PAYMENT':'🚫 No Payment')+'</button>'
     +'</div>'
     +(p.noPayment?'<div style="background:#dc2626;border-radius:10px;padding:16px;margin-bottom:14px;text-align:center"><div style="font-size:20px">🚫</div><div style="font-size:17px;font-weight:900;color:#fff">NO PAYMENT</div><div style="font-size:12px;color:#fecaca">This visit is free of charge</div></div>':'')
     +(!p.noPayment?'<div class="field" style="margin-bottom:14px">':'<div style="display:none">')
