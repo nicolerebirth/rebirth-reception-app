@@ -50,6 +50,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .svc-opts{padding:12px 14px 16px;background:#fff5f5;border-top:1px solid #fca5a5;display:flex;flex-wrap:wrap;gap:9px}
 .card-inp-sec{border:2.5px solid #d97706;border-radius:12px;background:#fffbeb;padding:18px;margin-top:12px}
 .pay-sec{border:2px solid #16a34a;border-radius:12px;background:#f0fdf4;padding:18px;margin-top:14px}
+.btn-nopay{padding:10px 20px;border-radius:8px;border:3px solid #94a3b8;background:#fff;color:#94a3b8;font-weight:800;cursor:pointer;font-family:inherit;font-size:14px;min-height:46px;transition:all .15s}
+.btn-nopay.active{border-color:#dc2626;background:#dc2626;color:#fff;box-shadow:0 3px 10px rgba(220,38,38,.4)}
 .crow{display:flex;gap:10px;padding:8px 0;border-bottom:0.5px solid #e2e8f0}
 .clbl{font-size:12px;color:#94a3b8;min-width:110px;flex-shrink:0;padding-top:1px}
 .cval{font-size:14px;font-weight:500;color:#111}
@@ -560,9 +562,9 @@ function paySection(isV) {
   return '<div class="pay-sec">'
     +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">'
     +'<div style="font-size:16px;font-weight:700;color:#166534">💰 Payment</div>'
-    +'<button type="button" onclick="p.noPayment=!p.noPayment;if(p.noPayment){p.est=\'0\';p.dep=\'\';p.depMeth=\'\';};render()" style="padding:8px 14px;border-radius:8px;border:2px solid '+(p.noPayment?'\'#dc2626\'':'\'#94a3b8\'')+';background:'+(p.noPayment?'\'#fef2f2\'':'\'#fff\'')+';color:'+(p.noPayment?'\'#dc2626\'':'\'#64748b\'')+';font-weight:700;cursor:pointer;font-family:inherit;font-size:13px">'+(p.noPayment?'✓ No Payment':'🚫 No Payment')+'</button>'
-    +'</div>'
-    +(p.noPayment?'<div style="background:#fef2f2;border:2px solid #dc2626;border-radius:10px;padding:16px;margin-bottom:14px;text-align:center"><div style="font-size:16px;font-weight:700;color:#dc2626">🚫 No Payment</div><div style="font-size:13px;color:#9f1239;margin-top:4px">This visit is free of charge</div></div>':'')
+    +'<button type="button" onclick="toggleNoPayment(isV)" class="btn-nopay'+(p.noPayment?' active':'')+'">'
+    +(p.noPayment?'<span>✅</span> NO PAYMENT':'🚫 No Payment')
+    +'</button>'
     +(!p.noPayment?'<div class="field" style="margin-bottom:14px">\'':'')
     +'<label style="color:#166534;font-weight:600">Estimate amount ₱ <span style="color:#C41010">*</span></label>'
     +'<input type="number" class="inp" style="color:#111;background:#fff;font-size:20px;font-weight:700;border-color:#16a34a;border-width:2px" value="'+esc(p.est)+'" placeholder="0.00" oninput="'+onin+'(\'est\',this.value)">'
@@ -1470,6 +1472,13 @@ async function confirmSignature() {
 
 
 
+
+function toggleNoPayment(isV) {
+  var p = isV ? S.vf.pay : S.f.pay;
+  p.noPayment = !p.noPayment;
+  if (p.noPayment) { p.est = '0'; p.dep = ''; p.depMeth = ''; }
+  render();
+}
 function btnLoading(el, fn) {
   el.style.background = '#94a3b8';
   el.style.pointerEvents = 'none';
