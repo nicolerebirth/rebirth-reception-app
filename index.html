@@ -592,8 +592,14 @@ function paySection(isV) {
     +'</div>';
 }
 
-function maintPrompt() {
-  const c = S.sel; if(!c) return '';
+function maintPrompt(isV) {
+  const c = isV ? S.sel : null;
+  // 新規客の場合 - まだカードが確認できない
+  if (!isV) {
+    const newConf = S.f.confirmedCard;
+    if (!newConf) return '<div style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;padding:14px;margin-top:8px"><div style="font-size:13px;color:#64748b">🃏 Register a Maintenance Prepaid Card below to use it for this service.</div></div>';
+    c = {prepaidNum: newConf, prepaidUsed: parseInt(S.f.prepaidUsedInit||0)};
+  }
   const has  = !!(c.prepaidNum && c.prepaidNum.trim());
   const used = c.prepaidUsed||0;
   const ok   = has && used<4;
@@ -604,8 +610,8 @@ function maintPrompt() {
     +'<div style="font-size:15px;font-weight:700;color:#92400e;margin-bottom:6px">🃏 Use prepaid card for this maintenance?</div>'
     +'<div style="font-size:13px;color:#b45309;margin-bottom:14px">Card #<strong>'+esc(c.prepaidNum)+'</strong> · Visit <strong>'+next+'</strong> of 4'+(free?' <span style="background:#d97706;color:#fff;padding:2px 8px;border-radius:12px;font-size:12px;margin-left:6px">★ FREE!</span>':'')+'</div>'
     +'<div style="display:flex;gap:10px">'
-    +'<button onclick="S.vf.useCard=true;render()" style="flex:1;padding:12px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;border:2.5px solid '+(S.vf.useCard?'#d97706':'#cbd5e1')+';background:'+(S.vf.useCard?'#d97706':'#fff')+';color:'+(S.vf.useCard?'#fff':'#64748b')+';font-family:inherit;min-height:50px">'+(S.vf.useCard?'✓ ':'')+'YES — charge card</button>'
-    +'<button onclick="S.vf.useCard=false;render()" style="flex:1;padding:12px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;border:2.5px solid '+(!S.vf.useCard?R:'#cbd5e1')+';background:'+(!S.vf.useCard?R:'#fff')+';color:'+(!S.vf.useCard?'#fff':'#64748b')+';font-family:inherit;min-height:50px">'+(!S.vf.useCard?'✓ ':'')+'NO — regular</button>'
+    +'<button onclick="'+(isV?'S.vf':'S.f')+'.useCard=true;render()" style="flex:1;padding:12px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;border:2.5px solid '+((isV?S.vf:S.f).useCard?'#d97706':'#cbd5e1')+';background:'+((isV?S.vf:S.f).useCard?'#d97706':'#fff')+';color:'+((isV?S.vf:S.f).useCard?'#fff':'#64748b')+';font-family:inherit;min-height:50px">'+(S.vf.useCard?'✓ ':'')+'YES — charge card</button>'
+    +'<button onclick="'+(isV?'S.vf':'S.f')+'.useCard=false;render()" style="flex:1;padding:12px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;border:2.5px solid '+(!(isV?S.vf:S.f).useCard?R:'#cbd5e1')+';background:'+(!S.vf.useCard?R:'#fff')+';color:'+(!S.vf.useCard?'#fff':'#64748b')+';font-family:inherit;min-height:50px">'+(!S.vf.useCard?'✓ ':'')+'NO — regular</button>'
     +'</div></div>';
 }
 
@@ -633,7 +639,7 @@ function svcPick(svs, isV) {
       h += '</div>';
     }
     h += '</div>';
-    if (isV && s.on && (def.id==='ppm'||def.id==='cem')) h += maintPrompt();
+    if (s.on && (def.id==='ppm'||def.id==='cem'||def.id==='free_mnt')) h += maintPrompt(isV);
   });
   return h;
 }
