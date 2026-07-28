@@ -112,6 +112,8 @@ let _submitting = false;
 
 const R = '#C41010';
 const STAFF = ['Nicole','Diane','Jho'];
+
+
 const PAY_METHODS = ['Cash','Credit Card','GCash (Acct 1)','GCash (Acct 2)','Bank Transfer'];
 
 const SVC = [
@@ -575,8 +577,13 @@ function paySection(isV) {
     +PAY_METHODS.map(m => '<option value="'+m+'"'+(p.depMeth===m?' selected':'')+'>'+m+'</option>').join('')
     +'</select></div>'
     +'<div class="field"><label>Received by</label><select class="inp" style="color:#111" onchange="'+onin+'(\'depStaff\',this.value)"><option value="">Select...</option>'
+    +'<div class="field"><label>Received by</label>'
+    +'<select class="inp" style="color:#111" onchange="'+onin+'(\\\'depStaff\\\',this.value===\\\'__other__\\\'?\\\'__other__\\\':this.value);render()">'
+    +'<option value="">Select...</option>'
     +STAFF.map(s => '<option value="'+s+'"'+(p.depStaff===s?' selected':'')+'>'+s+'</option>').join('')
-    +'</select></div>'
+    +'<option value="__other__"'+(p.depStaff&&!STAFF.includes(p.depStaff)?' selected':'')+'>Other (specify)...</option>'
+    +'</select>'
+    +(p.depStaff&&!STAFF.includes(p.depStaff)?'<input class="inp" style="color:#111;background:#fff;margin-top:6px" value="'+esc(p.depStaff&&p.depStaff!=='__other__'?p.depStaff:'')+"\""+' placeholder="Enter name..." oninput="'+onin+'(\\\'depStaff\\\',this.value)">':'')
     +'</div>'
     +(p.depMeth?'<div class="field"><label style="font-weight:600;color:#C41010">'+refLabel(p.depMeth)+' *</label><input class="inp" style="color:#111;background:#fff;border:2px solid '+(p.depNote?'#16a34a':'#C41010')+'" value="'+esc(p.depNote)+'" placeholder="Enter ref number..." oninput="'+onin+'(\'depNote\',this.value)"></div>':'')
     +(p.est ? '<div style="margin-top:12px;padding:10px 14px;background:#dcfce7;border-radius:8px;font-size:14px;font-weight:600;color:#166534">'+fmt(fin)+(dep>0?' − Deposit '+fmt(dep)+' = Balance '+fmt(bal):'')+'</div>' : '')
@@ -602,7 +609,14 @@ function maintPrompt() {
 
 function svcPick(svs, isV) {
   let h = '';
+  const SVC_HEADERS = {
+    'ppf_motec': '<div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#64748b;margin:6px 0 8px;padding-left:4px;border-bottom:2px solid #e2e8f0;padding-bottom:6px">🛡️ PPF</div>',
+    'cer':       '<div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#64748b;margin:14px 0 8px;padding-left:4px;border-bottom:2px solid #e2e8f0;padding-bottom:6px">✨ Coating</div>',
+    'pnt':       '<div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#64748b;margin:14px 0 8px;padding-left:4px;border-bottom:2px solid #e2e8f0;padding-bottom:6px">🔧 Other Services</div>',
+    'prepaid':   '<div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#d97706;margin:14px 0 8px;padding-left:4px;border-bottom:2px solid #fde68a;padding-bottom:6px">🃏 Maintenance Prepaid Card</div>',
+  };
   SVC.forEach((def,i) => {
+    if (SVC_HEADERS[def.id]) h += SVC_HEADERS[def.id];
     const s  = svs[i];
     const ip = def.id==='prepaid';
     const cls = ip&&s.on ? 'svc-item on-prepaid' : 'svc-item'+(s.on?' on':'');
@@ -798,7 +812,7 @@ function new1Scr() {
     +'<div class="card"><div class="sec">Customer information</div>'
     +'<div class="g2" style="margin-bottom:14px"><div class="field"><label>First name<span class="req">*</span></label><input class="inp" value="'+esc(S.f.fn)+'" oninput="sf(\'fn\',this.value)" placeholder="Juan"></div><div class="field"><label>Last name<span class="req">*</span></label><input class="inp" value="'+esc(S.f.ln)+'" oninput="sf(\'ln\',this.value)" placeholder="dela Cruz"></div></div>'
     +'<div class="field" style="margin-bottom:14px"><label>Phone<span class="req">*</span></label><div style="display:flex;gap:8px;align-items:center"><input class="inp" id="p1" style="width:94px;text-align:center" maxlength="4" value="'+esc(S.f.p1)+'" placeholder="0912" oninput="sf(\'p1\',this.value.replace(/\\D/g,\'\'));if(this.value.length===4)document.getElementById(\'p2\').focus()"><span style="color:#94a3b8;font-size:22px">–</span><input class="inp" id="p2" style="width:74px;text-align:center" maxlength="3" value="'+esc(S.f.p2)+'" placeholder="345" oninput="sf(\'p2\',this.value.replace(/\\D/g,\'\'));if(this.value.length===3)document.getElementById(\'p3\').focus()"><span style="color:#94a3b8;font-size:22px">–</span><input class="inp" id="p3" style="width:84px;text-align:center" maxlength="4" value="'+esc(S.f.p3)+'" placeholder="6789" oninput="sf(\'p3\',this.value.replace(/\\D/g,\'\'))"></div></div>'
-    +'<div class="g2" style="margin-bottom:14px"><div class="field"><label>Visit date<span class="req">*</span></label><input type="date" class="inp" value="'+S.f.dt+'" oninput="sf(\'dt\',this.value)"></div><div class="field"><label>Staff<span class="req">*</span></label><select class="inp" style="color:#111" oninput="sf(\'st\',this.value)"><option value="">Select staff...</option>'+STAFF.map(s=>'<option value="'+s+'"'+(S.f.st===s?' selected':'')+'>'+s+'</option>').join('')+'</select></div></div>'
+    +'<div class="g2" style="margin-bottom:14px"><div class="field"><label>Visit date<span class="req">*</span></label><input type="date" class="inp" value="'+S.f.dt+'" oninput="sf(\'dt\',this.value)"></div><div class="field"><label>Staff<span class="req">*</span></label><select class="inp" style="color:#111" oninput="sf(\'st\',this.value)"><option value="">Select staff...</option>'+STAFF.map(s=>'<option value="'+s+'"'+(S.f.st===s?' selected':'')+'>'+s+'</option>').join('')+'<option value="__other__"'+(S.f.st&&!STAFF.includes(S.f.st)?' selected':'')+'>Other (specify)...</option></select>'+(S.f.st&&!STAFF.includes(S.f.st)?'<input class="inp" style="color:#111;background:#fff;margin-top:6px" value="'+(S.f.st!=='__other__'?esc(S.f.st):'')+'"\'  placeholder="Enter name..." oninput="sf(\\\'st\\\',this.value)">':'')+'</div></div>'
     +'<div class="dvdr"></div><div style="font-size:13px;color:#94a3b8;margin-bottom:12px">Optional</div>'
     +'<div class="field" style="margin-bottom:12px"><label>Address</label><input class="inp" value="'+esc(S.f.addr)+'" placeholder="Street, City, Province" oninput="sf(\'addr\',this.value)"></div>'
     +'<div class="field"><label>Email</label><input type="email" class="inp" value="'+esc(S.f.email)+'" placeholder="email@example.com" oninput="sf(\'email\',this.value)"></div></div>'
@@ -866,7 +880,7 @@ function retVisitScr() {
   return '<div style="padding:20px"><button class="btn-sm" onclick="go(\'prof\')" style="margin-bottom:14px"><i class="ti ti-arrow-left"></i> Back</button>'
     +custHeader
     +'<div class="card">'
-    +'<div class="g2" style="margin-bottom:16px"><div class="field"><label>Service date<span class="req">*</span></label><input type="date" class="inp" value="'+S.vf.svd+'" oninput="svf(\'svd\',this.value)"></div><div class="field"><label>Staff<span class="req">*</span></label><select class="inp" style="color:#111" oninput="svf(\'st\',this.value)"><option value="">Select...</option>'+STAFF.map(s=>'<option value="'+s+'"'+(S.vf.st===s?' selected':'')+'>'+s+'</option>').join('')+'</select></div></div>'
+    +'<div class="g2" style="margin-bottom:16px"><div class="field"><label>Service date<span class="req">*</span></label><input type="date" class="inp" value="'+S.vf.svd+'" oninput="svf(\'svd\',this.value)"></div><div class="field"><label>Staff<span class="req">*</span></label><select class="inp" style="color:#111" oninput="svf(\'st\',this.value)"><option value="">Select...</option>'+STAFF.map(s=>'<option value="'+s+'"'+(S.vf.st===s?' selected':'')+'>'+s+'</option>').join('')+'<option value="__other__"'+(S.vf.st&&!STAFF.includes(S.vf.st)?' selected':'')+'>Other (specify)...</option></select>'+(S.vf.st&&!STAFF.includes(S.vf.st)?'<input class="inp" style="color:#111;background:#fff;margin-top:6px" value="'+(S.vf.st!=='__other__'?esc(S.vf.st):'')+'"\'  placeholder="Enter name..." oninput="svf(\\\'st\\\',this.value)">':'')+'</div></div>'
     +'<div class="sec">Services performed</div>'+svcPick(S.vf.svs,true)
     +(pOn?cardInputSec(true):'')
     +'<div class="dvdr"></div><div style="font-size:13px;font-weight:500;color:#64748b;margin-bottom:10px">Notes</div>'
@@ -947,7 +961,7 @@ function payScr() {
     +'<span style="font-weight:600">'+fmt(fin)+'</span></div>'
     +(dep>0?'<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;color:#1d4ed8"><span>Down Payment'+(p.depMeth?' ('+esc(p.depMeth)+')':'')+' :</span><span style="font-weight:600">&#8722; '+fmt(dep)+'</span></div>':'')
     +'</div>'
-    +(remain>0?'<div class="g2" style="margin-bottom:12px"><div class="field"><label style="font-weight:600">Payment method <span style="color:#C41010">*</span></label><select class="inp" style="color:#111" onchange="ppf(\'payMeth\',this.value)"><option value="">Select...</option>'+PAY_METHODS.map(m=>'<option value="'+m+'"'+(pf.payMeth===m?' selected':'')+'>'+m+'</option>').join('')+'</select></div><div class="field"><label style="font-weight:600">Received by <span style="color:#C41010">*</span></label><select class="inp" style="color:#111" onchange="ppf(\'payStaff\',this.value)"><option value="">Select...</option>'+STAFF.map(s=>'<option value="'+s+'"'+(pf.payStaff===s?' selected':'')+'>'+s+'</option>').join('')+'</select></div></div>':'')
+    +(remain>0?'<div class="g2" style="margin-bottom:12px"><div class="field"><label style="font-weight:600">Payment method <span style="color:#C41010">*</span></label><select class="inp" style="color:#111" onchange="ppf(\'payMeth\',this.value)"><option value="">Select...</option>'+PAY_METHODS.map(m=>'<option value="'+m+'"'+(pf.payMeth===m?' selected':'')+'>'+m+'</option>').join('')+'</select></div><div class="field"><label style="font-weight:600">Received by <span style="color:#C41010">*</span></label><select class="inp" style="color:#111" onchange="ppf(\'payStaff\',this.value)"><option value="">Select...</option>'+STAFF.map(s=>'<option value="'+s+'"'+(pf.payStaff===s?' selected':'')+'>'+s+'</option>').join('')+'<option value="__other__"'+(pf.payStaff&&!STAFF.includes(pf.payStaff)?' selected':'')+'>Other (specify)...</option></select>'+(pf.payStaff&&!STAFF.includes(pf.payStaff)?'<input class="inp" style="color:#111;background:#fff;margin-top:6px" value="'+(pf.payStaff!=='__other__'?esc(pf.payStaff):'')+'"\'  placeholder="Enter name..." oninput="ppf(\\\'payStaff\\\',this.value)">':'')+'</div></div>':'')
     +(remain>0?'<div class="field"><label style="font-weight:600;color:#C41010">'+refLabel(pf.payMeth)+' *</label><input class="inp" style="color:#111;background:#fff;border:2px solid '+(pf.payNote?'#16a34a':'#C41010')+'" value="'+esc(pf.payNote||'')+'" placeholder="Enter ref number..." oninput="ppf(\'payNote\',this.value)"></div>':'')
     +(S.err?'<div class="errbox" style="margin-top:12px">'+S.err+'</div>':'')
     +'</div>'
@@ -1286,7 +1300,7 @@ function existingScr() {
     +'<input class="inp" id="ex-p3" style="width:84px;text-align:center" maxlength="4" value="'+esc(ex.p3)+'" placeholder="6789" oninput="S.ex.p3=this.value.replace(/\\D/g,\'\')"></div></div>'
     +'<div class="g2"><div class="field" style="margin-bottom:12px"><label>Email</label><input type="email" class="inp" value="'+esc(ex.email)+'" placeholder="email@example.com" oninput="S.ex.email=this.value"></div>'
     +'<div class="field"><label>Address</label><input class="inp" value="'+esc(ex.addr)+'" placeholder="City, Province" oninput="S.ex.addr=this.value"></div></div>'
-    +'<div class="field" style="margin-bottom:0"><label>Registered by<span class="req">*</span></label><select class="inp" style="color:#111" onchange="S.ex.staff=this.value"><option value="">Select staff...</option>'+STAFF.map(function(s){return '<option value="'+s+'"'+(S.ex.staff===s?' selected':'')+'>'+s+'</option>';}).join('')+'</select></div></div>'
+    +'<div class="field" style="margin-bottom:0"><label>Registered by<span class="req">*</span></label><select class="inp" style="color:#111" onchange="S.ex.staff=this.value"><option value="">Select staff...</option>'+STAFF.map(function(s){return '<option value="'+s+'"'+(S.ex.staff===s?' selected':'')+'>'+s+'</option>';}).join('')+'<option value="__other__"'+(S.ex.staff&&!STAFF.includes(S.ex.staff)?' selected':'')+'>Other (specify)...</option></select>'+(S.ex.staff&&!STAFF.includes(S.ex.staff)?'<input class="inp" style="color:#111;background:#fff;margin-top:6px" value="'+(S.ex.staff!=='__other__'?esc(S.ex.staff):'')+'"\'  placeholder="Enter name..." oninput="S.ex.staff=this.value">':'')+'</div></div>'
 
     // Vehicle Info
     +'<div class="card"><div class="sec">Vehicle information</div>'
