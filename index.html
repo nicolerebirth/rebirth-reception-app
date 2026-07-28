@@ -115,25 +115,29 @@ const STAFF = ['Nicole','Diane','Jho'];
 const PAY_METHODS = ['Cash','Credit Card','GCash (Acct 1)','GCash (Acct 2)','Bank Transfer'];
 
 const SVC = [
+  // ── PPF ──────────────────────────────────────────────────
   {id:'ppf_motec', n:'PPF — Motec',            opts:['6.5mil','7.5mil','8.5mil','Warranty Replacement']},
   {id:'ppf_stek',  n:'PPF — STEK',             opts:['DYNO','FORCE']},
+  {id:'ppm',       n:'PPF maintenance',         opts:[]},
+  {id:'ppf_ins',   n:'PPF Free Inspection',     opts:[], free:true},
+  // ── Coating ──────────────────────────────────────────────
   {id:'cer',       n:'Ceramic coating',         opts:['Budget','Standard','Premium','Super Premium']},
   {id:'gra',       n:'Graphene coating',        opts:['Budget','Standard','Premium','Super Premium']},
   {id:'dia',       n:'Diamond coating',         opts:['Standard','Premium','Super Premium']},
   {id:'tit',       n:'Titanium coating',        opts:['Standard','Premium','Super Premium']},
   {id:'g15',       n:'15H Ceramic guard',       opts:['Standard','Premium','Super Premium']},
+  {id:'cem',       n:'Coating maintenance',     opts:[]},
+  {id:'free_mnt',  n:'Free Maintenance',        opts:['Coating','PPF'], free:true},
+  // ── Other ─────────────────────────────────────────────────
   {id:'pnt',       n:'Paint & body repair',     opts:['Panel','Washover & Coating','Washover & PPF']},
   {id:'tnt',       n:'Tint',                    opts:['Action','Smart','Nex']},
   {id:'wnd',       n:'Windshield protection',   opts:[]},
   {id:'abc',       n:'Anti-bacterial coating',  opts:[]},
-  {id:'ppm',       n:'PPF maintenance',         opts:[]},
-  {id:'cem',       n:'Coating maintenance',     opts:[]},
-  {id:'prepaid',   n:'Maintenance Prepaid Card',opts:[]},
   {id:'buf',       n:'Buffing / Polishing',     opts:[]},
   {id:'dnt',       n:'Dent repair',             opts:[]},
   {id:'rct',       n:'Re-coating',              opts:[]},
-  {id:'ppf_ins',   n:'PPF Free Inspection',     opts:[], free:true},
-  {id:'free_mnt',  n:'Free Maintenance',        opts:['Coating','PPF'], free:true},
+  // ── Prepaid Card（一番下）─────────────────────────────────
+  {id:'prepaid',   n:'Maintenance Prepaid Card',opts:[]},
 ];
 
 const ms   = () => SVC.map(s => ({id:s.id, on:false, opt:''}));
