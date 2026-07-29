@@ -580,11 +580,11 @@ function paySection(isV) {
     +PAY_METHODS.map(m => '<option value="'+m+'"'+(p.depMeth===m?' selected':'')+'>'+m+'</option>').join('')
     +'</select></div>'
     +'<div class="field"><label>Received by</label>'
-    +'<select class="inp" style="color:#111" onchange="\'+onin+\'(\\\'depStaff\\\',this.value);render()"><option value="">Select...</option>'
+    +'<select class="inp" style="color:#111" onchange="setDepStaff('+(isV?1:0)+',this.value)"><option value="">Select...</option>'
     +STAFF.map(s => '<option value="'+s+'"'+(p.depStaff===s?' selected':'')+'>'+s+'</option>').join('')
     +'<option value="__other__"'+(p.depStaff&&!STAFF.includes(p.depStaff)?' selected':'')+'>Other (specify)...</option>'
     +'</select>'
-    +(p.depStaff&&!STAFF.includes(p.depStaff)?'<input class="inp" style="color:#111;background:#fff;margin-top:6px" value="'+esc(p.depStaff!=='__other__'?p.depStaff:'')+'"\'  placeholder="Enter name..." oninput="\'+onin+\'(\\\'depStaff\\\',this.value)">':'')
+    +(p.depStaff&&!STAFF.includes(p.depStaff)?'<input class="inp" style="color:#111;background:#fff;margin-top:6px" value="'+esc(p.depStaff!=='__other__'?p.depStaff:'')+'"\'  placeholder="Enter name..." oninput="setDepStaff('+(isV?1:0)+',this.value)">':'')
     +'</div>'
     +'</div>'
     +(p.depMeth?'<div class="field" style="margin-top:10px"><label style="font-weight:600;color:#C41010">'+refLabel(p.depMeth)+' *</label><input class="inp" style="color:#111;background:#fff;border:2px solid '+(p.depNote?'#16a34a':'#C41010')+'" value="'+esc(p.depNote)+'" placeholder="Enter ref number..." oninput="'+onin+'(\\\'depNote\\\',this.value)"></div>':'')
@@ -1479,6 +1479,11 @@ async function confirmSignature() {
 
 
 
+
+function setDepStaff(isV, v) {
+  if (isV) { S.vf.pay.depStaff = v; } else { S.f.pay.depStaff = v; }
+  render();
+}
 function toggleNoPayment(isV) {
   var p = isV ? S.vf.pay : S.f.pay;
   p.noPayment = !p.noPayment;
