@@ -584,7 +584,7 @@ function paySection(isV) {
     +STAFF.map(s => '<option value="'+s+'"'+(p.depStaff===s?' selected':'')+'>'+s+'</option>').join('')
     +'<option value="__other__"'+(p.depStaff&&!STAFF.includes(p.depStaff)?' selected':'')+'>Other (specify)...</option>'
     +'</select>'
-    +(p.depStaff&&!STAFF.includes(p.depStaff)?'<input class="inp" style="color:#111;background:#fff;margin-top:6px" value="'+esc(p.depStaff!=='__other__'?p.depStaff:'')+'"\'  placeholder="Enter name..." oninput="setDepStaff('+(isV?1:0)+',this.value)">':'')
+    +(p.depStaff&&!STAFF.includes(p.depStaff)?'<input class="inp" style="color:#111;background:#fff;margin-top:6px" value="'+esc(p.depStaff!=='__other__'?p.depStaff:'')+'"\'  placeholder="Enter name..." oninput="saveDepStaff('+(isV?1:0)+',this.value)">':'')
     +'</div>'
     +'</div>'
     +(p.depMeth?'<div class="field" style="margin-top:10px"><label style="font-weight:600;color:#C41010">'+refLabel(p.depMeth)+' *</label><input class="inp" style="color:#111;background:#fff;border:2px solid '+(p.depNote?'#16a34a':'#C41010')+'" value="'+esc(p.depNote)+'" placeholder="Enter ref number..." oninput="'+onin+'(\\\'depNote\\\',this.value)"></div>':'')
@@ -1306,9 +1306,9 @@ function existingScr() {
     +'<input class="inp" id="ex-p2" style="width:74px;text-align:center" maxlength="3" value="'+esc(ex.p2)+'" placeholder="345" oninput="S.ex.p2=this.value.replace(/\\D/g,\'\');if(this.value.length===3)document.getElementById(\'ex-p3\').focus()">'
     +'<span style="color:#94a3b8;font-size:22px">–</span>'
     +'<input class="inp" id="ex-p3" style="width:84px;text-align:center" maxlength="4" value="'+esc(ex.p3)+'" placeholder="6789" oninput="S.ex.p3=this.value.replace(/\\D/g,\'\')"></div></div>'
+    +'<div class="field" style="margin-bottom:0"><label>Registered by<span class="req">*</span></label><select class="inp" style="color:#111" onchange="S.ex.staff=this.value;render()"><option value="">Select staff...</option>'+STAFF.map(function(s){return '<option value="'+s+'"'+(S.ex.staff===s?' selected':'')+'>'+s+'</option>';}).join('')+'<option value="__other__"'+(S.ex.staff&&!STAFF.includes(S.ex.staff)?' selected':'')+'>Other (specify)...</option></select>'+(S.ex.staff&&!STAFF.includes(S.ex.staff)?'<input class="inp" style="color:#111;background:#fff;margin-top:6px" value="'+(S.ex.staff!=='__other__'?esc(S.ex.staff):'')+'"\'  placeholder="Enter name..." oninput="S.ex.staff=this.value">':'')+'</div></div>'
     +'<div class="g2"><div class="field" style="margin-bottom:12px"><label>Email</label><input type="email" class="inp" value="'+esc(ex.email)+'" placeholder="email@example.com" oninput="S.ex.email=this.value"></div>'
     +'<div class="field"><label>Address</label><input class="inp" value="'+esc(ex.addr)+'" placeholder="City, Province" oninput="S.ex.addr=this.value"></div></div>'
-    +'<div class="field" style="margin-bottom:0"><label>Registered by<span class="req">*</span></label><select class="inp" style="color:#111" onchange="S.ex.staff=this.value;render()"><option value="">Select staff...</option>'+STAFF.map(function(s){return '<option value="'+s+'"'+(S.ex.staff===s?' selected':'')+'>'+s+'</option>';}).join('')+'<option value="__other__"'+(S.ex.staff&&!STAFF.includes(S.ex.staff)?' selected':'')+'>Other (specify)...</option></select>'+(S.ex.staff&&!STAFF.includes(S.ex.staff)?'<input class="inp" style="color:#111;background:#fff;margin-top:6px" value="'+(S.ex.staff!=='__other__'?esc(S.ex.staff):'')+'"\'  placeholder="Enter name..." oninput="S.ex.staff=this.value">':'')+'</div></div>'
 
     // Vehicle Info
     +'<div class="card"><div class="sec">Vehicle information</div>'
@@ -1483,6 +1483,9 @@ async function confirmSignature() {
 function setDepStaff(isV, v) {
   if (isV) { S.vf.pay.depStaff = v; } else { S.f.pay.depStaff = v; }
   render();
+}
+function saveDepStaff(isV, v) {
+  if (isV) { S.vf.pay.depStaff = v; } else { S.f.pay.depStaff = v; }
 }
 function toggleNoPayment(isV) {
   var p = isV ? S.vf.pay : S.f.pay;
