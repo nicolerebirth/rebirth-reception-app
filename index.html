@@ -1312,9 +1312,9 @@ function existingScr() {
 
     // Vehicle Info
     +'<div class="card"><div class="sec">Vehicle information</div>'
-    +'<div class="g2" style="margin-bottom:14px"><div class="field"><label>Model / make</label><input class="inp" value="'+esc(ex.mdl)+'" placeholder="Toyota Vios..." oninput="S.ex.mdl=this.value"></div>'
-    +'<div class="field"><label>Color</label>'+colSel+'</div></div>'
-    +'<div class="field"><label>License plate</label><input class="inp" value="'+esc(ex.plt)+'" placeholder="ABC 1234" oninput="S.ex.plt=this.value"></div></div>'
+    +'<div class="g2" style="margin-bottom:14px"><div class="field"><label>Model / make<span class="req">*</span></label><input class="inp" value="'+esc(ex.mdl)+'" placeholder="Toyota Vios..." oninput="S.ex.mdl=this.value"></div>'
+    +'<div class="field"><label>Color<span class="req">*</span></label>'+colSel+'</div></div>'
+    +'<div class="field"><label>License plate<span class="req">*</span></label><input class="inp" value="'+esc(ex.plt)+'" placeholder="ABC 1234" oninput="S.ex.plt=this.value"></div></div>'
 
     // Past Service
     +'<div class="card"><div class="sec">Past service type <span style=\"color:#C41010\">*</span></div>'
