@@ -378,21 +378,18 @@ async function submitNew() {
   S.f = {fn:'',ln:'',p1:'',p2:'',p3:'',dt:td(),st:'',addr:'',email:'',mdl:'',col:'',plt:'',svd:td(),svs:ms(),m1:'',m2:'',m3:'',prepaidNum:'',confirmedCard:'',prepaidUsedInit:0,pay:initPay()};
   _submitting = false;
   S.busy=false;
-  // Pay in Full → use depReceipt with balance=0
+  // Pay in Full → set as 'paid', go directly to Official Receipt
   if (payData.payFull && parseFloat(payData.dep||0) >= parseFloat(payData.est||0) && payData.depMeth) {
-    S.depInfo = {
-      fn:rec.fn, ln:rec.ln, phone:rec.phone,
-      appId:rec.id, mdl:rec.mdl, plt:rec.plt, date:f.svd,
-      services:rec.visits[0].svcs.join(', '),
-      dep: parseFloat(payData.dep),
-      depMeth: payData.depMeth,
-      depStaff: payData.depStaff||'',
-      depNote: payData.depNote||'',
-      balance: 0,
-      signature:'', signedAt:'',
-      isFullPayment: true
-    };
-    go('depReceipt');
+    rec.visits[0].pay.status = 'paid';
+    rec.visits[0].pay.final  = payData.est;
+    rec.visits[0].pay.payMeth   = payData.depMeth;
+    rec.visits[0].pay.payStaff  = payData.depStaff||'';
+    rec.visits[0].pay.payNote   = payData.depNote||'';
+    rec.visits[0].pay.signedAt  = '';
+    rec.visits[0].pay.signature = '';
+    S.sel = rec;
+    S.payVidx = 0;
+    go('receipt');
   } else if (payData.dep && parseFloat(payData.dep) > 0 && payData.depMeth) {
     S.depInfo = {
       fn: rec.fn, ln: rec.ln, phone: rec.phone,
@@ -692,8 +689,9 @@ function pBadge(vn) {
 function payBadge(pay) {
   if (!pay||!pay.est) return '';
   const colors = {pending:['#fef3c7','#92400e','⏳'],deposit:['#dbeafe','#1e40af','🏦'],completed:['#dcfce7','#166534','✅']};
-  const labels = {pending:'Unpaid',deposit:'Down Payment received',completed:'Paid'};
-  const st = pay.status||'pending';
+  const labels = {pending:'Unpaid',deposit:'Down Payment received',completed:'Paid',paid:'✅ Paid in Full'};
+  const _bal = Math.max(0, parseFloat(pay.est||0)-parseFloat(pay.dep||0));
+  const st = (parseFloat(pay.dep||0)>0 && _bal===0 && pay.status!=='completed') ? 'paid' : (pay.status||'pending');
   const [bg,fc,ic] = colors[st]||colors.pending;
   return '<span style="background:'+bg+';color:'+fc+';font-size:12px;font-weight:700;padding:3px 10px;border-radius:12px">'+ic+' '+labels[st]+' '+fmt(pay.final||pay.est)+'</span>';
 }
@@ -801,7 +799,7 @@ function profScr() {
         +(v.memo?'<div style="font-size:12px;color:#94a3b8;margin-top:6px;background:#f1f5f9;padding:6px 9px;border-radius:6px">'+esc(v.memo)+'</div>':'')
         +(pay.est?'<div style="margin-top:8px;padding:6px 10px;border-radius:6px;background:'+(pay.status==='completed'?'#dcfce7':pay.status==='deposit'?'#dbeafe':'#fef3c7')+';display:flex;align-items:center;justify-content:space-between;gap:8px">'
         +'<span style="font-size:12px;font-weight:700;color:'+(pay.status==='completed'?'#166534':pay.status==='deposit'?'#1e40af':'#92400e')+'">'+payBadge(pay)+(pay.dep&&parseFloat(pay.dep)>0?' &nbsp;|&nbsp; DP: '+fmt(pay.dep)+' &nbsp;|&nbsp; Balance: '+fmt(Math.max(0,parseFloat(pay.est||0)-parseFloat(pay.dep||0))):' &nbsp;'+fmt(pay.est||0))+'</span>'
-        +(pay.status!=='completed'?'<button onclick="S.payVidx='+vi+';S.pf=initPay();go(\'pay\')" style="background:#C41010;color:#fff;border:none;border-radius:5px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">💳 Pay</button>'
+        +(pay.status!=='completed'&&Math.max(0,parseFloat(pay.est||0)-parseFloat(pay.dep||0))>0?'<button onclick="S.payVidx='+vi+';S.pf=initPay();go(\'pay\')" style="background:#C41010;color:#fff;border:none;border-radius:5px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">💳 Pay</button>'
         :'<button onclick="S.payVidx='+vi+';go(\'receipt\')" style="background:#16a34a;color:#fff;border:none;border-radius:5px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">🖨 Receipt</button>')
         +'</div>':'')
         +'</div>';
