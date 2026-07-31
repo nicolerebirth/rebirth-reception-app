@@ -1527,7 +1527,7 @@ function saveDepStaff(isV, v) {
 function setEstimate(isV, v) {
   if (isV) { S.vf.pay.est=v; if(S.vf.pay.payFull) S.vf.pay.dep=v; }
   else      { S.f.pay.est=v;  if(S.f.pay.payFull)  S.f.pay.dep=v;  }
-  render();
+  // render() は呼ばない → タイプ中に画面上部に飛ばない
 }
 function setDepAmt(isV, v) {
   if (isV) S.vf.pay.dep=v; else S.f.pay.dep=v;
