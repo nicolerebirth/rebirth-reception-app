@@ -1414,7 +1414,15 @@ async function submitExisting() {
     plt: ex.plt||'',
     prepaidNum: ex.confirmedCard||'',
     prepaidUsed: ex.confirmedCard ? (ex.prepaidUsedInit||0) : 0,
-    visits: []
+    visits: [{
+      date: td(),
+      staff: ex.staff||'',
+      svcs: (ex.svcTypes||[]).filter(function(s){return s;}).concat(ex.svcOther?[ex.svcOther]:[]),
+      memo: 'Past service (Existing customer registration)',
+      usedCard: false,
+      prepaidVisitNum: null,
+      pay: {est:'', dep:'', depMeth:'', status:'existing', signedAt:'', signature:''}
+    }]
   };
 
   S.cx.push(rec);
