@@ -791,7 +791,7 @@ function listScr() {
   cx.forEach(c => {
     const visits = c.visits||[];
     const lastV  = visits.length ? visits[visits.length-1] : null;
-    h += '<div class="cx-card" onclick="openCxProfile(\''+c.id+'\',\''+c.fn+'\',\''+c.ln+'\')"><div style="display:flex;justify-content:space-between;align-items:start">';
+    h += '<div class="cx-card" onclick="openCxProfile(\''+c.id+'\')">';
     h += '<div><div style="font-weight:700;font-size:15px">'+esc(c.fn)+' '+esc(c.ln)+'</div>';
     h += '<div style="font-size:12px;color:#64748b">📞 '+esc(c.phone||'')+(c.mdl?' &nbsp;🚗 '+esc(c.mdl)+(c.plt?' · '+esc(c.plt):''):'')+'</div>';
     if (lastV) h += '<div style="font-size:11px;color:#94a3b8;margin-top:2px">Last: '+lastV.date+' · '+(lastV.svcs||[]).slice(0,1).join('')+'</div>';
@@ -1648,25 +1648,29 @@ async function searchFromSheets() {
   render();
 }
 
-async function openCxProfile(appId, fn, ln) {
-  // Show loading immediately with customer name
-  S.toast = '⏳ Loading ' + fn + ' ' + ln + '...';
-  S.busy = true; render();
-  try {
-    var full = await fetchOneCxFromSheets(appId);
-    if (full) {
-      var idx2 = S.cx.findIndex(function(c){ return c.id===appId; });
-      if (idx2 >= 0) S.cx[idx2] = full; else S.cx.push(full);
-      S.sel = full;
-    } else {
-      // Fallback to local cache
-      S.sel = S.cx.find(function(c){ return c.id===appId; }) || null;
-    }
-  } catch(e) {
-    S.sel = S.cx.find(function(c){ return c.id===appId; }) || null;
+async function openCxProfile(appId) {
+  // Step 1: Find from already-fetched results immediately
+  var cx = null;
+  if (S.sheetsResults) cx = S.sheetsResults.find(function(c){ return c.id===appId; });
+  if (!cx) cx = S.cx.find(function(c){ return c.id===appId; });
+  if (!cx) { flash('Customer not found','err'); return; }
+
+  // Step 2: Open profile immediately with available data
+  S.sel = cx;
+  go('prof');
+
+  // Step 3: Fetch full data (with visits) in background
+  if (S.url) {
+    try {
+      var full = await fetchOneCxFromSheets(appId);
+      if (full && full.visits && full.visits.length > 0) {
+        S.sel = full;
+        var i = S.cx.findIndex(function(c){ return c.id===appId; });
+        if (i >= 0) S.cx[i] = full; else S.cx.push(full);
+        render(); // Update profile with visit history
+      }
+    } catch(e) {}
   }
-  S.toast = null; S.busy = false;
-  if (S.sel) go('prof'); else flash('Customer not found. Please check connection.','err');
 }
 function btnLoading(el, fn) {
   el.style.background = '#94a3b8';
