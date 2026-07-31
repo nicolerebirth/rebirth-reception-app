@@ -50,6 +50,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .svc-opts{padding:12px 14px 16px;background:#fff5f5;border-top:1px solid #fca5a5;display:flex;flex-wrap:wrap;gap:9px}
 .card-inp-sec{border:2.5px solid #d97706;border-radius:12px;background:#fffbeb;padding:18px;margin-top:12px}
 .pay-sec{border:2px solid #16a34a;border-radius:12px;background:#f0fdf4;padding:18px;margin-top:14px}
+.btn-payfull{padding:10px 16px;border-radius:8px;border:2px solid #e2e8f0;background:#fff;color:#64748b;font-weight:700;cursor:pointer;font-family:inherit;font-size:13px;flex:1;transition:all .15s}
+.btn-payfull.active{border-color:#16a34a;background:#f0fdf4;color:#166534}
 .btn-nopay{padding:8px 16px;border-radius:8px;border:2px solid #94a3b8;background:#fff;color:#64748b;font-weight:700;cursor:pointer;font-family:inherit;font-size:13px;transition:all .15s}
 .btn-nopay.active{border-color:#16a34a;background:#16a34a;color:#fff;box-shadow:0 2px 8px rgba(22,163,74,.3)}
 .crow{display:flex;gap:10px;padding:8px 0;border-bottom:0.5px solid #e2e8f0}
@@ -597,11 +599,9 @@ function paySection(isV) {
     +(p.noPayment?'<div style="background:#dcfce7;border:2px solid #16a34a;border-radius:10px;padding:14px;margin-bottom:14px;text-align:center;color:#166534;font-weight:700">✅ No Payment — This visit is free of charge</div>':'')
     +(!p.noPayment?'<div class="field" style="margin-bottom:14px">':'<div style="display:none">')
     +'<label style="color:#166534;font-weight:600">Estimate amount ₱ <span style="color:#C41010">*</span></label>'
-    +'<input type="number" class="inp" style="color:#111;background:#fff;font-size:20px;font-weight:700;border-color:#16a34a;border-width:2px" value="'+esc(p.est)+'" placeholder="0.00" oninput="'+onin+'(\'est\',this.value)">'
-    +'</div>'
     +'<div style="display:flex;gap:8px;margin-bottom:12px;margin-top:4px">'
-    +'<button type="button" onclick="'+onin+'(\\\'payFull\\\',!p.payFull);'+onin+'(\\\'dep\\\',p.payFull?p.est:\'\');'+onin+'(\\\'depMeth\\\',\'\');render()" style="flex:1;padding:10px;border-radius:8px;border:2px solid '+(p.payFull?'\\\'#16a34a\'':'\\\'#e2e8f0\'')+';background:'+(p.payFull?'\\\'#f0fdf4\'':'\\\'#fff\'')+';font-weight:700;cursor:pointer;font-family:inherit;font-size:13px;color:'+(p.payFull?'\\\'#166534\'':'\\\'#64748b\'')+'">'
-    +(p.payFull?'✅ Pay in Full':'💳 Pay in Full (no DP)')+'</button>'
+    +'<button type="button" onclick="togglePayFull('+(isV?1:0)+')" class="btn-payfull'+(p.payFull?' active':'')+'">'
+    +(p.payFull?'✅ Pay in Full':'💳 Pay in Full')+'</button></div>'
     +'</div>'
     +'<div style="border-top:1px solid #bbf7d0;padding-top:12px;margin-bottom:12px;font-size:14px;font-weight:600;color:#166534">🏦 '+(p.payFull?'Full Payment':'Down Payment received (optional)')+'</div>'
     +'<div class="g2" style="margin-bottom:10px">'
