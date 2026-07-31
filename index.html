@@ -361,44 +361,38 @@ async function submitNew() {
       memo:[f.m1,f.m2,f.m3].filter(Boolean).join('\n'),
       usedCard:false, prepaidVisitNum:null, pay:payData}]
   };
-  await postToSheets({type:'new', ...rec, services:rec.visits[0].svcs.join(', '), memo:rec.visits[0].memo,
-    estimate:payData.est, deposit:payData.dep,
-    depositMethod:payData.depMeth||'',
-    depositStaff:payData.depStaff||'',
-    depositNote:payData.depNote||''});
-  S.cx.push(rec);
-  await saveCx();
-  await silentPush(); // 自動バックアップ
+  try {
+    await postToSheets({type:'new', ...rec, services:rec.visits[0].svcs.join(', '), memo:rec.visits[0].memo,
+      estimate:payData.est, deposit:payData.dep,
+      depositMethod:payData.depMeth||'',
+      depositStaff:payData.depStaff||'',
+      depositNote:payData.depNote||''});
+    S.cx.push(rec);
+    await saveCx();
+    await silentPush();
+  } catch(e) {
+    S.err = 'Network error. Please check your connection.';
+    _submitting=false; S.busy=false; render(); return;
+  }
   S.savedInfo = {type:'new', name:rec.fn+' '+rec.ln, card:rec.prepaidNum, svcs:rec.visits[0].svcs, date:rec.firstVisit, staff:rec.staff};
   S.f = {fn:'',ln:'',p1:'',p2:'',p3:'',dt:td(),st:'',addr:'',email:'',mdl:'',col:'',plt:'',svd:td(),svs:ms(),m1:'',m2:'',m3:'',prepaidNum:'',confirmedCard:'',prepaidUsedInit:0,pay:initPay()};
   _submitting = false;
   S.busy=false;
-  // Go to deposit receipt if deposit was paid
-  // If Pay in Full: process as full payment immediately
+  // Pay in Full → use depReceipt with balance=0
   if (payData.payFull && parseFloat(payData.dep||0) >= parseFloat(payData.est||0) && payData.depMeth) {
-    S.payInfo = {
-      fn:rec.fn, ln:rec.ln, appId:rec.id,
-      mdl:rec.mdl, plt:rec.plt, date:f.svd,
+    S.depInfo = {
+      fn:rec.fn, ln:rec.ln, phone:rec.phone,
+      appId:rec.id, mdl:rec.mdl, plt:rec.plt, date:f.svd,
       services:rec.visits[0].svcs.join(', '),
-      est: parseFloat(payData.est||0),
-      dep: 0,
-      paidAmt: parseFloat(payData.dep||0),
-      method: payData.depMeth,
-      staff: payData.depStaff||'',
-      ref: payData.depNote||'',
+      dep: parseFloat(payData.dep),
+      depMeth: payData.depMeth,
+      depStaff: payData.depStaff||'',
+      depNote: payData.depNote||'',
       balance: 0,
-      signature:'', signedAt:''
+      signature:'', signedAt:'',
+      isFullPayment: true
     };
-    // Also post payment to sheets
-    await postToSheets({type:'payment', id:rec.id,
-      fn:rec.fn, ln:rec.ln,
-      finalAmount:parseFloat(payData.est||0),
-      deposit:0, paymentDate:f.svd,
-      paymentMethod:payData.depMeth,
-      paymentStaff:payData.depStaff||'',
-      paymentNote:payData.depNote||''
-    });
-    go('receipt');
+    go('depReceipt');
   } else if (payData.dep && parseFloat(payData.dep) > 0 && payData.depMeth) {
     S.depInfo = {
       fn: rec.fn, ln: rec.ln, phone: rec.phone,
@@ -1255,7 +1249,7 @@ function depReceiptScr() {
 
   // Title
   h.push('<div style="text-align:center;margin-bottom:14px">');
-  h.push('<div style="font-size:15px;font-weight:700;color:#111;text-transform:uppercase;letter-spacing:2px">Down Payment Receipt</div>');
+  h.push('<div style="font-size:15px;font-weight:700;color:#111;text-transform:uppercase;letter-spacing:2px">'+(info.isFullPayment?'Full Payment Receipt':'Down Payment Receipt')+'</div>');
   h.push('<div style="font-size:11px;color:#64748b;margin-top:4px">Date: ' + esc(info.date||'') + '</div>');
   h.push('</div>');
 
@@ -1273,7 +1267,7 @@ function depReceiptScr() {
 
   // Deposit details
   h.push('<div style="margin-top:16px;border-top:2px solid #e2e8f0;padding-top:12px">');
-  h.push('<div style="display:flex;justify-content:space-between;font-size:16px;font-weight:900;margin-bottom:8px"><span>Down Payment Paid:</span><span style="color:#1d4ed8">' + fmt(info.dep) + '</span></div>');
+  h.push('<div style="display:flex;justify-content:space-between;font-size:16px;font-weight:900;margin-bottom:8px"><span>'+(info.isFullPayment?'Total Paid:':'Down Payment Paid:')+'</span><span style="color:#1d4ed8">' + fmt(info.dep) + '</span></div>');
   h.push('<div style="font-size:13px;color:#64748b;margin-bottom:4px"><strong>Method:</strong> ' + esc(info.depMeth||'—') + '</div>');
   h.push('<div style="font-size:13px;color:#64748b;margin-bottom:4px"><strong>Received by:</strong> ' + esc(info.depStaff||'—') + '</div>');
   if (info.depNote) h.push('<div style="font-size:13px;color:#64748b"><strong>Ref#:</strong> ' + esc(info.depNote) + '</div>');
