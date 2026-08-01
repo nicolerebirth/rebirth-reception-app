@@ -241,31 +241,50 @@ async function deleteCustomer() {
   await saveCx(); S.sel=null; S.confirmDel=false;
   flash(nm+' deleted.'); go(S.prevScr==='list'?'list':'home');
 }
+function localSearch(q) {
+  // ローカルキャッシュから検索
+  const ql = (q||'').toLowerCase();
+  return S.cx.filter(c => {
+    if (S.sb==='ln') return (c.ln||'').toLowerCase().includes(ql);
+    if (S.sb==='p4') return c.p3===q || (c.phone||'').endsWith(q);
+    if (S.sb==='em') return (c.email||'').toLowerCase().includes(ql);
+    if (S.sb==='pl') return (c.plt||'').toLowerCase().replace(/\s/g,'').includes(ql.replace(/\s/g,''));
+    // デフォルト: 名前・電話・車両で検索
+    return (c.fn+' '+c.ln).toLowerCase().includes(ql) ||
+           (c.phone||'').includes(q) ||
+           (c.plt||'').toLowerCase().includes(ql) ||
+           (c.mdl||'').toLowerCase().includes(ql);
+  });
+}
+
 async function doSearch() {
   const q = (S.sq||'').trim();
   if (!q) { S.res=[]; render(); return; }
-  if (!S.url) {
-    // Fallback: search local cache
-    const ql = q.toLowerCase();
-    S.res = S.cx.filter(c => {
-      if (S.sb==='ln') return c.ln.toLowerCase().includes(ql);
-      if (S.sb==='p4') return c.p3===q;
-      if (S.sb==='em') return (c.email||'').toLowerCase().includes(ql);
-      if (S.sb==='pl') return (c.plt||'').toLowerCase().replace(/\s/g,'').includes(ql.replace(/\s/g,''));
-      return false;
-    });
-    render(); return;
+
+  // まずローカルキャッシュで即時表示
+  S.res = localSearch(q);
+  render();
+
+  // URLが設定されていればSheetsからも検索
+  if (S.url) {
+    S.busy=true; render();
+    try {
+      const results = await fetchCxFromSheets(q);
+      if (results && results.length > 0) {
+        S.res = results;
+        // ローカルキャッシュを更新
+        results.forEach(sc => {
+          const i = S.cx.findIndex(c=>c.id===sc.id);
+          if (i>=0) S.cx[i]=sc; else S.cx.push(sc);
+        });
+      }
+      // Sheetsが0件でもローカル結果を維持
+    } catch(e) {
+      // Sheets失敗時はローカル結果を維持
+    }
+    S.busy=false;
+    render();
   }
-  // Sheets-First: search from Sheets
-  S.busy=true; render();
-  const results = await fetchCxFromSheets(q);
-  S.res = results;
-  // Update local cache
-  results.forEach(sc => {
-    const i = S.cx.findIndex(c=>c.id===sc.id);
-    if (i>=0) S.cx[i]=sc; else S.cx.push(sc);
-  });
-  S.busy=false; render();
 }
 function confirmCard(isV) {
   const el = document.getElementById(isV ? 'cinp-ret' : 'cinp-new');
