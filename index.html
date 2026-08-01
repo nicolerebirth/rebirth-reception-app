@@ -890,7 +890,7 @@ function profScr() {
       const vi = vs.length-1-ri;
       const pay = v.pay||{};
       return '<div class="visit-blk">'
-        +'<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-weight:700;font-size:14px">'+esc(v.date)+'</span><span style="font-size:11px;color:#94a3b8;background:#f1f5f9;padding:2px 9px;border-radius:12px">'+esc(v.staff||'')+'</span></div>'
+        +'<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-weight:700;font-size:14px">'+fmtVisitDate(v.date)+'</span><span style="font-size:11px;color:#94a3b8;background:#f1f5f9;padding:2px 9px;border-radius:12px">'+esc(v.staff||'')+'</span></div>'
         +(v.svcs||[]).map(s=>'<div style="font-size:13px;color:#16a34a;margin-bottom:2px">✓ '+esc(s)+'</div>').join('')
         +(v.usedCard&&v.prepaidVisitNum?pBadge(v.prepaidVisitNum):'')
         +(v.memo?'<div style="font-size:12px;color:#94a3b8;margin-top:6px;background:#f1f5f9;padding:6px 9px;border-radius:6px">'+esc(v.memo)+'</div>':'')
@@ -1097,7 +1097,7 @@ function payScr() {
     +'<button class="btn-sm" onclick="go(\'prof\')" style="margin-bottom:14px"><i class="ti ti-arrow-left"></i> Back</button>'
     +'<div style="background:#f0fdf4;border:2px solid #16a34a;border-radius:12px;padding:14px 18px;margin-bottom:16px">'
     +'<div style="font-size:17px;font-weight:700;color:#166534">💰 Complete Payment</div>'
-    +'<div style="font-size:13px;color:#15803d">'+esc(c.fn)+' '+esc(c.ln)+' — Service date: '+esc(v.date)+'</div>'
+    +'<div style="font-size:13px;color:#15803d">'+esc(c.fn)+' '+esc(c.ln)+' — Service date: '+fmtVisitDate(v.date)+'</div>'
     +'</div>'
     +'<div class="card">'
     +'<div style="font-size:12px;font-weight:600;text-transform:uppercase;color:#94a3b8;margin-bottom:10px">📋 Services</div>'
@@ -1689,6 +1689,17 @@ function saveStaffName(field, v) {
   if (field === 'ret_st')   S.vf.st = v;
   if (field === 'payStaff') S.pf.payStaff = v;
   if (field === 'ex_staff') S.ex.staff = v;
+}
+function fmtVisitDate(d) {
+  if (!d) return '';
+  // If ISO format "2026-07-31" → format nicely
+  if (/^\d{4}-\d{2}-\d{2}/.test(d)) {
+    var dt = new Date(d + 'T00:00:00');
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return months[dt.getMonth()] + ' ' + dt.getDate() + ', ' + dt.getFullYear();
+  }
+  // Old format "Fri Jul 31" - return as is (year unknown)
+  return d;
 }
 function toggleNoPayment(isV) {
   var p = isV ? S.vf.pay : S.f.pay;
