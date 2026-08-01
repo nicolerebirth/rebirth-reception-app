@@ -156,7 +156,7 @@ const fmt  = n => n ? '₱' + parseFloat(n).toLocaleString('en-PH',{minimumFract
 const initPay = () => ({
   est:'', dep:'', depMeth:'', depStaff:'', depDate:td(), depNote:'',
   final:'', payMeth:'', payStaff:'', payNote:'', payDate:'', status:'pending',
-  signature:'', signedAt:'', noPayment:false, payFull:false
+  signature:'', signedAt:'', finalSignature:'', finalSignedAt:'', noPayment:false, payFull:false
 });
 
 const pill    = (lbl,on,fn,sz=13) => `<button onclick="${fn}" style="padding:9px 18px;border-radius:24px;font-size:${sz}px;cursor:pointer;border:2.5px solid ${on?R:'#cbd5e1'};background:${on?R:'#fff'};color:${on?'#fff':'#64748b'};font-weight:${on?700:400};font-family:inherit;min-height:46px">${lbl}</button>`;
@@ -1088,11 +1088,11 @@ function receiptScr() {
     +'</div>'
     +(v.usedCard&&v.prepaidVisitNum?'<div style="margin-top:8px;padding:8px 12px;background:#fffbeb;border-radius:8px;font-size:12px;color:#92400e">🃏 Prepaid card used — Visit '+v.prepaidVisitNum+' of 4'+(v.prepaidVisitNum===4?' ★ FREE':'')+'</div>':'')
     // Signature section
-    +(p.signedAt
+    +(p.finalSignedAt
       ? '<div style="margin-top:16px;padding-top:14px;border-top:2px dashed #e2e8f0">'
         +'<div style="font-size:12px;font-weight:700;color:#166534;margin-bottom:8px">✅ Customer Signature</div>'
-        +(p.signature?'<img src="'+p.signature+'" style="width:100%;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc">':'')
-        +'<div style="font-size:11px;color:#64748b;margin-top:6px">'+esc(p.signedAt)+'</div>'
+        +(p.finalSignature?'<img src="'+p.finalSignature+'" style="width:100%;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc">':'')
+        +'<div style="font-size:11px;color:#64748b;margin-top:6px">'+esc(p.finalSignedAt)+'</div>'
         +'</div>'
       : '<div style="margin-top:16px;padding-top:14px;border-top:2px dashed #C41010">'
         +'<div style="font-size:14px;font-weight:700;color:#C41010;margin-bottom:10px">✍️ Customer Signature (Required)</div>'
@@ -1530,7 +1530,7 @@ async function confirmSignature() {
     if(cx.id!==c.id) return cx;
     return Object.assign({},cx,{visits:cx.visits.map(function(v,i){
       if(i!==vidx) return v;
-      return Object.assign({},v,{pay:Object.assign({},v.pay,{signature:sigData,signedAt:sigText})});
+      return Object.assign({},v,{pay:Object.assign({},v.pay,{finalSignature:sigData,finalSignedAt:sigText})});
     })});
   });
   S.sel = S.cx.find(function(x){return x.id===c.id;});
