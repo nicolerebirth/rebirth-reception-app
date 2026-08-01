@@ -815,7 +815,7 @@ function retScr() {
 
 function profScr() {
   if (!S.sel) { go('ret'); return ''; }
-  const fr  = S.cx.find(x=>x.id===S.sel.id)||S.sel; S.sel=fr;
+  const fr  = S.sel; // Use S.sel directly (already updated by openCxProfile)
   const vs  = fr.visits||[];
   const hc  = !!(fr.prepaidNum&&fr.prepaidNum.trim());
   const used = fr.prepaidUsed||0;
@@ -1320,7 +1320,7 @@ function depReceiptScr() {
     h.push('<button onclick="go(\'saved\')" style="background:#16a34a;color:#fff;border:none;border-radius:8px;padding:14px 28px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;width:100%">&#10003; Done - Back to Home</button>');
     h.push('</div>');
   } else {
-    h.push('<div style="font-size:14px;font-weight:700;color:#64748b;margin-bottom:10px">&#9997;&#65039; '+(info.isFullPayment?'Customer Signature':'Customer Signature (optional - can sign on final receipt)')+'</div>');
+    h.push('<div style="font-size:14px;font-weight:700;color:#64748b;margin-bottom:10px">&#9997;&#65039; '+(info.isFullPayment?'Customer Signature':'Customer Signature ')+'</div>');
     h.push('<canvas id="dep-sig-canvas" width="380" height="150" style="width:100%;height:150px;border:2px solid #cbd5e1;border-radius:8px;background:#fff;touch-action:none;display:block;margin-bottom:10px"></canvas>');
     h.push('<div style="display:flex;gap:10px">');
     h.push('<button onclick="clearDepSignature()" style="flex:1;padding:10px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;cursor:pointer;font-family:inherit;font-size:14px;min-height:44px">Clear</button>');
@@ -1649,26 +1649,45 @@ async function searchFromSheets() {
 }
 
 async function openCxProfile(appId) {
-  // Step 1: Find from already-fetched results immediately
+  // Step 1: Find best available data
+  // Priority: S.cx (may have visits) > S.sheetsResults (has no visits)
+  var cxLocal = S.cx.find(function(c){ return c.id===appId; });
+  var cxSheet = S.sheetsResults ? S.sheetsResults.find(function(c){ return c.id===appId; }) : null;
+
+  // Use whichever has more data (visits)
   var cx = null;
-  if (S.sheetsResults) cx = S.sheetsResults.find(function(c){ return c.id===appId; });
-  if (!cx) cx = S.cx.find(function(c){ return c.id===appId; });
+  if (cxLocal && (cxLocal.visits||[]).length > 0) {
+    cx = cxLocal; // Local has visits - use it
+  } else if (cxSheet) {
+    cx = cxSheet; // Use Sheets result
+    if (!cx.visits) cx.visits = [];
+    // Merge local visits if available
+    if (cxLocal && (cxLocal.visits||[]).length > 0) {
+      cx.visits = cxLocal.visits;
+    }
+  } else if (cxLocal) {
+    cx = cxLocal;
+  }
+
   if (!cx) { flash('Customer not found','err'); return; }
 
-  // Step 2: Open profile immediately with available data
+  // Step 2: Open profile immediately
   S.sel = cx;
   go('prof');
 
-  // Step 3: Fetch full data (with visits) in background
+  // Step 3: Fetch full data (with visits) from Sheets in background
   if (S.url) {
     try {
       var full = await fetchOneCxFromSheets(appId);
       if (full) {
-        // Always update with fresh Sheets data (including visits)
+        // If Sheets has no visits but we have local visits, keep local
+        if ((!full.visits || full.visits.length === 0) && (cx.visits||[]).length > 0) {
+          full.visits = cx.visits;
+        }
         S.sel = full;
         var i2 = S.cx.findIndex(function(c){ return c.id===appId; });
         if (i2 >= 0) S.cx[i2] = full; else S.cx.push(full);
-        render(); // Re-render profile with visit history
+        render();
       }
     } catch(e) {}
   }
