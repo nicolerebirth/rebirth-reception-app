@@ -1663,11 +1663,12 @@ async function openCxProfile(appId) {
   if (S.url) {
     try {
       var full = await fetchOneCxFromSheets(appId);
-      if (full && full.visits && full.visits.length > 0) {
+      if (full) {
+        // Always update with fresh Sheets data (including visits)
         S.sel = full;
-        var i = S.cx.findIndex(function(c){ return c.id===appId; });
-        if (i >= 0) S.cx[i] = full; else S.cx.push(full);
-        render(); // Update profile with visit history
+        var i2 = S.cx.findIndex(function(c){ return c.id===appId; });
+        if (i2 >= 0) S.cx[i2] = full; else S.cx.push(full);
+        render(); // Re-render profile with visit history
       }
     } catch(e) {}
   }
