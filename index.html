@@ -791,13 +791,72 @@ function listScr() {
   cx.forEach(c => {
     const visits = c.visits||[];
     const lastV  = visits.length ? visits[visits.length-1] : null;
-    h += '<div class="cx-card" onclick="openCxProfile(\''+c.id+'\')">';
-    h += '<div><div style="font-weight:700;font-size:15px">'+esc(c.fn)+' '+esc(c.ln)+'</div>';
-    h += '<div style="font-size:12px;color:#64748b">📞 '+esc(c.phone||'')+(c.mdl?' &nbsp;🚗 '+esc(c.mdl)+(c.plt?' · '+esc(c.plt):''):'')+'</div>';
-    if (lastV) h += '<div style="font-size:11px;color:#94a3b8;margin-top:2px">Last: '+lastV.date+' · '+(lastV.svcs||[]).slice(0,1).join('')+'</div>';
+
+    // 支払い状況を計算
+    var totalEst=0, totalPaid=0;
+    visits.forEach(function(v){
+      var p = v.pay||{};
+      var est = parseFloat(p.est||0);
+      var dep = parseFloat(p.dep||0);
+      var bal = parseFloat(p.balance||p.bal||Math.max(0,est-dep));
+      totalEst += est;
+      if (p.status==='paid'||p.status==='completed'||p.status==='Paid') totalPaid += est;
+      else if (dep>0) totalPaid += dep;
+    });
+    var outstanding = Math.max(0, totalEst - totalPaid);
+    var hasBalance = outstanding > 0 && totalEst > 0;
+    var hasDep = visits.some(function(v){
+      var p=v.pay||{};
+      return (p.status==='Deposit Received'||p.status==='deposit') && parseFloat(p.dep||0)>0;
+    });
+
+    // 最終来店日・サービス
+    var lastDate = lastV ? lastV.date : '';
+    var lastSvc  = lastV ? (lastV.svcs||[]).slice(0,1).join('') : '';
+    // 来店からの経過日数
+    var daysSince = '';
+    if (lastDate) {
+      var diff = Math.floor((new Date() - new Date(lastDate)) / 86400000);
+      if (diff === 0) daysSince = 'Today';
+      else if (diff === 1) daysSince = 'Yesterday';
+      else if (diff < 30) daysSince = diff + ' days ago';
+      else if (diff < 365) daysSince = Math.floor(diff/30) + ' months ago';
+      else daysSince = Math.floor(diff/365) + ' year(s) ago';
+    }
+
+    // カード背景色（未払いは薄赤）
+    var cardBg = hasBalance ? 'background:#fff5f5;border-color:#fca5a5;' : '';
+
+    h += '<div class="cx-card" onclick="openCxProfile(\''+c.id+'\')" style="'+cardBg+'">';
+    h += '<div style="flex:1">';
+    h += '<div style="display:flex;justify-content:space-between;align-items:start">';
+    h += '<div style="font-weight:700;font-size:15px">'+esc(c.fn)+' '+esc(c.ln)+'</div>';
+    h += '<div style="font-size:11px;color:#64748b">'+visits.length+' visit'+(visits.length!==1?'s':'')+'</div>';
     h += '</div>';
-    h += '<div style="font-size:11px;color:#64748b;text-align:right">'+visits.length+' visit'+(visits.length!==1?'s':'')+'</div>';
-    h += '</div></div>';
+    h += '<div style="font-size:12px;color:#64748b;margin-top:2px">📞 '+esc(c.phone||'')+(c.mdl?' &nbsp;🚗 '+esc(c.mdl)+(c.plt?' · '+esc(c.plt):''):'')+'</div>';
+
+    // 最終来店日
+    if (lastDate) {
+      h += '<div style="font-size:11px;color:#64748b;margin-top:4px">';
+      h += '🗓️ <strong>'+lastDate+'</strong> <span style="color:#94a3b8">('+daysSince+')</span>';
+      if (lastSvc) h += ' &nbsp;· '+esc(lastSvc);
+      h += '</div>';
+    }
+
+    // 支払い状況バッジ
+    if (hasBalance) {
+      h += '<div style="margin-top:6px;display:inline-block;background:#fee2e2;color:#dc2626;border:1px solid #fca5a5;border-radius:6px;padding:3px 10px;font-size:12px;font-weight:700">';
+      h += '⚠️ Balance: ₱'+outstanding.toLocaleString('en-PH',{minimumFractionDigits:2})+'</div>';
+    } else if (hasDep) {
+      h += '<div style="margin-top:6px;display:inline-block;background:#dbeafe;color:#1d4ed8;border:1px solid #93c5fd;border-radius:6px;padding:3px 10px;font-size:12px;font-weight:700">';
+      h += '🏦 DP received</div>';
+    } else if (visits.length > 0 && totalEst > 0) {
+      h += '<div style="margin-top:6px;display:inline-block;background:#dcfce7;color:#16a34a;border:1px solid #86efac;border-radius:6px;padding:3px 10px;font-size:12px;font-weight:700">';
+      h += '✅ Paid</div>';
+    }
+
+    h += '</div>';
+    h += '</div>';
   });
 
   h += '</div>';
