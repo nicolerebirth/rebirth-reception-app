@@ -316,7 +316,13 @@ function val3() {
   S.err=''; go('newConf');
 }
 function valVf() {
-  if (!S.vf.st) { S.err='Select a staff member.'; render(); return; }
+  // DOM から直接読み直して確実に反映
+  var stEl = document.getElementById('vf-staff-sel');
+  if (stEl && stEl.value) S.vf.st = stEl.value;
+  // Other inputがある場合はその値を使う
+  var stInp = document.querySelector('#vf-staff-sel + input.inp');
+  if (stInp && stInp.value.trim()) S.vf.st = stInp.value.trim();
+  if (!S.vf.st || S.vf.st === '__other__') { S.err='Select a staff member.'; render(); return; }
   const sel = S.vf.svs.filter(s=>s.on);
   if (!sel.length) { S.err='Select at least one service.'; render(); return; }
   const miss = sel.find(s => SVC.find(x=>x.id===s.id).opts.length>0 && !s.opt);
@@ -1045,7 +1051,7 @@ function retVisitScr() {
     +'<input type="date" class="inp" value="'+S.vf.svd+'" oninput="svf(\\\'svd\\\',this.value)">'
     +'</div>'
     +'<div class="field"><label>Staff<span class="req">*</span></label>'
-    +'<select class="inp" style="color:#111" onchange="svf(\\\'st\\\',this.value);render()">'
+    +'<select id="vf-staff-sel" class="inp" style="color:#111" onchange="svf(\\\'st\\\',this.value);render()">'
     +'<option value="">Select...</option>'
     +STAFF.map(s=>'<option value="'+s+'"'+(S.vf.st===s?' selected':'')+'>'+s+'</option>').join('')
     +'<option value="__other__"'+(S.vf.st&&!STAFF.includes(S.vf.st)?' selected':'')+'>Other (specify)...</option>'
