@@ -892,7 +892,23 @@ function retScr() {
     +'<div class="card"><div class="sec">Find a returning customer</div>'
     +'<div style="display:flex;gap:9px;flex-wrap:wrap;margin-bottom:16px">'+[['ln','Last name'],['p4','Last 4 digits'],['em','Email'],['pl','License plate']].map(([v,l])=>pill(l,S.sb===v,'S.sb=\''+v+'\';render()')).join('')+'</div>'
     +'<div style="display:flex;gap:9px"><input class="inp" value="'+esc(S.sq)+'" placeholder="'+(S.sb==='ln'?'Enter last name...':S.sb==='p4'?'Last 4 digits...':S.sb==='em'?'Email...':'License plate...')+'" oninput="S.sq=this.value" onkeydown="if(event.key===\'Enter\')doSearch()"><button class="btn-r" style="flex-shrink:0" onclick="doSearch()">Search</button></div></div>'
-    +(S.res.length>0?'<div class="card"><div style="font-size:13px;color:#94a3b8;margin-bottom:12px">'+S.res.length+' result'+(S.res.length!==1?'s':'')+' found</div>'+S.res.map(c=>'<div class="cxrow" onclick="openCx(\''+c.id+'\',\'ret\')"><div class="av" style="width:42px;height:42px;font-size:15px">'+(c.fn?c.fn[0]:'')+(c.ln?c.ln[0]:'')+'</div><div style="flex:1"><div style="font-weight:600;font-size:15px">'+esc(c.fn)+' '+esc(c.ln)+'</div><div style="f</div><div style=\"font-size:12px;color:#64748b;margin-top:2px\">\'+esc(c.mdl||c.phone)+(c.plt?\' \xc2\xb7 \'+esc(c.plt):\'\')+\'<br>\'+(c.visits&&c.visits.length?\'\xf0\x9f\x93\x85 \'+fmtVisitDate(c.visits[c.visits.length-1].date)+\' \xc2\xb7 \'+esc((c.visits[c.visits.length-1].svcs||[])[0]||\'\'):\'\xf0\x9f\x93\x9e \'+esc(c.phone))+\'</div></div>i class="ti ti-arrow-right" style="color:#94a3b8;font-size:18px"></i></div>').join('')+'</div>':'')
+    +(S.res.length>0?'<div class="card">'
+    +'<div style="font-size:13px;color:#94a3b8;margin-bottom:12px">'+S.res.length+' result'+(S.res.length!==1?'s':'')+' found</div>'
+    +S.res.map(c=>{
+      var lastV = c.visits&&c.visits.length ? c.visits[c.visits.length-1] : null;
+      var line2 = c.mdl ? '🚗 '+esc(c.mdl)+(c.plt?' · '+esc(c.plt):'') : '📞 '+esc(c.phone||'');
+      var line3 = lastV ? '📅 '+fmtVisitDate(lastV.date)+' · '+esc((lastV.svcs||[])[0]||'') : '📞 '+esc(c.phone||'');
+      return '<div class="cxrow" onclick="openCx(\''+c.id+'\',\'ret\')">'  
+        +'<div class="av" style="width:42px;height:42px;font-size:15px">'+(c.fn?c.fn[0]:'')+(c.ln?c.ln[0]:'')+' </div>'
+        +'<div style="flex:1">'
+        +'<div style="font-weight:600;font-size:15px">'+esc(c.fn)+' '+esc(c.ln)+'</div>'
+        +'<div style="font-size:12px;color:#64748b;margin-top:2px">'+line2+'</div>'
+        +'<div style="font-size:12px;color:#64748b;margin-top:1px">'+line3+'</div>'
+        +'</div>'
+        +'<i class="ti ti-arrow-right" style="color:#94a3b8;font-size:18px"></i>'
+        +'</div>';
+    }).join('')
+    +'</div>':'')
     +(S.sq&&!S.res.length?'<div style="text-align:center;padding:30px;color:#94a3b8">No customers found.</div>':'')
     +'</div>';
 }
