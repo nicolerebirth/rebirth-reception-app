@@ -488,7 +488,7 @@ async function submitVisit() {
     memo:[S.vf.m1,S.vf.m2,S.vf.m3].filter(Boolean).join('\n'),
     usedCard:!!useCard, prepaidVisitNum:pvn, pay:payData
   };
-  await postToSheets({
+  try { await postToSheets({
     type:'return', id:S.sel.id,
     fn:S.sel.fn||'', ln:S.sel.ln||'', phone:S.sel.phone||'',
     email:S.sel.email||'', mdl:S.sel.mdl||'', col:S.sel.col||'', plt:S.sel.plt||'',
@@ -509,6 +509,7 @@ async function submitVisit() {
   S.sel = S.cx.find(c=>c.id===S.sel.id);
   await saveCx();
   await silentPush(); // 自動バックアップ
+  } catch(e) { S.err='Network error. Check connection.'; _submitting=false; S.busy=false; render(); return; }
   S.savedInfo = {type:'return', name:S.sel.fn+' '+S.sel.ln, selId:S.sel.id,
     svcs:v.svcs, date:v.date, staff:v.staff,
     useCard:!!useCard, prepaidVisitNum:pvn, buyingCard:buyCard?S.vf.newCardNum.trim():null};
@@ -1613,19 +1614,21 @@ function confirmExCard() {
 }
 
 async function submitExisting() {
+  if (_submitting) return;
+  _submitting = true; S.busy=true; render();
   var ex = S.ex;
-  if (!ex.fn.trim()||!ex.ln.trim()) { S.err='First and last name required.'; render(); return; }
-  if (!ex.p1||!ex.p2||!ex.p3)      { S.err='Phone number required.'; render(); return; }
-  if (!ex.staff)                    { S.err='Please select staff.'; render(); return; }
-  if (!ex.mdl.trim())               { S.err='Vehicle model is required.'; render(); return; }
+  if (!ex.fn.trim()||!ex.ln.trim()) { S.err='First and last name required.'; _submitting=false; S.busy=false; render(); return; }
+  if (!ex.p1||!ex.p2||!ex.p3)      { S.err='Phone number required.'; _submitting=false; S.busy=false; render(); return; }
+  if (!ex.staff)                    { S.err='Please select staff.'; _submitting=false; S.busy=false; render(); return; }
+  if (!ex.mdl.trim())               { S.err='Vehicle model is required.'; _submitting=false; S.busy=false; render(); return; }
   // Color: read from DOM if not set
   var colEl = document.querySelector('select[onchange*="S.ex.col"]');
   if (colEl && colEl.value) S.ex.col = colEl.value;
   var colInp = document.querySelector('input[placeholder*="color"], input[placeholder*="Color"]');
   if (colInp && colInp.value.trim()) S.ex.col = colInp.value.trim();
-  if (!(ex.col||'').trim())         { S.err='Vehicle color is required.'; render(); return; }
-  if (!ex.plt.trim())               { S.err='License plate is required.'; render(); return; }
-  if (!ex.svcTypes||!ex.svcTypes.some(function(s){return s;})) { S.err='Please select at least one past service.'; render(); return; }
+  if (!(ex.col||'').trim())         { S.err='Vehicle color is required.'; _submitting=false; S.busy=false; render(); return; }
+  if (!ex.plt.trim())               { S.err='License plate is required.'; _submitting=false; S.busy=false; render(); return; }
+  if (!ex.svcTypes||!ex.svcTypes.some(function(s){return s;})) { S.err='Please select at least one past service.'; _submitting=false; S.busy=false; render(); return; }
 
   var rec = {
     id: Date.now()+'',
@@ -2059,10 +2062,21 @@ async function saveEditVisit() {
   go('prof');
 }
 function btnLoading(el, fn) {
+  var origBg = el.style.background;
+  var origText = el.textContent;
   el.style.background = '#94a3b8';
   el.style.pointerEvents = 'none';
-  el.textContent = 'Processing...';
-  fn();
+  el.textContent = '⏳ Processing...';
+  var result = fn();
+  // async functionの場合、エラー時にボタンを復元
+  if (result && typeof result.then === 'function') {
+    result.catch(function(e) {
+      el.style.background = origBg;
+      el.style.pointerEvents = '';
+      el.textContent = origText;
+      console.error('Submit error:', e);
+    });
+  }
 }
 function render() {
   const b = document.getElementById('body');
