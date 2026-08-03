@@ -334,6 +334,11 @@ function valVf() {
   var stInp = document.querySelector('#vf-staff-sel + input.inp');
   if (stInp && stInp.value.trim()) S.vf.st = stInp.value.trim();
   if (!S.vf.st || S.vf.st === '__other__') { S.err='Select a staff member.'; render(); return; }
+  // DOM から Invoice / Job Order を読み直し
+  var invElR = document.querySelector('input[placeholder="e.g. 1801"]');
+  if (invElR && invElR.value.trim()) S.vf.invoiceNo = invElR.value.trim();
+  var jobElR = document.querySelector('input[placeholder="e.g. JO-001"]');
+  if (jobElR && jobElR.value.trim()) S.vf.jobOrderNo = jobElR.value.trim();
   if (!S.vf.invoiceNo.trim())  { S.err='Invoice No. is required.'; render(); return; }
   if (!S.vf.jobOrderNo.trim()) { S.err='Job Order No. is required.'; render(); return; }
   const sel = S.vf.svs.filter(s=>s.on);
@@ -406,7 +411,7 @@ async function submitNew() {
   }
   S.err = '';
   const pOn = f.svs[SVC.findIndex(x=>x.id==='prepaid')]?.on;
-  const payData = {...f.pay, status: parseFloat(f.pay.dep||0)>0 ? 'deposit' : 'pending'};
+  const payData = {...f.pay, status: f.pay.noPayment ? 'Free' : parseFloat(f.pay.dep||0)>0 ? 'Paid Down Payment' : 'Free'};
   const rec = {
     id: Date.now()+'', fn:f.fn, ln:f.ln, p1:f.p1, p2:f.p2, p3:f.p3,
     phone: f.p1+'-'+f.p2+'-'+f.p3,
@@ -477,7 +482,7 @@ async function submitVisit() {
   const pIdx = SVC.findIndex(x=>x.id==='prepaid');
   const buyCard = S.vf.svs[pIdx]?.on && S.vf.newCardNum.trim();
   const pvn = useCard ? ((S.sel.prepaidUsed||0)+1) : null;
-  const payData = {...S.vf.pay, status: parseFloat(S.vf.pay.dep||0)>0 ? 'deposit' : 'pending'};
+  const payData = {...S.vf.pay, status: S.vf.pay.noPayment ? 'Free' : parseFloat(S.vf.pay.dep||0)>0 ? 'Paid Down Payment' : 'Free'};
   const v = {
     date:S.vf.svd, staff:S.vf.st, svcs:getSvcs(S.vf.svs), invoiceNo:S.vf.invoiceNo, jobOrderNo:S.vf.jobOrderNo,
     memo:[S.vf.m1,S.vf.m2,S.vf.m3].filter(Boolean).join('\n'),
@@ -753,9 +758,13 @@ function pBadge(vn) {
 function payBadge(pay) {
   if (!pay||!pay.est) return '';
   const colors = {pending:['#fef3c7','#92400e','⏳'],deposit:['#dbeafe','#1e40af','🏦'],completed:['#dcfce7','#166534','✅']};
-  const labels = {pending:'Unpaid',deposit:'Down Payment received',completed:'Paid',paid:'✅ Paid in Full'};
+  const labels = {pending:'Free','Paid Down Payment':'Paid Down Payment',deposit:'Paid Down Payment',completed:'Full Paid',paid:'Full Paid','Full Paid':'Full Paid','Free':'Free'};
   const _bal = Math.max(0, parseFloat(pay.est||0)-parseFloat(pay.dep||0));
-  const st = (parseFloat(pay.dep||0)>0 && _bal===0 && pay.status!=='completed') ? 'paid' : (pay.status||'pending');
+  const _payStatus = pay.status||'pending';
+  const st = (_bal===0 && parseFloat(pay.est||0)>0) ? 'Full Paid'
+    : (parseFloat(pay.dep||0)>0 && _bal>0) ? 'Paid Down Payment'
+    : (pay.noPayment||pay.est==='0') ? 'Free'
+    : _payStatus;
   const [bg,fc,ic] = colors[st]||colors.pending;
   return '<span style="background:'+bg+';color:'+fc+';font-size:12px;font-weight:700;padding:3px 10px;border-radius:12px">'+ic+' '+labels[st]+' '+fmt(pay.final||pay.est)+'</span>';
 }
@@ -951,15 +960,26 @@ function profScr() {
     :vs.slice().reverse().map((v,ri) => {
       const vi = vs.length-1-ri;
       const pay = v.pay||{};
-      return '<div class="visit-blk">'
-        +'<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-weight:700;font-size:14px">'+fmtVisitDate(v.date)+'</span><span style="font-size:11px;color:#94a3b8;background:#f1f5f9;padding:2px 9px;border-radius:12px">'+esc(v.staff||'')+'</span></div>'
+      const isAmend = v.visitType==='Amendment';
+      return '<div class="visit-blk" style="'+(isAmend?'border-left:3px solid #f59e0b;padding-left:10px;':'')+'">'
+        +'<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:4px">'
+        +'<span style="font-weight:700;font-size:14px">'+fmtVisitDate(v.date)+'</span>'
+        +(isAmend?'<span style="font-size:10px;background:#fef3c7;color:#92400e;border-radius:4px;padding:1px 6px;font-weight:700;margin-left:6px">✏️ AMENDED</span>':v.hasAmendment?'<span style="font-size:10px;background:#f1f5f9;color:#64748b;border-radius:4px;padding:1px 6px">Original</span>':'')
+        +'<span style="font-size:11px;color:#94a3b8;background:#f1f5f9;padding:2px 9px;border-radius:12px">'+esc(v.staff||'')+'</span>'
+        +'</div>'
+        +(v.invoiceNo||v.jobOrderNo?'<div style="margin-bottom:6px">'
+          +(v.invoiceNo?'<span style="font-size:11px;font-weight:700;background:#eff6ff;color:#1d4ed8;border-radius:6px;padding:2px 8px;margin-right:4px">📋 '+esc(v.invoiceNo)+'</span>':'')
+          +(v.jobOrderNo?'<span style="font-size:11px;font-weight:700;background:#f0fdf4;color:#166534;border-radius:6px;padding:2px 8px">🔧 '+esc(v.jobOrderNo)+'</span>':'')
+          +'</div>':'')
         +(v.svcs||[]).map(s=>'<div style="font-size:13px;color:#16a34a;margin-bottom:2px">✓ '+esc(s)+'</div>').join('')
         +(v.usedCard&&v.prepaidVisitNum?pBadge(v.prepaidVisitNum):'')
         +(v.memo?'<div style="font-size:12px;color:#94a3b8;margin-top:6px;background:#f1f5f9;padding:6px 9px;border-radius:6px">'+esc(v.memo)+'</div>':'')
-        +(pay.est?'<div style="margin-top:8px;padding:6px 10px;border-radius:6px;background:'+(pay.status==='completed'?'#dcfce7':pay.status==='deposit'?'#dbeafe':'#fef3c7')+';display:flex;align-items:center;justify-content:space-between;gap:8px">'
-        +'<span style="font-size:12px;font-weight:700;color:'+(pay.status==='completed'?'#166534':pay.status==='deposit'?'#1e40af':'#92400e')+'">'+payBadge(pay)+(pay.dep&&parseFloat(pay.dep)>0?' &nbsp;|&nbsp; DP: '+fmt(pay.dep)+' &nbsp;|&nbsp; Balance: '+fmt(Math.max(0,parseFloat(pay.est||0)-parseFloat(pay.dep||0))):' &nbsp;'+fmt(pay.est||0))+'</span>'
-        +(pay.status!=='completed'&&Math.max(0,parseFloat(pay.est||0)-parseFloat(pay.dep||0))>0?'<button onclick="S.payVidx='+vi+';S.pf=initPay();go(\'pay\')" style="background:#C41010;color:#fff;border:none;border-radius:5px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">💳 Pay</button>'
-        :'<button onclick="S.payVidx='+vi+';go(\'receipt\')" style="background:#16a34a;color:#fff;border:none;border-radius:5px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">🖨 Receipt</button>')
+        +(isAmend?'':'<div style="text-align:right;margin-top:6px">')
+        +(isAmend?'':'<button onclick="startEditVisit('+JSON.stringify(c.id)+','+vi+')" style="font-size:12px;padding:4px 14px;border:1.5px solid #cbd5e1;border-radius:8px;background:#f8fafc;cursor:pointer;color:#475569;font-family:inherit;font-weight:600">✏️ Edit visit</button></div>')
+        +(pay.est?'<div style="margin-top:8px;padding:6px 10px;border-radius:6px;background:'+(pay.status==='completed'?'#dcfce7':pay.status==='deposit'?'#dbeafe':'#fef3c7')+';display:flex;align-items:center;justify-content:space-between">'
+        +'<span style="font-size:12px;font-weight:700;color:'+(pay.status==='completed'?'#166534':pay.status==='deposit'?'#1e40af':'#92400e')+'">'+payBadge(pay,vi)+'</span>'
+        +(pay.status!=='Full Paid'&&pay.status!=='completed'&&Math.max(0,parseFloat(pay.est||0)-parseFloat(pay.dep||0))>0?'<button onclick="S.payVidx='+vi+';S.pf=initPay();go(\'pay\')" style="background:#C41010;color:#fff;border:none;border-radius:5px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer">💳 Pay</button>'
+        :'<button onclick="S.payVidx='+vi+';go(\'receipt\')" style="background:#16a34a;color:#fff;border:none;border-radius:5px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer">🧾 Receipt</button>')
         +'</div>':'')
         +'</div>';
     }).join(''))
@@ -1598,6 +1618,11 @@ async function submitExisting() {
   if (!ex.p1||!ex.p2||!ex.p3)      { S.err='Phone number required.'; render(); return; }
   if (!ex.staff)                    { S.err='Please select staff.'; render(); return; }
   if (!ex.mdl.trim())               { S.err='Vehicle model is required.'; render(); return; }
+  // Color: read from DOM if not set
+  var colEl = document.querySelector('select[onchange*="S.ex.col"]');
+  if (colEl && colEl.value) S.ex.col = colEl.value;
+  var colInp = document.querySelector('input[placeholder*="color"], input[placeholder*="Color"]');
+  if (colInp && colInp.value.trim()) S.ex.col = colInp.value.trim();
   if (!(ex.col||'').trim())         { S.err='Vehicle color is required.'; render(); return; }
   if (!ex.plt.trim())               { S.err='License plate is required.'; render(); return; }
   if (!ex.svcTypes||!ex.svcTypes.some(function(s){return s;})) { S.err='Please select at least one past service.'; render(); return; }
@@ -1629,15 +1654,15 @@ async function submitExisting() {
 
   S.cx.push(rec);
   await saveCx();
-  await silentPush();
-  await postToSheets({
+  try { await silentPush(); } catch(e) {}
+  try { await postToSheets({
     type:'existing_customer', ...rec,
     services: (ex.svcTypes&&ex.svcTypes.length) ? '[Past: '+(ex.svcTypes.join(', '))+(ex.svcOther?' / '+ex.svcOther:'')+']' : '[Existing customer]',
     estimate:'', deposit:'',
     depositMethod:'', depositStaff:'', depositNote:'',
     memo: 'Registered from existing customer list'
       +((ex.svcTypes&&ex.svcTypes.length)?' | Past: '+ex.svcTypes.join(', ')+(ex.svcOther?' / '+ex.svcOther:''):'')
-  });
+  }); } catch(e) { console.log('Sheets error:', e); }
 
   S.ex = {fn:'',ln:'',p1:'',p2:'',p3:'',addr:'',email:'',mdl:'',col:'',plt:'',staff:'',
     svcTypes:[],svcOther:'',prepaidNum:'',prepaidUsedInit:0,confirmedCard:''};
@@ -1968,30 +1993,69 @@ async function saveEditVisit() {
   if (!inv||!inv.value.trim()) { alert('Invoice No. is required.'); return; }
   if (!job||!job.value.trim()) { alert('Job Order No. is required.'); return; }
   if (_editSvcs.length===0) initEditSvcs();
-  // Update local data
-  v.invoiceNo  = inv.value.trim();
-  v.jobOrderNo = job.value.trim();
-  v.svcs       = _editSvcs.filter(Boolean);
-  if (est && est.value) v.pay.est = est.value;
+
+  const newSvcs = _editSvcs.filter(Boolean);
+  const newEst  = (est && est.value.trim()) ? est.value.trim() : (v.pay.est||'');
+
+  // ── Amendment: 元の記録はそのまま保存 ──────────────────────
+  // 変更があった場合のみ、amendmentを追加
+  const changed =
+    inv.value.trim() !== (v.invoiceNo||'') ||
+    job.value.trim() !== (v.jobOrderNo||'') ||
+    newSvcs.join(',') !== (v.svcs||[]).join(',') ||
+    newEst !== (v.pay.est||'');
+
+  if (!changed) { go('prof'); return; }
+
+  // 元の記録にamendment参照を追加
+  v.hasAmendment = true;
+
+  // 新しいamendmentレコードを作成（元の隣に追加）
+  const amendment = {
+    date:       v.date,
+    staff:      v.staff,
+    invoiceNo:  inv.value.trim(),
+    jobOrderNo: job.value.trim(),
+    svcs:       newSvcs,
+    memo:       v.memo||'',
+    usedCard:   v.usedCard,
+    visitType:  'Amendment',
+    amendedAt:  new Date().toISOString().slice(0,10),
+    originalIdx: vi,
+    pay: Object.assign({}, v.pay, {est: newEst})
+  };
+
+  // visitsにamendmentを挿入（元の直後）
+  c.visits.splice(vi+1, 0, amendment);
+
   _editSvcs = [];
-  // Update S.cx
+
+  // ローカルキャッシュ更新
   const ci = S.cx.findIndex(function(cx){ return cx.id===c.id; });
   if (ci>=0) S.cx[ci] = c;
   await saveCx();
-  // Post to Sheets
+
+  // Sheetsに追記（上書きではなく新規行として）
   if (S.url) {
     try {
       await postToSheets({
-        type:'editVisit',
-        id: c.id,
-        vidx: vi,
-        invoiceNo:  v.invoiceNo,
-        jobOrderNo: v.jobOrderNo,
-        services:   v.svcs.join(', '),
-        estimate:   v.pay.est||''
+        type: 'amendment',
+        id:   c.id,
+        originalInvoiceNo:  v.invoiceNo||'',
+        originalJobOrderNo: v.jobOrderNo||'',
+        originalServices:   (v.svcs||[]).join(', '),
+        originalEstimate:   v.pay.est||'',
+        newInvoiceNo:   amendment.invoiceNo,
+        newJobOrderNo:  amendment.jobOrderNo,
+        newServices:    amendment.svcs.join(', '),
+        newEstimate:    newEst,
+        amendedAt:      amendment.amendedAt,
+        fn: c.fn, ln: c.ln, date: v.date
       });
     } catch(e) {}
   }
+
+  flash('✅ Amendment saved. Original record preserved.');
   go('prof');
 }
 function btnLoading(el, fn) {
