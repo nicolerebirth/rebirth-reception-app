@@ -863,7 +863,7 @@ function listScr() {
     // 最終来店日
     if (lastDate) {
       h += '<div style="font-size:11px;color:#64748b;margin-top:4px">';
-      h += '🗓️ <strong>'+lastDate+'</strong> <span style="color:#94a3b8">('+daysSince+')</span>';
+      h += '🗓️ <strong>'+fmtVisitDate(lastDate)+'</strong> <span style="color:#94a3b8">('+daysSince+')</span>';
       if (lastSvc) h += ' &nbsp;· '+esc(lastSvc);
       h += '</div>';
     }
@@ -1733,14 +1733,19 @@ function saveStaffName(field, v) {
 }
 function fmtVisitDate(d) {
   if (!d) return '';
-  // If ISO format "2026-07-31" → format nicely
+  // ISO format "2026-07-31" → "Jul 31, 2026"
   if (/^\d{4}-\d{2}-\d{2}/.test(d)) {
     var dt = new Date(d + 'T00:00:00');
     var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     return months[dt.getMonth()] + ' ' + dt.getDate() + ', ' + dt.getFullYear();
   }
-  // Old format "Fri Jul 31" - return as is (year unknown)
-  return d;
+  // Try to parse other formats
+  var dt2 = new Date(d);
+  if (!isNaN(dt2.getTime()) && dt2.getFullYear() > 2000) {
+    var months2 = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return months2[dt2.getMonth()] + ' ' + dt2.getDate() + ', ' + dt2.getFullYear();
+  }
+  return d; // fallback
 }
 function toggleNoPayment(isV) {
   var p = isV ? S.vf.pay : S.f.pay;
