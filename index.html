@@ -261,30 +261,30 @@ async function doSearch() {
   const q = (S.sq||'').trim();
   if (!q) { S.res=[]; render(); return; }
 
-  // まずローカルキャッシュで即時表示
-  S.res = localSearch(q);
+  // ① ローカルキャッシュで即時表示
+  var local = localSearch(q);
+  S.res = local;
   render();
 
-  // URLが設定されていればSheetsからも検索
-  if (S.url) {
-    S.busy=true; render();
-    try {
-      const results = await fetchCxFromSheets(q);
-      if (results && results.length > 0) {
-        S.res = results;
-        // ローカルキャッシュを更新
-        results.forEach(sc => {
-          const i = S.cx.findIndex(c=>c.id===sc.id);
-          if (i>=0) S.cx[i]=sc; else S.cx.push(sc);
-        });
-      }
-      // Sheetsが0件でもローカル結果を維持
-    } catch(e) {
-      // Sheets失敗時はローカル結果を維持
+  // ② Sheetsからも検索（URL設定済みの場合）
+  if (!S.url) return;
+  S.busy = true; render();
+  try {
+    var results = await fetchCxFromSheets(q);
+    if (results && results.length > 0) {
+      S.res = results;
+      results.forEach(function(sc) {
+        var i = S.cx.findIndex(function(c){ return c.id===sc.id; });
+        if (i>=0) S.cx[i]=sc; else S.cx.push(sc);
+      });
+    } else if (local.length > 0) {
+      S.res = local; // Sheetsが0件ならローカルを維持
     }
-    S.busy=false;
-    render();
+  } catch(e) {
+    if (local.length > 0) S.res = local; // エラー時もローカルを維持
   }
+  S.busy = false;
+  render();
 }
 function confirmCard(isV) {
   const el = document.getElementById(isV ? 'cinp-ret' : 'cinp-new');
