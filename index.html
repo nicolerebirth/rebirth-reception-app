@@ -299,9 +299,18 @@ function confirmCard(isV) {
 function val1() {
   if (!S.f.fn.trim()||!S.f.ln.trim()) { S.err='First and last name required.'; render(); return; }
   if (!S.f.p1||!S.f.p2||!S.f.p3)     { S.err='Phone number required.'; render(); return; }
-  if (!S.f.st)                         { S.err='Select a staff member.'; render(); return; }
-  if (!S.f.invoiceNo.trim())           { S.err='Invoice No. is required.'; render(); return; }
-  if (!S.f.jobOrderNo.trim())          { S.err='Job Order No. is required.'; render(); return; }
+  // DOMから直接読み直し
+  var stEl = document.getElementById('new1-staff-sel');
+  if (stEl && stEl.value) S.f.st = stEl.value;
+  var stInp = document.querySelector('#new1-staff-sel + input.inp');
+  if (stInp && stInp.value.trim()) S.f.st = stInp.value.trim();
+  if (!S.f.st || S.f.st === '__other__') { S.err='Select a staff member.'; render(); return; }
+  var invEl = document.getElementById('new1-invoice');
+  if (invEl) S.f.invoiceNo = invEl.value.trim();
+  var jobEl = document.getElementById('new1-joborder');
+  if (jobEl) S.f.jobOrderNo = jobEl.value.trim();
+  if (!S.f.invoiceNo)  { S.err='Invoice No. is required.'; render(); return; }
+  if (!S.f.jobOrderNo) { S.err='Job Order No. is required.'; render(); return; }
   S.err=''; go('new2');
 }
 function val3() {
@@ -1000,7 +1009,7 @@ function new1Scr() {
     +'<input type="date" class="inp" value="'+S.f.dt+'" oninput="sf(\\\'dt\\\',this.value)">'
     +'</div>'
     +'<div class="field"><label>Staff<span class="req">*</span></label>'
-    +'<select class="inp" style="color:#111" onchange="sf(\\\'st\\\',this.value);render()">'
+    +'<select id="new1-staff-sel" class="inp" style="color:#111" onchange="sf(\\\'st\\\',this.value);render()">'
     +'<option value="">Select staff...</option>'
     +STAFF.map(s=>'<option value="'+s+'"'+(S.f.st===s?' selected':'')+'>'+s+'</option>').join('')
     +'<option value="__other__"'+(S.f.st&&!STAFF.includes(S.f.st)?' selected':'')+'>Other (specify)...</option>'
@@ -1011,6 +1020,15 @@ function new1Scr() {
     +'<div class="field" style="margin-bottom:12px"><label>Address</label><input class="inp" value="'+esc(S.f.addr)+'" placeholder="Street, City, Province" oninput="sf(\'addr\',this.value)"></div>'
     +'<div class="field"><label>Email</label><input type="email" class="inp" value="'+esc(S.f.email)+'" placeholder="email@example.com" oninput="sf(\'email\',this.value)"></div></div>'
     +(S.err?'<div class="errbox">'+S.err+'</div>':'')
+    +'<div class="card" style="margin-bottom:12px">'
+    +'<div class="sec">📋 Job Numbers</div>'
+    +'<div class="g2" style="margin-bottom:0">'
+    +'<div class="field"><label>Invoice No.<span class="req">*</span></label>'
+    +'<input id="new1-invoice" class="inp" style="color:#111;background:#fff" value="'+esc(S.f.invoiceNo)+'" placeholder="e.g. 1801">'
+    +'</div>'
+    +'<div class="field"><label>Job Order No.<span class="req">*</span></label>'
+    +'<input id="new1-joborder" class="inp" style="color:#111;background:#fff" value="'+esc(S.f.jobOrderNo)+'" placeholder="e.g. JO-001">'
+    +'</div></div></div>'
     +'<div class="acts"><button class="btn-g" onclick="go(\'home\')">Cancel</button><button class="btn-r" onclick="val1()">Next: Vehicle →</button></div></div>';
 }
 
@@ -1029,15 +1047,6 @@ function new2Scr() {
 function new3Scr() {
   const pOn = S.f.svs[SVC.findIndex(x=>x.id==='prepaid')]?.on;
   return '<div style="padding:20px">'+stepBar(3)
-    +'<div class="card" style="margin-bottom:12px">'
-    +'<div class="sec">📋 Job Numbers</div>'
-    +'<div class="g2" style="margin-bottom:0">'
-    +'<div class="field"><label>Invoice No.<span class="req">*</span></label>'
-    +'<input class="inp" style="color:#111;background:#fff" value="'+esc(S.f.invoiceNo)+'" placeholder="e.g. 1801" oninput="S.f.invoiceNo=this.value.trim()">'
-    +'</div>'
-    +'<div class="field"><label>Job Order No.<span class="req">*</span></label>'
-    +'<input class="inp" style="color:#111;background:#fff" value="'+esc(S.f.jobOrderNo)+'" placeholder="e.g. JO-001" oninput="S.f.jobOrderNo=this.value.trim()">'
-    +'</div></div></div>'
     +'<div class="card">'
     +'<div class="g2" style="margin-bottom:18px"><div class="field"><label>Date of service<span class="req">*</span></label><input type="date" class="inp" value="'+S.f.svd+'" oninput="sf(\'svd\',this.value)"></div></div>'
     +'<div class="sec">Services</div>'+svcPick(S.f.svs,false)
@@ -1754,19 +1763,23 @@ function saveStaffName(field, v) {
 }
 function fmtVisitDate(d) {
   if (!d) return '';
-  // ISO format "2026-07-31" → "Jul 31, 2026"
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  // ISO format "2026-07-31"
   if (/^\d{4}-\d{2}-\d{2}/.test(d)) {
-    var dt = new Date(d + 'T00:00:00');
-    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var parts = d.split('-');
+    return months[parseInt(parts[1])-1] + ' ' + parseInt(parts[2]) + ', ' + parts[0];
+  }
+  // "2026/07/31"
+  if (/^\d{4}\/\d{2}\/\d{2}/.test(d)) {
+    var p2 = d.split('/');
+    return months[parseInt(p2[1])-1] + ' ' + parseInt(p2[2]) + ', ' + p2[0];
+  }
+  // "Fri Jul 28 2026 ..." or similar with year
+  var dt = new Date(d);
+  if (!isNaN(dt.getTime()) && dt.getFullYear() > 2000) {
     return months[dt.getMonth()] + ' ' + dt.getDate() + ', ' + dt.getFullYear();
   }
-  // Try to parse other formats
-  var dt2 = new Date(d);
-  if (!isNaN(dt2.getTime()) && dt2.getFullYear() > 2000) {
-    var months2 = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    return months2[dt2.getMonth()] + ' ' + dt2.getDate() + ', ' + dt2.getFullYear();
-  }
-  return d; // fallback
+  return d; // unknown format, show as-is
 }
 function setInvoiceNo(isV, v) {
   if (isV) S.vf.pay.invoiceNo = v; else S.f.pay.invoiceNo = v;
