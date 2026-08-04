@@ -1900,43 +1900,61 @@ async function searchFromSheets() {
 }
 
 async function openCxProfile(appId) {
-  // Step 1: Find best available data
-  // Priority: S.cx (may have visits) > S.sheetsResults (has no visits)
-  var cxLocal = S.cx.find(function(c){ return c.id===appId; });
-  var cxSheet = S.sheetsResults ? S.sheetsResults.find(function(c){ return c.id===appId; }) : null;
+  if (!appId) { flash('Customer ID missing','err'); return; }
 
-  // Use whichever has more data (visits)
-  var cx = null;
-  if (cxLocal && (cxLocal.visits||[]).length > 0) {
-    cx = cxLocal; // Local has visits - use it
-  } else if (cxSheet) {
-    cx = cxSheet; // Use Sheets result
-    if (!cx.visits) cx.visits = [];
-    // Merge local visits if available
-    if (cxLocal && (cxLocal.visits||[]).length > 0) {
-      cx.visits = cxLocal.visits;
-    }
-  } else if (cxLocal) {
-    cx = cxLocal;
+  // Step 1: 複数の方法で顧客を探す（id / cxId どちらでも対応）
+  function findCx(arr) {
+    if (!arr) return null;
+    // id完全一致
+    var r = arr.find(function(c){ return c.id===appId; });
+    if (r) return r;
+    // cxId完全一致（CX-0001等の古い顧客）
+    r = arr.find(function(c){ return c.cxId===appId; });
+    if (r) return r;
+    // 部分一致（念のため）
+    r = arr.find(function(c){ return String(c.id).includes(appId) || appId.includes(String(c.id)); });
+    return r || null;
   }
 
-  if (!cx) { flash('Customer not found','err'); return; }
+  var cxLocal  = findCx(S.cx);
+  var cxSheet  = findCx(S.sheetsResults);
+  var cxAll    = []; // 全候補を結合してベストを選択
+  if (cxLocal) cxAll.push(cxLocal);
+  if (cxSheet) cxAll.push(cxSheet);
 
-  // Step 2: Open profile immediately
+  // visitsが多い方を優先
+  cxAll.sort(function(a,b){ return (b.visits||[]).length - (a.visits||[]).length; });
+  var cx = cxAll[0] || null;
+
+  // キャッシュにない場合 → Sheetsから取得
+  if (!cx && S.url) {
+    S.busy = true; render();
+    try {
+      var fetched = await fetchOneCxFromSheets(appId);
+      if (fetched) cx = fetched;
+    } catch(e) {}
+    S.busy = false;
+  }
+
+  if (!cx) { flash('Customer not found. Try searching again.','err'); render(); return; }
+
+  // Step 2: プロフィールを即座に開く
   S.sel = cx;
+  // キャッシュに追加
+  var ci = S.cx.findIndex(function(c){ return c.id===cx.id || c.cxId===cx.cxId; });
+  if (ci >= 0) S.cx[ci] = cx; else S.cx.push(cx);
   go('prof');
 
-  // Step 3: Fetch full data (with visits) from Sheets in background
+  // Step 3: Sheetsから最新データをバックグラウンド取得
   if (S.url) {
     try {
-      var full = await fetchOneCxFromSheets(appId);
+      var full = await fetchOneCxFromSheets(cx.id || appId);
       if (full) {
-        // If Sheets has no visits but we have local visits, keep local
-        if ((!full.visits || full.visits.length === 0) && (cx.visits||[]).length > 0) {
+        if ((!full.visits||full.visits.length===0) && (cx.visits||[]).length>0) {
           full.visits = cx.visits;
         }
         S.sel = full;
-        var i2 = S.cx.findIndex(function(c){ return c.id===appId; });
+        var i2 = S.cx.findIndex(function(c){ return c.id===full.id; });
         if (i2 >= 0) S.cx[i2] = full; else S.cx.push(full);
         render();
       }
