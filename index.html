@@ -836,7 +836,10 @@ function listScr() {
   } else if (!S.url) {
     h += '<div style="background:#fef3c7;border-radius:8px;padding:14px;margin-bottom:14px;font-size:13px;color:#92400e">⚠️ Please set Apps Script URL in Settings first.</div>';
   } else if (S.sheetsResults !== null && cx.length === 0) {
-    h += '<div style="text-align:center;padding:30px;color:#64748b">No results found for "'+esc(q)+'"</div>';
+    h += '<div style="text-align:center;padding:30px;color:#64748b">';
+    h += 'No results found for "'+esc(q)+'"<br>';
+    h += '<small style="color:#94a3b8">Try: full name, phone number, or plate number</small>';
+    h += '</div>';
   } else if (S.sheetsResults === null) {
     h += '<div style="text-align:center;padding:30px;color:#64748b">';
     h += 'Enter a name, phone number, or plate number<br>then press <strong>🔍 Search</strong><br><br>';
@@ -883,7 +886,7 @@ function listScr() {
     // カード背景色（未払いは薄赤）
     var cardBg = hasBalance ? 'background:#fff5f5;border-color:#fca5a5;' : '';
 
-    h += '<div class="cx-card" onclick="openCxProfile(\''+c.id+'\')" style="'+cardBg+'">';
+    h += '<div class="cx-card" onclick="openCxProfile(this.dataset.id)" data-id="' + c.id + '">';
     h += '<div style="flex:1">';
     h += '<div style="display:flex;justify-content:space-between;align-items:start">';
     h += '<div style="font-weight:700;font-size:15px">'+esc(c.fn)+' '+esc(c.ln)+'</div>';
@@ -1855,7 +1858,21 @@ async function fetchOneCxFromSheets(appId) {
   } catch(e) { return null; }
 }
 async function searchFromSheets() {
-  if (!S.url) { flash('Please set Apps Script URL in Settings.','err'); return; }
+  if (!S.url) {
+    // URLなし：ローカルキャッシュから検索
+    var q = (S.lq||'').toLowerCase();
+    if (!q) { S.sheetsResults = [...S.cx]; }
+    else {
+      S.sheetsResults = S.cx.filter(function(c) {
+        return (c.fn+' '+c.ln).toLowerCase().includes(q) ||
+               (c.phone||'').includes(q) ||
+               (c.plt||'').toLowerCase().replace(/\s/g,'').includes(q.replace(/\s/g,'')) ||
+               (c.mdl||'').toLowerCase().includes(q) ||
+               (c.email||'').toLowerCase().includes(q);
+      });
+    }
+    render(); return;
+  }
   S.sheetSearching = true;
   render();
   var results = await fetchCxFromSheets(S.lq||'');
