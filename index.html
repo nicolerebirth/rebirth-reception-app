@@ -1844,8 +1844,16 @@ async function fetchCxFromSheets(q) {
     var url = S.url + '?action=search&q=' + encodeURIComponent(q||'');
     var r = await fetch(url, {headers:{'Content-Type':'text/plain'}});
     var d = await r.json();
+    // デプロイ確認: customers がない場合は旧バージョン
+    if (!d.customers && d.ok) {
+      flash('⚠️ Apps Script needs redeployment! Please redeploy.', 'err');
+      return [];
+    }
     return d.customers || [];
-  } catch(e) { return []; }
+  } catch(e) {
+    flash('Network error: ' + e.message, 'err');
+    return [];
+  }
 }
 
 async function fetchOneCxFromSheets(appId) {
