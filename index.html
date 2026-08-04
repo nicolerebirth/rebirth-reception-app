@@ -1858,30 +1858,43 @@ async function fetchOneCxFromSheets(appId) {
   } catch(e) { return null; }
 }
 async function searchFromSheets() {
+  // まずローカルキャッシュで即時表示
+  var localResults = localSearch(S.lq||'');
+  if (localResults.length > 0) {
+    S.sheetsResults = localResults;
+    render(); // ← 瞬時に表示
+  }
+
   if (!S.url) {
-    // URLなし：ローカルキャッシュから検索
-    var q = (S.lq||'').toLowerCase();
-    if (!q) { S.sheetsResults = [...S.cx]; }
-    else {
-      S.sheetsResults = S.cx.filter(function(c) {
-        return (c.fn+' '+c.ln).toLowerCase().includes(q) ||
-               (c.phone||'').includes(q) ||
-               (c.plt||'').toLowerCase().replace(/\s/g,'').includes(q.replace(/\s/g,'')) ||
-               (c.mdl||'').toLowerCase().includes(q) ||
-               (c.email||'').toLowerCase().includes(q);
-      });
-    }
+    // URL未設定：ローカル結果のみ
+    if (S.sheetsResults === null) S.sheetsResults = localResults;
     render(); return;
   }
+
+  // Sheetsからも検索（バックグラウンド）
   S.sheetSearching = true;
   render();
-  var results = await fetchCxFromSheets(S.lq||'');
-  S.sheetsResults = results;
-  // Update local cache with fresh data
-  results.forEach(function(sc) {
-    var idx2 = S.cx.findIndex(function(lc){ return lc.id===sc.id; });
-    if (idx2 >= 0) S.cx[idx2] = sc; else S.cx.push(sc);
-  });
+  try {
+    var results = await fetchCxFromSheets(S.lq||'');
+    if (results && results.length > 0) {
+      // Sheetsに結果あり → Sheets結果を使用
+      S.sheetsResults = results;
+      results.forEach(function(sc) {
+        var i = S.cx.findIndex(function(lc){ return lc.id===sc.id; });
+        if (i >= 0) S.cx[i] = sc; else S.cx.push(sc);
+      });
+    } else if (localResults.length > 0) {
+      // Sheetsが0件 → ローカル結果を維持（消えない！）
+      S.sheetsResults = localResults;
+    } else {
+      // 両方0件 → 0件表示
+      S.sheetsResults = [];
+    }
+  } catch(e) {
+    // エラー時はローカル結果を維持
+    if (localResults.length > 0) S.sheetsResults = localResults;
+    else S.sheetsResults = [];
+  }
   S.sheetSearching = false;
   render();
 }
