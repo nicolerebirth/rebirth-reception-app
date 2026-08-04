@@ -242,18 +242,15 @@ async function deleteCustomer() {
   flash(nm+' deleted.'); go(S.prevScr==='list'?'list':'home');
 }
 function localSearch(q) {
-  // ローカルキャッシュから検索
+  // ローカルキャッシュから検索（S.sbに関係なく全フィールド検索）
+  if (!q) return [...S.cx];
   const ql = (q||'').toLowerCase();
-  return S.cx.filter(c => {
-    if (S.sb==='ln') return (c.ln||'').toLowerCase().includes(ql);
-    if (S.sb==='p4') return c.p3===q || (c.phone||'').endsWith(q);
-    if (S.sb==='em') return (c.email||'').toLowerCase().includes(ql);
-    if (S.sb==='pl') return (c.plt||'').toLowerCase().replace(/\s/g,'').includes(ql.replace(/\s/g,''));
-    // デフォルト: 名前・電話・車両で検索
-    return (c.fn+' '+c.ln).toLowerCase().includes(ql) ||
-           (c.phone||'').includes(q) ||
-           (c.plt||'').toLowerCase().includes(ql) ||
-           (c.mdl||'').toLowerCase().includes(ql);
+  return S.cx.filter(function(c) {
+    var haystack = [
+      c.fn||'', c.ln||'', (c.fn||'')+' '+(c.ln||''), (c.ln||'')+' '+(c.fn||''),
+      c.phone||'', c.email||'', c.mdl||'', c.plt||'', c.p3||''
+    ].join(' ').toLowerCase();
+    return haystack.includes(ql);
   });
 }
 
@@ -1842,16 +1839,22 @@ async function fetchCxFromSheets(q) {
   if (!S.url) return [];
   try {
     var url = S.url + '?action=search&q=' + encodeURIComponent(q||'');
-    var r = await fetch(url, {headers:{'Content-Type':'text/plain'}});
-    var d = await r.json();
-    // デプロイ確認: customers がない場合は旧バージョン
-    if (!d.customers && d.ok) {
-      flash('⚠️ Apps Script needs redeployment! Please redeploy.', 'err');
+    var r = await fetch(url);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    var text = await r.text();
+    var d;
+    try { d = JSON.parse(text); } catch(pe) { throw new Error('Invalid JSON: ' + text.slice(0,100)); }
+    if (d.ok === false && d.error) {
+      flash('GS Error: ' + d.error, 'err');
+      return [];
+    }
+    if (!Array.isArray(d.customers) && d.ok === true && !d.count) {
+      flash('⚠️ Apps Script not updated. Please redeploy with NEW VERSION.', 'err');
       return [];
     }
     return d.customers || [];
   } catch(e) {
-    flash('Network error: ' + e.message, 'err');
+    flash('Connection error: ' + e.message, 'err');
     return [];
   }
 }
@@ -1866,42 +1869,37 @@ async function fetchOneCxFromSheets(appId) {
   } catch(e) { return null; }
 }
 async function searchFromSheets() {
-  // まずローカルキャッシュで即時表示
-  var localResults = localSearch(S.lq||'');
-  if (localResults.length > 0) {
-    S.sheetsResults = localResults;
-    render(); // ← 瞬時に表示
-  }
+  var q = S.lq||'';
 
+  // Step 1: ローカルキャッシュで即時表示
+  var localResults = localSearch(q);
+  S.sheetsResults = localResults.length > 0 ? localResults : null;
+  render();
+
+  // Step 2: URL未設定ならローカルのみ
   if (!S.url) {
-    // URL未設定：ローカル結果のみ
-    if (S.sheetsResults === null) S.sheetsResults = localResults;
+    S.sheetsResults = localResults;
     render(); return;
   }
 
-  // Sheetsからも検索（バックグラウンド）
-  S.sheetSearching = true;
-  render();
+  // Step 3: Sheetsから検索
+  S.sheetSearching = true; render();
   try {
-    var results = await fetchCxFromSheets(S.lq||'');
+    var results = await fetchCxFromSheets(q);
     if (results && results.length > 0) {
-      // Sheetsに結果あり → Sheets結果を使用
       S.sheetsResults = results;
+      // キャッシュ更新
       results.forEach(function(sc) {
-        var i = S.cx.findIndex(function(lc){ return lc.id===sc.id; });
-        if (i >= 0) S.cx[i] = sc; else S.cx.push(sc);
+        var i = S.cx.findIndex(function(lc){ return lc.id===sc.id||lc.cxId===sc.cxId; });
+        if (i >= 0) S.cx[i] = Object.assign(S.cx[i], sc);
+        else S.cx.push(sc);
       });
-    } else if (localResults.length > 0) {
-      // Sheetsが0件 → ローカル結果を維持（消えない！）
-      S.sheetsResults = localResults;
     } else {
-      // 両方0件 → 0件表示
-      S.sheetsResults = [];
+      // Sheetsが0件 → ローカル結果を維持
+      S.sheetsResults = localResults.length > 0 ? localResults : [];
     }
   } catch(e) {
-    // エラー時はローカル結果を維持
-    if (localResults.length > 0) S.sheetsResults = localResults;
-    else S.sheetsResults = [];
+    S.sheetsResults = localResults.length > 0 ? localResults : [];
   }
   S.sheetSearching = false;
   render();
@@ -2118,27 +2116,37 @@ async function saveEditVisit() {
   go('prof');
 }
 async function testApiConnection() {
-  if (!S.url) { flash('Please set Apps Script URL first.','err'); return; }
-  flash('🔄 Testing connection...','');
+  if (!S.url) { flash('Please set Apps Script URL in Settings.','err'); return; }
+  S.toast = '🔄 Testing...'; render();
   try {
-    // Test 1: Basic connection
-    var r1 = await fetch(S.url + '?t=' + Date.now(), {headers:{'Content-Type':'text/plain'}});
-    var d1 = await r1.json();
-    if (d1.ok && !d1.customers) {
-      flash('❌ Old version deployed. Please redeploy with NEW VERSION.','err');
+    // Test: ping
+    var r1 = await fetch(S.url);
+    var t1 = await r1.text();
+    var d1;
+    try { d1 = JSON.parse(t1); } catch(e) { d1 = {}; }
+    if (d1.system && d1.ok && !d1.customers) {
+      S.toast = null;
+      flash('❌ OLD version still running. Must redeploy with NEW VERSION in Apps Script.','err');
       return;
     }
-    // Test 2: Search API
-    var r2 = await fetch(S.url + '?action=search&q=', {headers:{'Content-Type':'text/plain'}});
-    var d2 = await r2.json();
-    if (d2.customers !== undefined) {
-      flash('✅ API OK! Found ' + (d2.customers||[]).length + ' customers.','');
+    // Test: search API
+    var r2 = await fetch(S.url + '?action=search&q=');
+    var t2 = await r2.text();
+    var d2;
+    try { d2 = JSON.parse(t2); } catch(e) { d2 = {}; }
+    S.toast = null;
+    if (Array.isArray(d2.customers)) {
+      flash('✅ API working! ' + d2.customers.length + ' customers in database.','');
+    } else if (d2.error) {
+      flash('❌ GS Error: ' + d2.error,'err');
     } else {
-      flash('❌ Search API not working. Please redeploy.','err');
+      flash('❌ Unknown response. Raw: ' + t2.slice(0,80),'err');
     }
   } catch(e) {
-    flash('❌ Connection error: ' + e.message,'err');
+    S.toast = null;
+    flash('❌ Network error: ' + e.message,'err');
   }
+  render();
 }
 function btnLoading(el, fn) {
   var origBg = el.style.background;
