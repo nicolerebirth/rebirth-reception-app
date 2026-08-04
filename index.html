@@ -216,7 +216,29 @@ function tog(i, isV) {
   render();
 }
 function setOpt(i, o, isV) { const a=isV?S.vf.svs:S.f.svs; a[i]={...a[i],opt:a[i].opt===o?'':o}; render(); }
-function openCx(id, from) { S.sel=S.cx.find(c=>c.id===id)||null; S.prevScr=from||'ret'; S.confirmDel=false; go('prof'); }
+async function openCx(id, from) {
+  S.prevScr = from||'ret';
+  S.confirmDel = false;
+  // まずキャッシュから開く
+  var cx = S.cx.find(function(c){ return c.id===id || c.cxId===id; });
+  if (!cx && S.res) cx = S.res.find(function(c){ return c.id===id || c.cxId===id; });
+  if (!cx && S.sheetsResults) cx = S.sheetsResults.find(function(c){ return c.id===id || c.cxId===id; });
+  if (cx) { S.sel = cx; go('prof'); }
+  else { flash('Customer not found','err'); return; }
+  // バックグラウンドでvisitsを取得
+  if (S.url) {
+    try {
+      var full = await fetchOneCxFromSheets(id);
+      if (full) {
+        if ((!full.visits||full.visits.length===0) && (cx.visits||[]).length>0) full.visits = cx.visits;
+        S.sel = full;
+        var ci = S.cx.findIndex(function(c){ return c.id===full.id||c.cxId===full.cxId; });
+        if (ci>=0) S.cx[ci]=full; else S.cx.push(full);
+        if (S.scr==='prof') render();
+      }
+    } catch(e) {}
+  }
+}
 function openPwList() { S.pw=''; S.pwErr=false; go('pwList'); }
 function openPwSettings() { S.pw=''; S.pwErr=false; go('pwSettings'); }
 function checkPwSettings() {
@@ -1917,9 +1939,7 @@ async function openCxProfile(appId) {
     // cxId完全一致（CX-0001等の古い顧客）
     r = arr.find(function(c){ return c.cxId===appId; });
     if (r) return r;
-    // 部分一致（念のため）
-    r = arr.find(function(c){ return String(c.id).includes(appId) || appId.includes(String(c.id)); });
-    return r || null;
+    return null; // 部分一致は削除（誤マッチ防止）
   }
 
   var cxLocal  = findCx(S.cx);
