@@ -1511,6 +1511,66 @@ async function saveEditVisit() {
   flash('✅ Amendment saved. Original record preserved.');
   go('prof');
 }
+function localSearch(q) {
+  if (!q) return [...S.cx];
+  const ql = (q||'').toLowerCase();
+  return S.cx.filter(function(c) {
+    var haystack = [
+      c.fn||'', c.ln||'', (c.fn||'')+' '+(c.ln||''), (c.ln||'')+' '+(c.fn||''),
+      c.phone||'', c.email||'', c.mdl||'', c.plt||'', c.p3||''
+    ].join(' ').toLowerCase();
+    return haystack.includes(ql);
+  });
+}
+
+async function doSearch() {
+  const q = (S.sq||'').trim();
+  if (!q) { S.res=[]; render(); return; }
+
+  // まずローカルから即時表示
+  S.res = localSearch(q);
+  render();
+
+  // Sheetsからも検索
+  if (S.url) {
+    S.busy = false;
+    try {
+      var results = await fetchCxFromSheets(q);
+      if (results && results.length > 0) {
+        S.res = results;
+        results.forEach(function(sc) {
+          var i = S.cx.findIndex(function(lc){ return lc.id===sc.id||lc.cxId===sc.cxId; });
+          if (i>=0) S.cx[i]=Object.assign(S.cx[i],sc); else S.cx.push(sc);
+        });
+      }
+    } catch(e) {}
+    render();
+  }
+}
+
+async function openCx(id, from) {
+  S.prevScr = from||'ret';
+  S.confirmDel = false;
+  // キャッシュとres両方から検索
+  var cx = S.cx.find(function(c){ return c.id===id||c.cxId===id; });
+  if (!cx && S.res) cx = S.res.find(function(c){ return c.id===id||c.cxId===id; });
+  if (!cx) { flash('Customer not found','err'); return; }
+  S.sel = cx;
+  go('prof');
+  // バックグラウンドでvisitsを取得
+  if (S.url) {
+    try {
+      var full = await fetchOneCxFromSheets(id);
+      if (full) {
+        if ((!full.visits||full.visits.length===0)&&(cx.visits||[]).length>0) full.visits=cx.visits;
+        S.sel = full;
+        var ci = S.cx.findIndex(function(c){ return c.id===full.id||c.cxId===full.cxId; });
+        if (ci>=0) S.cx[ci]=full; else S.cx.push(full);
+        if (S.scr==='prof') render();
+      }
+    } catch(e) {}
+  }
+}
 function btnLoading(el, fn) {
   var origBg = el.style.background;
   var origText = el.textContent;
