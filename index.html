@@ -2117,6 +2117,29 @@ async function saveEditVisit() {
   flash('✅ Amendment saved. Original record preserved.');
   go('prof');
 }
+async function testApiConnection() {
+  if (!S.url) { flash('Please set Apps Script URL first.','err'); return; }
+  flash('🔄 Testing connection...','');
+  try {
+    // Test 1: Basic connection
+    var r1 = await fetch(S.url + '?t=' + Date.now(), {headers:{'Content-Type':'text/plain'}});
+    var d1 = await r1.json();
+    if (d1.ok && !d1.customers) {
+      flash('❌ Old version deployed. Please redeploy with NEW VERSION.','err');
+      return;
+    }
+    // Test 2: Search API
+    var r2 = await fetch(S.url + '?action=search&q=', {headers:{'Content-Type':'text/plain'}});
+    var d2 = await r2.json();
+    if (d2.customers !== undefined) {
+      flash('✅ API OK! Found ' + (d2.customers||[]).length + ' customers.','');
+    } else {
+      flash('❌ Search API not working. Please redeploy.','err');
+    }
+  } catch(e) {
+    flash('❌ Connection error: ' + e.message,'err');
+  }
+}
 function btnLoading(el, fn) {
   var origBg = el.style.background;
   var origText = el.textContent;
