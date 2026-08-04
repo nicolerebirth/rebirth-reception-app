@@ -416,8 +416,10 @@ function retScr() {
     +'<div style="font-size:13px;color:#94a3b8;margin-bottom:12px">'+S.res.length+' result'+(S.res.length!==1?'s':'')+' found</div>'
     +S.res.map(c=>{
       var lastV = c.visits&&c.visits.length ? c.visits[c.visits.length-1] : null;
+      var lastDate = lastV ? lastV.date : c.lastVisitDate;
+      var lastSvc  = lastV ? (lastV.svcs||[])[0] : (c.lastVisitSvcs||[])[0];
       var line2 = c.mdl ? '🚗 '+esc(c.mdl)+(c.plt?' · '+esc(c.plt):'') : '📞 '+esc(c.phone||'');
-      var line3 = lastV ? '📅 '+fmtVisitDate(lastV.date)+' · '+esc((lastV.svcs||[])[0]||'') : '📞 '+esc(c.phone||'');
+      var line3 = lastDate ? '📅 '+fmtVisitDate(lastDate)+' · '+esc(lastSvc||'') : '📞 '+esc(c.phone||'');
       return '<div class="cxrow" onclick="openCx(\''+c.id+'\',\'ret\')">'  
         +'<div class="av" style="width:42px;height:42px;font-size:15px">'+(c.fn?c.fn[0]:'')+(c.ln?c.ln[0]:'')+' </div>'
         +'<div style="flex:1">'
@@ -474,7 +476,7 @@ function profScr() {
         +'</div>';
     }).join(''))
     +'</div></div>'
-    +'<button class="btn-r" style="width:100%;padding:15px;font-size:16px;margin-bottom:12px" onclick="S.vf={svd:\''+td()+'\',st:\'\',svs:ms(),m1:\'\',m2:\'\',m3:\'\',useCard:false,newCardNum:\'\',confirmedCard:\'\',pay:initPay()};go(\'retVisit\')">+ Record new visit for '+esc(fr.fn)+' '+esc(fr.ln)+'</button>'
+    +'<button class="btn-r" style="width:100%;padding:15px;font-size:16px;margin-bottom:12px" onclick="S.vf={svd:\''+td()+'\',st:\'\',svs:ms(),m1:\'\',m2:\'\',m3:\'\',useCard:false,newCardNum:\'\',confirmedCard:\'\',invoiceNo:\'\',jobOrderNo:\'\',pay:initPay()};go(\'retVisit\')">+ Record new visit for '+esc(fr.fn)+' '+esc(fr.ln)+'</button>'
     +(S.confirmDel
     ?'<div class="del-banner"><div style="font-size:22px;margin-bottom:10px">🗑️</div><div style="font-weight:700;font-size:16px;color:#dc2626;margin-bottom:6px">Delete '+esc(fr.fn)+' '+esc(fr.ln)+'?</div><div style="font-size:13px;color:#64748b;margin-bottom:18px;line-height:1.6">All visit history ('+vs.length+') will be permanently removed.<br><strong>This cannot be undone.</strong></div><div style="display:flex;gap:12px;justify-content:center"><button class="btn-g" style="min-width:120px" onclick="S.confirmDel=false;render()">Cancel</button><button class="btn-del-y" style="min-width:150px" onclick="deleteCustomer()"><i class="ti ti-trash"></i> Yes, delete</button></div></div>'
     :'<button class="btn-del" onclick="S.confirmDel=true;render()"><i class="ti ti-trash" style="font-size:16px"></i>Delete this customer</button>')
@@ -614,6 +616,16 @@ function retVisitScr() {
     +'</select>'
     +(S.vf.st&&!STAFF.includes(S.vf.st)?'<input class="inp" style="color:#111;background:#fff;margin-top:6px" value="'+esc(S.vf.st!=='__other__'?S.vf.st:'')+'" placeholder="Enter name..." oninput="saveStaffName(\'ret_st\',this.value)">':'')
     +'</div></div>'
+    +'<div class="card" style="margin-bottom:12px">'
+    +'<div class="sec">📋 Job Numbers</div>'
+    +'<div class="g2" style="margin-bottom:0">'
+    +'<div class="field"><label>Invoice No.<span class="req">*</span></label>'
+    +'<input id="retvisit-invoice" class="inp" style="color:#111;background:#fff" value="'+esc(S.vf.invoiceNo)+'" placeholder="e.g. 1801">'
+    +'</div>'
+    +'<div class="field"><label>Job Order No.<span class="req">*</span></label>'
+    +'<input id="retvisit-joborder" class="inp" style="color:#111;background:#fff" value="'+esc(S.vf.jobOrderNo)+'" placeholder="e.g. JO-001">'
+    +'</div></div></div>'
+    +'<div class="card">'
     +'<div class="sec">Services performed</div>'+svcPick(S.vf.svs,true)
     +(pOn?cardInputSec(true):'')
     +'<div class="dvdr"></div><div style="font-size:13px;font-weight:500;color:#64748b;margin-bottom:10px">Notes</div>'
@@ -638,7 +650,7 @@ function retConfScr() {
     +(c.mdl?'<div style="font-size:13px;color:#475569;margin-bottom:6px">🚗 '+esc(c.mdl)+(c.col?' ('+esc(c.col)+')':'')+(c.plt?' | 🔖 '+esc(c.plt):'')+'</div>':'')
     +(c.prepaidNum?'<div style="padding:6px 10px;background:#fffbeb;border:1.5px solid #d97706;border-radius:6px;font-size:13px;font-weight:600;color:#92400e">🃏 Card #'+esc(c.prepaidNum)+' — Used: '+(c.prepaidUsed||0)+'/4'+(uc?' → This is <strong>Visit '+nx+' of 4</strong>'+(nx===4?' ★ FREE!':''):'')+'</div>':'')
     +'</div>'
-    +crow('Service date',S.vf.svd)+crow('Staff',S.vf.st)
+    +crow('Service date',S.vf.svd)+crow('Staff',S.vf.st)+crow('Invoice No.',S.vf.invoiceNo)+crow('Job Order No.',S.vf.jobOrderNo)
     +'<div style="margin-top:12px">'+getSvcs(S.vf.svs).map(s=>'<span class="stag">✓ '+esc(s)+'</span>').join('')+'</div>'
     +(uc?'<div style="margin-top:10px;padding:12px 14px;border-radius:8px;background:'+(nx===4?'#d97706':'#fffbeb')+';border:2px solid #d97706;font-size:15px;font-weight:700;color:'+(nx===4?'#fff':'#92400e')+'">🃏 Prepaid card — Visit '+nx+' of 4'+(nx===4?' ★ FREE VISIT ★':'')+'</div>':'')
     +(bc?'<div style="margin-top:10px;padding:10px 14px;border-radius:8px;background:#f0fdf4;border:1.5px solid #16a34a;font-size:14px;font-weight:700;color:#166534">🃏 New card #'+esc(S.vf.newCardNum)+' will be registered</div>':'')
@@ -742,8 +754,11 @@ function receiptScr() {
     +'</div>'
     +'<div style="background:#f8fafc;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px">'
     +'<div style="font-weight:700;font-size:14px;margin-bottom:4px">'+esc(c.fn)+' '+esc(c.ln)+'</div>'
+    +(c.cxId?'<div style="color:#64748b">🪪 Customer No.: <strong>'+esc(c.cxId)+'</strong></div>':'')
     +(c.phone?'<div style="color:#64748b">📞 '+esc(c.phone)+'</div>':'')
     +(c.mdl?'<div style="color:#64748b">🚗 '+esc(c.mdl)+(c.col?' ('+esc(c.col)+')':'')+(c.plt?' | 🔖 '+esc(c.plt):'')+'</div>':'')
+    +(v.invoiceNo?'<div style="color:#64748b">📋 Invoice No.: <strong>'+esc(v.invoiceNo)+'</strong></div>':'')
+    +(v.jobOrderNo?'<div style="color:#64748b">🔧 Job Order No.: <strong>'+esc(v.jobOrderNo)+'</strong></div>':'')
     +'</div>'
     +'<div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#64748b;margin-bottom:6px">Services Rendered</div>'
     +(v.svcs||[]).map(s=>'<div style="font-size:13px;padding:4px 0;border-bottom:0.5px solid #f1f5f9">✓ '+esc(s)+'</div>').join('')
@@ -852,7 +867,6 @@ function initSignature(canvasId) {
   canvas.addEventListener('mouseleave', function(){drawing=false;});
 }
 
-async 
 // ── Deposit Signature functions ────────────────────────────────
 
 async function skipDepSignature() {
@@ -966,8 +980,11 @@ function depReceiptScr() {
   // Customer info
   h.push('<div style="background:#f8fafc;border-radius:8px;padding:10px 14px;margin-bottom:14px">');
   h.push('<div style="font-weight:700;font-size:15px;margin-bottom:4px">' + esc(info.fn||'') + ' ' + esc(info.ln||'') + '</div>');
+  if (info.cxId) h.push('<div style="font-size:12px;color:#64748b">&#128273; Customer No.: <strong>' + esc(info.cxId) + '</strong></div>');
   if (info.phone) h.push('<div style="font-size:12px;color:#64748b">&#128222; ' + esc(info.phone) + '</div>');
   if (info.mdl) h.push('<div style="font-size:12px;color:#64748b">&#128663; ' + esc(info.mdl) + (info.plt?' | &#128278; '+esc(info.plt):'') + '</div>');
+  if (info.invoiceNo) h.push('<div style="font-size:12px;color:#64748b">&#128203; Invoice No.: <strong>' + esc(info.invoiceNo) + '</strong></div>');
+  if (info.jobOrderNo) h.push('<div style="font-size:12px;color:#64748b">&#128295; Job Order No.: <strong>' + esc(info.jobOrderNo) + '</strong></div>');
   h.push('</div>');
 
   // Services
@@ -1009,7 +1026,6 @@ function depReceiptScr() {
   h.push('</div>');
   return h.join('');
 }
-async 
 // ── Register Existing Customer ─────────────────────────────────
 function existingScr() {
   var ex = S.ex;
@@ -1588,6 +1604,466 @@ function btnLoading(el, fn) {
     });
   }
 }
+// ══════════════════════════════════════════════════════════════
+// 復元された関数群（誤って削除されていたため再構築）
+// ══════════════════════════════════════════════════════════════
+
+const APP_PW = 'rebirth';
+
+// ── Sheetsへの汎用送信 ───────────────────────────────────────────
+async function postToSheets(payload) {
+  if (!S.url) return {ok:false, error:'No Apps Script URL set'};
+  try {
+    var res = await fetch(S.url, {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      body: JSON.stringify(payload)
+    });
+    var text = await res.text();
+    try { return JSON.parse(text); } catch(pe) { return {ok:true}; }
+  } catch(e) {
+    console.log('postToSheets error:', e);
+    return {ok:false, error:e.message};
+  }
+}
+
+// ── バックグラウンド自動バックアップ（軽量ping） ───────────────────
+async function silentPush() {
+  if (!S.url) return;
+  try { await postToSheets({type:'push_all'}); } catch(e) {}
+}
+
+// ── 設定画面：手動Push/Pull ────────────────────────────────────
+async function pushToSheets() {
+  if (!S.url) { flash('Please enter and save the Apps Script URL first.', 'err'); return; }
+  S.syncing = true; render();
+  try {
+    await postToSheets({type:'push_all'});
+    flash('✅ Pushed to Sheets.');
+  } catch(e) {
+    flash('Push failed: '+e.message, 'err');
+  }
+  S.syncing = false; render();
+}
+
+async function pullFromSheets() {
+  if (!S.url) { flash('Please enter and save the Apps Script URL first.', 'err'); return; }
+  S.syncing = true; render();
+  try {
+    var r = await fetch(S.url+'?action=get');
+    var d = await r.json();
+    if (d.ok && Array.isArray(d.customers)) {
+      d.customers.forEach(function(sc) {
+        var i = S.cx.findIndex(function(lc){ return lc.id===sc.id||lc.cxId===sc.cxId; });
+        if (i>=0) S.cx[i]=Object.assign({},S.cx[i],sc); else S.cx.push(sc);
+      });
+      await saveCx();
+      flash('✅ Pulled '+d.customers.length+' customer(s) from Sheets.');
+    } else {
+      flash('Pull failed: '+(d.error||'unknown error'), 'err');
+    }
+  } catch(e) {
+    flash('Pull failed: '+e.message, 'err');
+  }
+  S.syncing = false; render();
+}
+
+async function saveUrl() {
+  try { await store.set('url', S.url||''); } catch(e) {}
+  flash('Apps Script URL saved.');
+  render();
+}
+
+// ── パスワード ───────────────────────────────────────────────
+function openPwSettings() {
+  S.pw=''; S.pwErr=false;
+  go('pwSettings');
+}
+function checkPw() {
+  if ((S.pw||'').trim() === APP_PW) {
+    S.pw=''; S.pwErr=false;
+    go('ret');
+  } else {
+    S.pwErr = true;
+    render();
+  }
+}
+function checkPwSettings() {
+  if ((S.pw||'').trim() === APP_PW) {
+    S.pw=''; S.pwErr=false;
+    go('settings');
+  } else {
+    S.pwErr = true;
+    render();
+  }
+}
+
+// ── サービス選択トグル ─────────────────────────────────────────
+function tog(i, isV) {
+  var svs = isV ? S.vf.svs : S.f.svs;
+  svs[i].on = !svs[i].on;
+  if (svs[i].on) {
+    var def = SVC[i];
+    if (def && def.opts && def.opts.length && !svs[i].opt) svs[i].opt = def.opts[0];
+  } else {
+    svs[i].opt = '';
+  }
+  render();
+}
+function setOpt(i, opt, isV) {
+  var svs = isV ? S.vf.svs : S.f.svs;
+  svs[i].opt = opt;
+  render();
+}
+
+// ── プリペイドカード確認 ────────────────────────────────────────
+function confirmCard(isV) {
+  var id = isV ? 'cinp-ret' : 'cinp-new';
+  var el = document.getElementById(id);
+  var val = (el?el.value:'').trim();
+  if (!val) { alert('Please enter a card number first.'); return; }
+  if (isV) { S.vf.newCardNum = val; S.vf.confirmedCard = val; }
+  else     { S.f.prepaidNum = val; S.f.confirmedCard = val; }
+  render();
+}
+
+// ── ステップバー（新規登録ウィザード） ─────────────────────────
+function stepBar(cur) {
+  return stepsBar(['Customer','Vehicle','Services','Confirm'], cur);
+}
+
+// ── 入力バリデーション：新規顧客 Step1 → Step2 ─────────────────
+function val1() {
+  var f = S.f;
+  var invEl = document.getElementById('new1-invoice');
+  var jobEl = document.getElementById('new1-joborder');
+  if (invEl) f.invoiceNo = invEl.value.trim();
+  if (jobEl) f.jobOrderNo = jobEl.value.trim();
+  var staffSel = document.getElementById('new1-staff-sel');
+  if (staffSel && staffSel.value) f.st = staffSel.value;
+
+  if (!f.fn.trim()||!f.ln.trim()) { S.err='First and last name are required.'; render(); return; }
+  if (!f.p1||!f.p2||!f.p3)        { S.err='Phone number is required.'; render(); return; }
+  if (!f.dt)                       { S.err='Visit date is required.'; render(); return; }
+  if (!f.st)                       { S.err='Please select staff.'; render(); return; }
+  if (!f.invoiceNo)                { S.err='Invoice No. is required.'; render(); return; }
+  if (!f.jobOrderNo)               { S.err='Job Order No. is required.'; render(); return; }
+  S.err = '';
+  go('new2');
+}
+
+// ── 入力バリデーション：新規顧客 Step3 → 確認画面 ───────────────
+function val3() {
+  var f = S.f;
+  var svcs = getSvcs(f.svs);
+  if (!svcs.length) { S.err='Please select at least one service.'; render(); return; }
+  var pOn = f.svs[SVC.findIndex(x=>x.id==='prepaid')]?.on;
+  if (pOn && !f.confirmedCard) { S.err='Please register the prepaid card number.'; render(); return; }
+  if (!f.pay.noPayment && !f.pay.est) { S.err='Please enter an estimate amount, or mark as No Payment.'; render(); return; }
+  if (parseFloat(f.pay.dep||0)>0 && !f.pay.depMeth) { S.err='Please select a Down Payment method.'; render(); return; }
+  if (parseFloat(f.pay.dep||0)>0 && f.pay.depMeth && !f.pay.depNote) { S.err='Please enter the reference number.'; render(); return; }
+  S.err = '';
+  go('newConf');
+}
+
+// ── 入力バリデーション：再来店visit → 確認画面 ───────────────────
+function valVf() {
+  var f = S.vf;
+  var invEl = document.getElementById('retvisit-invoice');
+  var jobEl = document.getElementById('retvisit-joborder');
+  if (invEl) f.invoiceNo = invEl.value.trim();
+  if (jobEl) f.jobOrderNo = jobEl.value.trim();
+
+  if (!f.svd) { S.err='Service date is required.'; render(); return; }
+  if (!f.st)  { S.err='Please select staff.'; render(); return; }
+  if (!f.invoiceNo)   { S.err='Invoice No. is required.'; render(); return; }
+  if (!f.jobOrderNo)  { S.err='Job Order No. is required.'; render(); return; }
+  var svcs = getSvcs(f.svs);
+  if (!svcs.length) { S.err='Please select at least one service.'; render(); return; }
+  var pOn = f.svs[SVC.findIndex(x=>x.id==='prepaid')]?.on;
+  if (pOn && !f.confirmedCard) { S.err='Please register the prepaid card number.'; render(); return; }
+  if (!f.pay.noPayment && !f.pay.est) { S.err='Please enter an estimate amount, or mark as No Payment.'; render(); return; }
+  if (parseFloat(f.pay.dep||0)>0 && !f.pay.depMeth) { S.err='Please select a Down Payment method.'; render(); return; }
+  if (parseFloat(f.pay.dep||0)>0 && f.pay.depMeth && !f.pay.depNote) { S.err='Please enter the reference number.'; render(); return; }
+  S.err = '';
+  go('retConf');
+}
+
+// ── 新規顧客登録の送信 ───────────────────────────────────────────
+async function submitNew() {
+  if (_submitting) return;
+  _submitting = true; S.busy = true; render();
+
+  var f = S.f;
+  var svcs = getSvcs(f.svs);
+  var id = 'A'+Date.now();
+  var phone = f.p1+'-'+f.p2+'-'+f.p3;
+  var pOn = f.svs[SVC.findIndex(x=>x.id==='prepaid')]?.on;
+  var cardNum = pOn ? (f.confirmedCard||'') : '';
+  var est = f.pay.noPayment ? 0 : parseFloat(f.pay.est||0);
+  var dep = parseFloat(f.pay.dep||0);
+
+  var rec = {
+    id: id, fn:f.fn, ln:f.ln, p1:f.p1, p2:f.p2, p3:f.p3, phone:phone,
+    email:f.email||'', addr:f.addr||'',
+    firstVisit: f.dt, staff:f.st||'',
+    mdl:f.mdl||'', col:f.col||'', plt:f.plt||'',
+    prepaidNum: cardNum, prepaidUsed: cardNum ? (parseInt(f.prepaidUsedInit)||0) : 0,
+    visits: [{
+      date: f.svd, staff: f.st||'', svcs: svcs,
+      memo: [f.m1,f.m2,f.m3].filter(Boolean).join(' / '),
+      usedCard:false, prepaidVisitNum:null,
+      invoiceNo: f.invoiceNo||'', jobOrderNo: f.jobOrderNo||'',
+      pay: {
+        est:String(est||''), dep:String(dep||''), depMeth:f.pay.depMeth||'',
+        status: f.pay.noPayment ? 'Free' : (dep>0 ? 'deposit' : 'pending'),
+        final:String(est||''), signedAt:'', signature:''
+      }
+    }]
+  };
+
+  S.cx.push(rec);
+  await saveCx();
+
+  var newCxId = '';
+  try {
+    var result = await postToSheets({
+      type:'new', id:id,
+      fn:f.fn, ln:f.ln, phone:phone, email:f.email||'', addr:f.addr||'',
+      firstVisit:f.dt, date:f.svd, staff:f.st||'',
+      mdl:f.mdl||'', col:f.col||'', plt:f.plt||'',
+      prepaidNum:cardNum, prepaidUsed: cardNum?(parseInt(f.prepaidUsedInit)||0):0,
+      services: svcs.join(', '),
+      estimate: est, deposit: dep,
+      depositMethod: f.pay.depMeth||'', depositStaff: f.pay.depStaff||'', depositNote: f.pay.depNote||'',
+      memo: [f.m1,f.m2,f.m3].filter(Boolean).join(' / '),
+      invoiceNo: f.invoiceNo||''
+    });
+    if (result && result.cxId) {
+      newCxId = result.cxId;
+      var newCi = S.cx.findIndex(function(x){return x.id===id;});
+      if (newCi>=0) S.cx[newCi].cxId = newCxId;
+      await saveCx();
+    }
+  } catch(e) { console.log('Sheets error:', e); }
+
+  S.savedInfo = {type:'new', name:f.fn+' '+f.ln, date:f.svd, staff:f.st, svcs:svcs, card:cardNum, selId:id};
+
+  _submitting = false; S.busy = false;
+
+  if (dep > 0 && f.pay.depMeth) {
+    S.depInfo = {
+      date: f.svd, appId: id, cxId: newCxId, fn:f.fn, ln:f.ln, phone:phone, mdl:f.mdl||'', plt:f.plt||'',
+      invoiceNo: f.invoiceNo||'', jobOrderNo: f.jobOrderNo||'',
+      services: svcs.join(', '), dep: dep, depMeth: f.pay.depMeth, depStaff: f.pay.depStaff||'',
+      depNote: f.pay.depNote||'', balance: Math.max(0, est-dep),
+      signedAt:'', signature:'', isFullPayment: (dep >= est && est>0)
+    };
+    go('depReceipt');
+  } else {
+    go('saved');
+  }
+}
+
+// ── 再来店visitの送信 ────────────────────────────────────────────
+async function submitVisit() {
+  if (_submitting) return;
+  _submitting = true; S.busy = true; render();
+
+  var c = S.sel;
+  if (!c) { _submitting=false; S.busy=false; render(); return; }
+
+  var f = S.vf;
+  var svcs = getSvcs(f.svs);
+  var pOn = f.svs[SVC.findIndex(x=>x.id==='prepaid')]?.on;
+  var newCard = pOn ? (f.newCardNum||'') : '';
+  var useExistingCard = !!(c.prepaidNum && (c.prepaidUsed||0) < 4 && !newCard);
+  var prepaidVisitNum = useExistingCard ? (c.prepaidUsed||0)+1 : null;
+  var est = f.pay.noPayment ? 0 : parseFloat(f.pay.est||0);
+  var dep = parseFloat(f.pay.dep||0);
+
+  var visit = {
+    date: f.svd, staff: f.st||'', svcs: svcs,
+    memo: [f.m1,f.m2,f.m3].filter(Boolean).join(' / '),
+    usedCard: useExistingCard, prepaidVisitNum: prepaidVisitNum,
+    invoiceNo: f.invoiceNo||'', jobOrderNo: f.jobOrderNo||'',
+    pay: {
+      est:String(est||''), dep:String(dep||''), depMeth:f.pay.depMeth||'',
+      status: f.pay.noPayment ? 'Free' : (dep>0 ? 'deposit' : 'pending'),
+      final:String(est||''), signedAt:'', signature:''
+    }
+  };
+
+  var ci = S.cx.findIndex(function(x){return x.id===c.id;});
+  if (ci>=0) {
+    S.cx[ci].visits = (S.cx[ci].visits||[]).concat([visit]);
+    if (newCard) { S.cx[ci].prepaidNum = newCard; S.cx[ci].prepaidUsed = 0; }
+    else if (useExistingCard) { S.cx[ci].prepaidUsed = prepaidVisitNum; }
+    S.sel = S.cx[ci];
+  }
+  await saveCx();
+
+  var newCxId = c.cxId || '';
+  try {
+    var result = await postToSheets({
+      type:'return', id:c.id,
+      fn:c.fn, ln:c.ln, phone:c.phone||'', mdl:c.mdl||'', plt:c.plt||'',
+      visitDate: f.svd, date: f.svd, staff: f.st||'',
+      services: svcs.join(', '),
+      estimate: est, deposit: dep,
+      depositMethod: f.pay.depMeth||'', depositStaff: f.pay.depStaff||'', depositNote: f.pay.depNote||'',
+      memo: [f.m1,f.m2,f.m3].filter(Boolean).join(' / '),
+      invoiceNo: f.invoiceNo||'',
+      prepaidNum: newCard||c.prepaidNum||'',
+      prepaidVisitNum: prepaidVisitNum
+    });
+    if (result && result.cxId) {
+      newCxId = result.cxId;
+      if (ci>=0) { S.cx[ci].cxId = newCxId; S.sel = S.cx[ci]; }
+      await saveCx();
+    }
+  } catch(e) { console.log('Sheets error:', e); }
+
+  S.savedInfo = {type:'return', name:c.fn+' '+c.ln, date:f.svd, staff:f.st, svcs:svcs,
+    card:newCard, useCard:useExistingCard, prepaidVisitNum:prepaidVisitNum, selId:c.id};
+
+  _submitting = false; S.busy = false;
+
+  if (dep > 0 && f.pay.depMeth) {
+    S.depInfo = {
+      date: f.svd, appId: c.id, cxId: newCxId, fn:c.fn, ln:c.ln, phone:c.phone||'', mdl:c.mdl||'', plt:c.plt||'',
+      invoiceNo: f.invoiceNo||'', jobOrderNo: f.jobOrderNo||'',
+      services: svcs.join(', '), dep: dep, depMeth: f.pay.depMeth, depStaff: f.pay.depStaff||'',
+      depNote: f.pay.depNote||'', balance: Math.max(0, est-dep),
+      signedAt:'', signature:'', isFullPayment: (dep >= est && est>0)
+    };
+    go('depReceipt');
+  } else {
+    go('saved');
+  }
+}
+
+// ── 支払い完了（Mark as PAID） ───────────────────────────────────
+async function completePayment() {
+  var c = S.sel; if (!c) return;
+  var vidx = S.payVidx;
+  var vs = c.visits||[];
+  var v = vs[vidx]; if (!v) return;
+  var pf = S.pf;
+  var p = v.pay||{};
+  var dep = parseFloat(p.dep||0);
+  var fin = parseFloat(pf.final||p.est||0);
+  var remain = Math.max(0, fin-dep);
+
+  if (remain > 0) {
+    if (!pf.payMeth)  { S.err='Please select a payment method.'; render(); return; }
+    if (!pf.payStaff) { S.err='Please select who received the payment.'; render(); return; }
+    if (!pf.payNote)  { S.err='Please enter the reference number.'; render(); return; }
+  }
+
+  var now = new Date();
+  v.pay = Object.assign({}, v.pay, {
+    final: String(fin), status:'completed',
+    payMeth: pf.payMeth||'', payStaff: pf.payStaff||'', payNote: pf.payNote||'',
+    payDate: now.toISOString().split('T')[0]
+  });
+
+  var ci = S.cx.findIndex(function(x){return x.id===c.id;});
+  if (ci>=0) { S.cx[ci].visits[vidx] = v; S.sel = S.cx[ci]; }
+  await saveCx();
+
+  try {
+    await postToSheets({
+      type:'payment', id:c.id,
+      fn:c.fn, ln:c.ln,
+      visitDate: v.date, paymentDate: v.pay.payDate,
+      finalAmount: fin, deposit: dep,
+      paymentMethod: pf.payMeth||'', paymentStaff: pf.payStaff||'', paymentNote: pf.payNote||''
+    });
+  } catch(e) { console.log('Sheets error:', e); }
+
+  S.err = '';
+  flash('✅ Payment recorded!');
+  go('receipt');
+}
+
+// ── 顧客情報の編集 ────────────────────────────────────────────
+function initEdit() {
+  var c = S.sel; if (!c) return;
+  S.ef = {
+    fn:c.fn||'', ln:c.ln||'',
+    p1:c.p1||(c.phone?c.phone.split('-')[0]:''),
+    p2:c.p2||(c.phone?c.phone.split('-')[1]:''),
+    p3:c.p3||(c.phone?c.phone.split('-')[2]:''),
+    addr:c.addr||'', email:c.email||'',
+    mdl:c.mdl||'', col:c.col||'', plt:c.plt||'',
+    prepaidNum:c.prepaidNum||'', prepaidUsed:c.prepaidUsed||0
+  };
+  S.err = '';
+  go('edit');
+}
+
+async function submitEdit() {
+  var c = S.sel; if (!c) return;
+  var ef = S.ef;
+  if (!ef.fn.trim()||!ef.ln.trim()) { S.err='First and last name are required.'; render(); return; }
+  if (!ef.p1||!ef.p2||!ef.p3)       { S.err='Phone number is required.'; render(); return; }
+  if (!(ef.col||'').trim())          { S.err='Vehicle color is required.'; render(); return; }
+  if (!ef.plt.trim())                { S.err='License plate is required.'; render(); return; }
+
+  var phone = ef.p1+'-'+ef.p2+'-'+ef.p3;
+  var ci = S.cx.findIndex(function(x){return x.id===c.id;});
+  if (ci>=0) {
+    S.cx[ci] = Object.assign({}, S.cx[ci], {
+      fn:ef.fn, ln:ef.ln, p1:ef.p1, p2:ef.p2, p3:ef.p3, phone:phone,
+      addr:ef.addr, email:ef.email, mdl:ef.mdl, col:ef.col, plt:ef.plt,
+      prepaidNum:ef.prepaidNum, prepaidUsed:ef.prepaidUsed
+    });
+    S.sel = S.cx[ci];
+  }
+  await saveCx();
+
+  try {
+    await postToSheets({
+      type:'editCustomer', id:c.id,
+      fn:ef.fn, ln:ef.ln, phone:phone, addr:ef.addr||'', email:ef.email||'',
+      mdl:ef.mdl||'', col:ef.col||'', plt:ef.plt||'',
+      prepaidNum:ef.prepaidNum||'', prepaidUsed:ef.prepaidUsed||0
+    });
+  } catch(e) { console.log('Sheets error:', e); }
+
+  S.err = '';
+  flash('✅ Customer info updated.');
+  go('prof');
+}
+
+// ── 顧客の削除 ───────────────────────────────────────────────────
+async function deleteCustomer() {
+  var c = S.sel; if (!c) return;
+  S.busy = true; render();
+  try {
+    var result = await postToSheets({type:'delete', id:c.id});
+    if (result && result.ok === false) {
+      S.busy = false;
+      flash('Delete failed: '+(result.error||'unknown error'), 'err');
+      render();
+      return;
+    }
+    S.cx = S.cx.filter(function(x){ return x.id!==c.id; });
+    S.res = (S.res||[]).filter(function(x){ return x.id!==c.id; });
+    await saveCx();
+    S.confirmDel = false;
+    S.sel = null;
+    S.busy = false;
+    flash('🗑️ Customer deleted.');
+    go('ret');
+  } catch(e) {
+    S.busy = false;
+    flash('Delete failed: '+e.message, 'err');
+    render();
+  }
+}
+
 function render() {
   const b = document.getElementById('body');
   if (!b) return;
