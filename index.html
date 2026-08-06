@@ -410,7 +410,7 @@ function pwListScr() {
 function retScr() {
   return '<div style="padding:20px"><button class="btn-sm" onclick="go(\'home\')" style="margin-bottom:14px"><i class="ti ti-arrow-left"></i> Home</button>'
     +'<div class="card"><div class="sec">Find a returning customer</div>'
-    +'<div style="display:flex;gap:9px;flex-wrap:wrap;margin-bottom:16px">'+[['ln','Last name'],['p4','Last 4 digits'],['em','Email'],['pl','License plate']].map(([v,l])=>pill(l,S.sb===v,'S.sb=\''+v+'\';render()')).join('')+'</div>'
+    +'<div style="display:flex;gap:9px;flex-wrap:wrap;margin-bottom:16px">'+[['ln','Last name'],['p4','Last 4 digits'],['em','Email'],['pl','License plate']].map(([v,l])=>pill(l,S.sb===v,'S.sb=\''+v+'\';render();if(S.sq)doSearch()')).join('')+'</div>'
     +'<div style="display:flex;gap:9px"><input class="inp" value="'+esc(S.sq)+'" placeholder="'+(S.sb==='ln'?'Enter last name...':S.sb==='p4'?'Last 4 digits...':S.sb==='em'?'Email...':'License plate...')+'" oninput="S.sq=this.value" onkeydown="if(event.key===\'Enter\')doSearch()"><button class="btn-r" style="flex-shrink:0" onclick="doSearch()">Search</button></div></div>'
     +(S.res.length>0?'<div class="card">'
     +'<div style="font-size:13px;color:#94a3b8;margin-bottom:12px">'+S.res.length+' result'+(S.res.length!==1?'s':'')+' found</div>'
@@ -750,7 +750,7 @@ function receiptScr() {
     +'</div>'
     +'<div style="text-align:center;margin-bottom:14px">'
     +'<div style="font-size:16px;font-weight:700;color:#111;text-transform:uppercase;letter-spacing:2px">Official Receipt</div>'
-    +'<div style="font-size:11px;color:#64748b">Receipt No.: '+rcpNo+'</div>'
+    +'<div style="font-size:11px;color:#64748b">'+(v.invoiceNo?'Invoice No.: '+esc(v.invoiceNo):'Receipt No.: '+rcpNo)+'</div>'
     +'<div style="font-size:11px;color:#64748b">Date: '+esc(p.payDate||v.date||'')+' '+esc(p.payTime||'')+'</div>'
     +'</div>'
     +'<div style="background:#f8fafc;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px">'
@@ -758,7 +758,6 @@ function receiptScr() {
     +(c.cxId?'<div style="color:#64748b">🪪 Customer No.: <strong>'+esc(c.cxId)+'</strong></div>':'')
     +(c.phone?'<div style="color:#64748b">📞 '+esc(c.phone)+'</div>':'')
     +(c.mdl?'<div style="color:#64748b">🚗 '+esc(c.mdl)+(c.col?' ('+esc(c.col)+')':'')+(c.plt?' | 🔖 '+esc(c.plt):'')+'</div>':'')
-    +(v.invoiceNo?'<div style="color:#64748b">📋 Invoice No.: <strong>'+esc(v.invoiceNo)+'</strong></div>':'')
     +(v.jobOrderNo?'<div style="color:#64748b">🔧 Job Order No.: <strong>'+esc(v.jobOrderNo)+'</strong></div>':'')
     +'</div>'
     +'<div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#64748b;margin-bottom:6px">Services Rendered</div>'
@@ -1341,10 +1340,10 @@ function renderList() {
   }, 0);
 }
 // ── Sheets-First: シートから顧客を取得 ───────────────────────────
-async function fetchCxFromSheets(q) {
-  if (!S.url) return [];
+async function fetchCxFromSheets(q, by) {
+  if (!S.url) return null;
   try {
-    var url = S.url + '?action=search&q=' + encodeURIComponent(q||'');
+    var url = S.url + '?action=search&q=' + encodeURIComponent(q||'') + '&by=' + encodeURIComponent(by||'ln');
     var ctrl2 = new AbortController();
     var timer2 = setTimeout(function(){ ctrl2.abort(); }, 10000); // 10秒タイムアウト
     var r = await fetch(url, {signal: ctrl2.signal});
@@ -1355,16 +1354,16 @@ async function fetchCxFromSheets(q) {
     try { d = JSON.parse(text); } catch(pe) { throw new Error('Invalid JSON: ' + text.slice(0,100)); }
     if (d.ok === false && d.error) {
       flash('GS Error: ' + d.error, 'err');
-      return [];
+      return null;
     }
     if (!Array.isArray(d.customers) && d.ok === true && !d.count) {
       flash('⚠️ Apps Script not updated. Please redeploy with NEW VERSION.', 'err');
-      return [];
+      return null;
     }
-    return d.customers || [];
+    return d.customers || []; // 本当に0件ならここで空配列
   } catch(e) {
     flash('Connection error: ' + e.message, 'err');
-    return [];
+    return null; // 通信失敗はnull（0件とは区別する）
   }
 }
 
@@ -1531,13 +1530,21 @@ async function saveEditVisit() {
   flash('✅ Amendment saved. Original record preserved.');
   go('prof');
 }
-function localSearch(q) {
+function localSearch(q, sb) {
   if (!q) return [...S.cx];
-  const ql = (q||'').toLowerCase();
+  const ql = (q||'').toLowerCase().trim();
+  const mode = sb||'ln';
   return S.cx.filter(function(c) {
+    if (mode==='p4') {
+      var digits = ql.replace(/[^0-9]/g,'');
+      var last4  = (c.phone||'').replace(/[^0-9]/g,'').slice(-4);
+      return digits && last4.includes(digits);
+    }
+    if (mode==='em') return (c.email||'').toLowerCase().includes(ql);
+    if (mode==='pl') return (c.plt||'').toLowerCase().includes(ql);
+    // 'ln'（名前）: 姓・名・フルネームのみを対象にする（電話番号や車種等は含めない）
     var haystack = [
-      c.fn||'', c.ln||'', (c.fn||'')+' '+(c.ln||''), (c.ln||'')+' '+(c.fn||''),
-      c.phone||'', c.email||'', c.mdl||'', c.plt||'', c.p3||''
+      c.fn||'', c.ln||'', (c.fn||'')+' '+(c.ln||''), (c.ln||'')+' '+(c.fn||'')
     ].join(' ').toLowerCase();
     return haystack.includes(ql);
   });
@@ -1546,20 +1553,23 @@ function localSearch(q) {
 let _searchSeq = 0;
 async function doSearch() {
   const q = (S.sq||'').trim();
+  const sb = S.sb||'ln';
   const seq = ++_searchSeq; // このリクエスト固有の連番
   if (!q) { S.res=[]; render(); return; }
 
-  // まずローカルから即時表示
-  S.res = localSearch(q);
+  // まずローカルから即時表示（選択中のタブで絞り込み）
+  S.res = localSearch(q, sb);
   render();
 
   // Sheetsからも検索
   if (S.url) {
     S.busy = false;
     try {
-      var results = await fetchCxFromSheets(q);
+      var results = await fetchCxFromSheets(q, sb);
       if (seq !== _searchSeq) return; // 後から別の検索が始まっていたら、この古い結果は破棄
-      if (results && results.length > 0) {
+      if (results !== null) {
+        // バックエンドから正常に応答があった場合は、その結果を正として採用する
+        // （0件なら0件として表示。通信失敗時(null)はローカル検索結果を残す）
         S.res = results;
         results.forEach(function(sc) {
           var i = S.cx.findIndex(function(lc){ return lc.id===sc.id||lc.cxId===sc.cxId; });
@@ -1860,7 +1870,7 @@ async function submitNew() {
       estimate: est, deposit: dep,
       depositMethod: f.pay.depMeth||'', depositStaff: f.pay.depStaff||'', depositNote: f.pay.depNote||'',
       memo: [f.m1,f.m2,f.m3].filter(Boolean).join(' / '),
-      invoiceNo: f.invoiceNo||''
+      invoiceNo: f.invoiceNo||'', jobOrderNo: f.jobOrderNo||''
     });
     if (result && result.cxId) {
       newCxId = result.cxId;
@@ -1936,7 +1946,7 @@ async function submitVisit() {
       estimate: est, deposit: dep,
       depositMethod: f.pay.depMeth||'', depositStaff: f.pay.depStaff||'', depositNote: f.pay.depNote||'',
       memo: [f.m1,f.m2,f.m3].filter(Boolean).join(' / '),
-      invoiceNo: f.invoiceNo||'',
+      invoiceNo: f.invoiceNo||'', jobOrderNo: f.jobOrderNo||'',
       prepaidNum: newCard||c.prepaidNum||'',
       prepaidVisitNum: prepaidVisitNum
     });
