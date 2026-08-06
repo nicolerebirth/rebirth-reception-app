@@ -176,7 +176,7 @@ let S = {
   ef: {fn:'',ln:'',p1:'',p2:'',p3:'',addr:'',email:'',mdl:'',col:'',plt:'',prepaidNum:'',prepaidUsed:0},
   pf: initPay(), payVidx: null, depInfo: null,
   ex:{fn:'',ln:'',p1:'',p2:'',p3:'',addr:'',email:'',mdl:'',col:'',plt:'',staff:'',svcTypes:[],svcOther:'',prepaidNum:'',prepaidUsedInit:0,confirmedCard:''},
-  sel:null, prevScr:'ret', sb:'ln', sq:'', res:[],
+  sel:null, selLoadErr:false, prevScr:'ret', sb:'ln', sq:'', res:[],
   lq:'', ls:'name', lStaff:'all', sheetsResults:null, sheetSearching:false,
   pw:'', pwErr:false, confirmDel:false, savedInfo:null,
   toast:null, err:'', busy:false, syncing:false
@@ -448,7 +448,8 @@ function profScr() {
     +'<div class="g2" style="margin-bottom:14px">'
     +'<div class="card"><div style="display:flex;align-items:center;gap:12px;margin-bottom:14px"><div class="av" style="width:48px;height:48px;font-size:18px">'+(fr.fn?fr.fn[0]:'')+(fr.ln?fr.ln[0]:'')+'</div><div><div style="font-weight:600;font-size:17px">'+esc(fr.fn)+' '+esc(fr.ln)+'</div><div style="font-size:13px;color:#94a3b8">'+vs.length+' visit'+(vs.length!==1?'s':'')+'</div></div></div><div class="dvdr"></div>'+crow('Phone',fr.phone)+crow('Email',fr.email)+crow('Address',fr.addr)+crow('Vehicle',fr.mdl&&fr.col?fr.mdl+' · '+fr.col:fr.mdl||'')+crow('Plate',fr.plt)+'<button class="btn-g" style="width:100%;margin-top:14px" onclick="initEdit()"><i class="ti ti-edit"></i> Edit info</button></div>'
     +'<div class="card" style="overflow-y:auto;max-height:500px"><div class="sec">Service history</div>'
-    +(vs.length===0?'<div style="font-size:14px;color:#94a3b8">No visits yet.</div>'
+    +(S.selLoadErr?'<div style="background:#fef2f2;border:1.5px solid #fca5a5;border-radius:8px;padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:10px"><span style="font-size:13px;color:#dc2626">⚠️ Could not load the full visit history.</span><button class="btn-sm" onclick="retryOpenCx()" style="flex-shrink:0">🔄 Retry</button></div>':'')
+    +(vs.length===0?'<div style="font-size:14px;color:#94a3b8">'+(S.selLoadErr?'':'No visits yet.')+'</div>'
     :vs.slice().reverse().map((v,ri) => {
       const vi = vs.length-1-ri;
       const pay = v.pay||{};
@@ -1367,17 +1368,20 @@ async function fetchCxFromSheets(q) {
   }
 }
 
-async function fetchOneCxFromSheets(appId) {
+async function fetchOneCxFromSheets(appId, _isRetry) {
   if (!S.url) return null;
   try {
     var ctrl = new AbortController();
-    var timer = setTimeout(function(){ ctrl.abort(); }, 8000); // 8秒タイムアウト
+    var timer = setTimeout(function(){ ctrl.abort(); }, 15000); // 15秒タイムアウト
     var r = await fetch(S.url+'?action=getCx&appId='+encodeURIComponent(appId),
       {signal: ctrl.signal});
     clearTimeout(timer);
     var d = await r.json();
     return d.customer || null;
-  } catch(e) { return null; }
+  } catch(e) {
+    if (!_isRetry) return fetchOneCxFromSheets(appId, true); // 1回だけ自動リトライ
+    return null;
+  }
 }
 async function startEditVisit(cxId, vidx) {
   S.editVidx = vidx;
@@ -1539,8 +1543,10 @@ function localSearch(q) {
   });
 }
 
+let _searchSeq = 0;
 async function doSearch() {
   const q = (S.sq||'').trim();
+  const seq = ++_searchSeq; // このリクエスト固有の連番
   if (!q) { S.res=[]; render(); return; }
 
   // まずローカルから即時表示
@@ -1552,6 +1558,7 @@ async function doSearch() {
     S.busy = false;
     try {
       var results = await fetchCxFromSheets(q);
+      if (seq !== _searchSeq) return; // 後から別の検索が始まっていたら、この古い結果は破棄
       if (results && results.length > 0) {
         S.res = results;
         results.forEach(function(sc) {
@@ -1560,10 +1567,11 @@ async function doSearch() {
         });
       }
     } catch(e) {}
-    render();
+    if (seq === _searchSeq) render();
   }
 }
 
+let _openSeq = 0;
 async function openCx(id, from) {
   S.prevScr = from||'ret';
   S.confirmDel = false;
@@ -1572,20 +1580,35 @@ async function openCx(id, from) {
   if (!cx && S.res) cx = S.res.find(function(c){ return c.id===id||c.cxId===id; });
   if (!cx) { flash('Customer not found','err'); return; }
   S.sel = cx;
+  S.selLoadErr = false;
+  const seq = ++_openSeq; // この顧客オープン処理固有の連番
   go('prof');
   // バックグラウンドでvisitsを取得
   if (S.url) {
     try {
       var full = await fetchOneCxFromSheets(id);
+      if (seq !== _openSeq) return; // 後から別の顧客が開かれていたら、この古い結果は破棄
       if (full) {
         if ((!full.visits||full.visits.length===0)&&(cx.visits||[]).length>0) full.visits=cx.visits;
         S.sel = full;
+        S.selLoadErr = false;
         var ci = S.cx.findIndex(function(c){ return c.id===full.id||c.cxId===full.cxId; });
         if (ci>=0) S.cx[ci]=full; else S.cx.push(full);
         if (S.scr==='prof') render();
+      } else {
+        S.selLoadErr = true;
+        if (S.scr==='prof') render();
       }
-    } catch(e) {}
+    } catch(e) {
+      if (seq !== _openSeq) return;
+      S.selLoadErr = true;
+      if (S.scr==='prof') render();
+    }
   }
+}
+async function retryOpenCx() {
+  var c = S.sel; if (!c) return;
+  await openCx(c.id, S.prevScr);
 }
 function btnLoading(el, fn) {
   var origBg = el.style.background;
