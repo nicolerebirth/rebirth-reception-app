@@ -519,10 +519,10 @@ function new1Scr() {
     +'<div class="field" style="margin-bottom:14px"><label>Phone<span class="req">*</span></label><div style="display:flex;gap:8px;align-items:center"><input class="inp" id="p1" style="width:94px;text-align:center" maxlength="4" value="'+esc(S.f.p1)+'" placeholder="0912" oninput="sf(\'p1\',this.value.replace(/\\D/g,\'\'));if(this.value.length===4)document.getElementById(\'p2\').focus()"><span style="color:#94a3b8;font-size:22px">–</span><input class="inp" id="p2" style="width:74px;text-align:center" maxlength="3" value="'+esc(S.f.p2)+'" placeholder="345" oninput="sf(\'p2\',this.value.replace(/\\D/g,\'\'));if(this.value.length===3)document.getElementById(\'p3\').focus()"><span style="color:#94a3b8;font-size:22px">–</span><input class="inp" id="p3" style="width:84px;text-align:center" maxlength="4" value="'+esc(S.f.p3)+'" placeholder="6789" oninput="sf(\'p3\',this.value.replace(/\\D/g,\'\'))"></div></div>'
     +'<div class="g2" style="margin-bottom:14px">'
     +'<div class="field"><label>Visit date<span class="req">*</span></label>'
-    +'<input type="date" class="inp" value="'+S.f.dt+'" oninput="sf(\\\'dt\\\',this.value)">'
+    +'<input type="date" class="inp" value="'+S.f.dt+'" oninput="sf(\'dt\',this.value)">'
     +'</div>'
     +'<div class="field"><label>Staff<span class="req">*</span></label>'
-    +'<select id="new1-staff-sel" class="inp" style="color:#111" onchange="sf(\\\'st\\\',this.value);render()">'
+    +'<select id="new1-staff-sel" class="inp" style="color:#111" onchange="sf(\'st\',this.value);render()">'
     +'<option value="">Select staff...</option>'
     +STAFF.map(s=>'<option value="'+s+'"'+(S.f.st===s?' selected':'')+'>'+s+'</option>').join('')
     +'<option value="__other__"'+(S.f.st&&!STAFF.includes(S.f.st)?' selected':'')+'>Other (specify)...</option>'
@@ -607,10 +607,10 @@ function retVisitScr() {
     +'<div class="card">'
     +'<div class="g2" style="margin-bottom:16px">'
     +'<div class="field"><label>Service date<span class="req">*</span></label>'
-    +'<input type="date" class="inp" value="'+S.vf.svd+'" oninput="svf(\\\'svd\\\',this.value)">'
+    +'<input type="date" class="inp" value="'+S.vf.svd+'" oninput="svf(\'svd\',this.value)">'
     +'</div>'
     +'<div class="field"><label>Staff<span class="req">*</span></label>'
-    +'<select id="vf-staff-sel" class="inp" style="color:#111" onchange="svf(\\\'st\\\',this.value);render()">'
+    +'<select id="vf-staff-sel" class="inp" style="color:#111" onchange="svf(\'st\',this.value);render()">'
     +'<option value="">Select...</option>'
     +STAFF.map(s=>'<option value="'+s+'"'+(S.vf.st===s?' selected':'')+'>'+s+'</option>').join('')
     +'<option value="__other__"'+(S.vf.st&&!STAFF.includes(S.vf.st)?' selected':'')+'>Other (specify)...</option>'
@@ -710,11 +710,11 @@ function payScr() {
     +(remain>0?
     '<div class="g2" style="margin-bottom:12px">'
     +'<div class="field"><label style="font-weight:600">Payment method <span style="color:#C41010">*</span></label>'
-    +'<select class="inp" style="color:#111" onchange="ppf(\\\'payMeth\\\',this.value)"><option value="">Select...</option>'
+    +'<select class="inp" style="color:#111" onchange="ppf(\'payMeth\',this.value)"><option value="">Select...</option>'
     +PAY_METHODS.map(m=>'<option value="'+m+'"'+(pf.payMeth===m?' selected':'')+'>'+m+'</option>').join('')
     +'</select></div>'
     +'<div class="field"><label style="font-weight:600">Received by <span style="color:#C41010">*</span></label>'
-    +'<select class="inp" style="color:#111" onchange="ppf(\\\'payStaff\\\',this.value);render()"><option value="">Select...</option>'
+    +'<select class="inp" style="color:#111" onchange="ppf(\'payStaff\',this.value);render()"><option value="">Select...</option>'
     +STAFF.map(s=>'<option value="'+s+'"'+(pf.payStaff===s?' selected':'')+'>'+s+'</option>').join('')
     +'<option value="__other__"'+(pf.payStaff&&!STAFF.includes(pf.payStaff)?' selected':'')+'>Other (specify)...</option>'
     +'</select>'
