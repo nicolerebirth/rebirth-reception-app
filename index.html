@@ -454,12 +454,14 @@ function profScr() {
       const vi = vs.length-1-ri;
       const pay = v.pay||{};
       const isAmend = v.visitType==='Amendment';
+      const isLatest = vi === vs.length-1;
       return '<div class="visit-blk" style="'+(isAmend?'border-left:3px solid #f59e0b;padding-left:10px;':'')+'">'
         +'<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:4px">'
         +'<span style="font-weight:700;font-size:14px">'+fmtVisitDate(v.date)+'</span>'
         +(isAmend?'<span style="font-size:10px;background:#fef3c7;color:#92400e;border-radius:4px;padding:1px 6px;font-weight:700;margin-left:6px">✏️ AMENDED</span>':v.hasAmendment?'<span style="font-size:10px;background:#f1f5f9;color:#64748b;border-radius:4px;padding:1px 6px">Original</span>':'')
         +'<span style="font-size:11px;color:#94a3b8;background:#f1f5f9;padding:2px 9px;border-radius:12px">'+esc(v.staff||'')+'</span>'
         +'</div>'
+        +(isAmend&&v.editedBy?'<div style="font-size:11px;color:#b45309;margin-bottom:6px">✏️ Edited by: <strong>'+esc(v.editedBy)+'</strong> on '+esc(v.amendedAt||'')+'</div>':'')
         +(v.invoiceNo||v.jobOrderNo?'<div style="margin-bottom:6px">'
           +(v.invoiceNo?'<span style="font-size:11px;font-weight:700;background:#eff6ff;color:#1d4ed8;border-radius:6px;padding:2px 8px;margin-right:4px">📋 '+esc(v.invoiceNo)+'</span>':'')
           +(v.jobOrderNo?'<span style="font-size:11px;font-weight:700;background:#f0fdf4;color:#166534;border-radius:6px;padding:2px 8px">🔧 '+esc(v.jobOrderNo)+'</span>':'')
@@ -467,8 +469,8 @@ function profScr() {
         +(v.svcs||[]).map(s=>'<div style="font-size:13px;color:#16a34a;margin-bottom:2px">✓ '+esc(s)+'</div>').join('')
         +(v.usedCard&&v.prepaidVisitNum?pBadge(v.prepaidVisitNum):'')
         +(v.memo?'<div style="font-size:12px;color:#94a3b8;margin-top:6px;background:#f1f5f9;padding:6px 9px;border-radius:6px">'+esc(v.memo)+'</div>':'')
-        +(isAmend?'':'<div style="text-align:right;margin-top:6px">')
-        +(isAmend?'':'<button onclick="startEditVisit('+JSON.stringify(fr.id)+','+vi+')" style="font-size:12px;padding:4px 14px;border:1.5px solid #cbd5e1;border-radius:8px;background:#f8fafc;cursor:pointer;color:#475569;font-family:inherit;font-weight:600">✏️ Edit visit</button></div>')
+        +(isLatest?'<div style="text-align:right;margin-top:6px">':'')
+        +(isLatest?'<button onclick="startEditVisit(\''+fr.id+'\','+vi+')" style="font-size:12px;padding:4px 14px;border:1.5px solid #cbd5e1;border-radius:8px;background:#f8fafc;cursor:pointer;color:#475569;font-family:inherit;font-weight:600">✏️ Edit Service History</button></div>':'')
         +(pay.est?'<div style="margin-top:8px;padding:6px 10px;border-radius:6px;background:'+(pay.status==='completed'?'#dcfce7':pay.status==='deposit'?'#dbeafe':'#fef3c7')+';display:flex;align-items:center;justify-content:space-between">'
         +'<span style="font-size:12px;font-weight:700;color:'+(pay.status==='completed'?'#166534':pay.status==='deposit'?'#1e40af':'#92400e')+'">'+payBadge(pay,vi)+'</span>'
         +(pay.status!=='Full Paid'&&pay.status!=='completed'&&Math.max(0,parseFloat(pay.est||0)-parseFloat(pay.dep||0))>0?'<button onclick="S.payVidx='+vi+';S.pf=initPay();go(\'pay\')" style="background:#C41010;color:#fff;border:none;border-radius:5px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer">💳 Pay</button>'
@@ -1294,6 +1296,7 @@ function saveStaffName(field, v) {
   if (field === 'ret_st')   S.vf.st = v;
   if (field === 'payStaff') S.pf.payStaff = v;
   if (field === 'ex_staff') S.ex.staff = v;
+  if (field === 'ev_staff') S.evStaff = v;
 }
 function fmtVisitDate(d) {
   if (!d) return '';
@@ -1384,7 +1387,17 @@ async function fetchOneCxFromSheets(appId, _isRetry) {
   }
 }
 async function startEditVisit(cxId, vidx) {
+  const c = S.sel; if (!c) return;
+  const vs = c.visits||[];
+  if (parseInt(vidx) !== vs.length-1) {
+    flash('Only the most recent service history can be edited.', 'err');
+    return;
+  }
   S.editVidx = vidx;
+  S.evStaff = '';
+  S.err = '';
+  _editSvcsInited = false;
+  initEditSvcs();
   go('editVisit');
 }
 
@@ -1393,12 +1406,11 @@ function editVisitScr() {
   const vi = parseInt(S.editVidx);
   const v = (c.visits||[])[vi]; if (!v) return '';
   const p = v.pay||{};
-  const svcs = getSvcs(S.vf.svs||ms()); // use S.vf for editing
 
   return '<div style="padding:20px">'
     +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">'
     +'<button class="btn-g" onclick="go(\'prof\')">← Back</button>'
-    +'<div style="font-size:16px;font-weight:700">✏️ Edit Visit</div>'
+    +'<div style="font-size:16px;font-weight:700">✏️ Edit Service History</div>'
     +'</div>'
     +'<div class="card">'
     +'<div class="sec">Job Numbers</div>'
@@ -1412,7 +1424,7 @@ function editVisitScr() {
     +'<div class="sec">Services</div>'
     +SVC.map(function(def,idx){
       if (def.hdr) return '<div class="svc-hdr">'+def.hdr+'</div>';
-      const cur = (v.svcs||[]).find(s=>s===def.n||(s&&s.startsWith(def.n)));
+      const cur = _editSvcs.find(s=>s===def.n||(s&&s.startsWith(def.n)));
       const on = !!cur;
       const curOpt = cur && def.opts && def.opts.length ? cur.replace(def.n,'').replace(/[^a-zA-Z0-9 ()]/g,'').trim() : '';
       return '<div class="svc-row" onclick="toggleEditSvc('+idx+')">'
@@ -1429,20 +1441,32 @@ function editVisitScr() {
     +'<div class="field"><label>Estimate amount ₱ *</label>'
     +'<input type="number" class="inp" id="ev-est" style="color:#111;background:#fff;font-size:20px;font-weight:700" value="'+esc(p.est||'')+'"></div>'
     +'</div>'
+    +'<div class="card">'
+    +'<div class="sec">Who is making this change?</div>'
+    +'<div class="field"><label>Edited by<span class="req">*</span></label>'
+    +'<select class="inp" style="color:#111" onchange="saveStaffName(\'ev_staff\',this.value);render()"><option value="">Select staff...</option>'
+    +STAFF.map(s=>'<option value="'+s+'"'+(S.evStaff===s?' selected':'')+'>'+s+'</option>').join('')
+    +'<option value="__other__"'+(S.evStaff&&!STAFF.includes(S.evStaff)?' selected':'')+'>Other (specify)...</option>'
+    +'</select>'
+    +(S.evStaff&&!STAFF.includes(S.evStaff)?'<input class="inp" style="color:#111;background:#fff;margin-top:6px" value="'+esc(S.evStaff!=='__other__'?S.evStaff:'')+'" placeholder="Enter name..." oninput="saveStaffName(\'ev_staff\',this.value)">':'')
+    +'</div></div>'
+    +(S.err?'<div class="errbox" style="margin:12px 0">'+S.err+'</div>':'')
     +'<div style="margin-top:16px">'
     +'<button class="btn-r" style="width:100%;font-size:16px" onclick="saveEditVisit()">💾 Save Changes</button>'
     +'</div></div>';
 }
 
 var _editSvcs = [];
+var _editSvcsInited = false;
 function initEditSvcs() {
   // Initialize from current visit
   const c = S.sel; if (!c) return;
   const v = (c.visits||[])[parseInt(S.editVidx)]; if (!v) return;
   _editSvcs = (v.svcs||[]).slice();
+  _editSvcsInited = true;
 }
 function toggleEditSvc(idx) {
-  if (_editSvcs.length===0) initEditSvcs();
+  if (!_editSvcsInited) initEditSvcs();
   const def = SVC[idx]; if (!def||def.hdr) return;
   const i = _editSvcs.findIndex(s=>s&&(s===def.n||s.startsWith(def.n)));
   if (i>=0) _editSvcs.splice(i,1);
@@ -1450,7 +1474,7 @@ function toggleEditSvc(idx) {
   render();
 }
 function setEditOpt(idx, opt) {
-  if (_editSvcs.length===0) initEditSvcs();
+  if (!_editSvcsInited) initEditSvcs();
   const def = SVC[idx]; if (!def) return;
   const i = _editSvcs.findIndex(s=>s&&s.startsWith(def.n));
   if (i>=0) _editSvcs[i] = def.n+' '+opt;
@@ -1460,15 +1484,22 @@ async function saveEditVisit() {
   const c = S.sel; if (!c) return;
   const vi = parseInt(S.editVidx);
   const v = (c.visits||[])[vi]; if (!v) return;
+  if (vi !== (c.visits||[]).length-1) {
+    flash('Only the most recent service history can be edited.', 'err');
+    go('prof');
+    return;
+  }
   const inv = document.getElementById('ev-inv');
   const job = document.getElementById('ev-job');
   const est = document.getElementById('ev-est');
-  if (!inv||!inv.value.trim()) { alert('Invoice No. is required.'); return; }
-  if (!job||!job.value.trim()) { alert('Job Order No. is required.'); return; }
-  if (_editSvcs.length===0) initEditSvcs();
+  if (!inv||!inv.value.trim()) { S.err='Invoice No. is required.'; render(); return; }
+  if (!job||!job.value.trim()) { S.err='Job Order No. is required.'; render(); return; }
+  if (!S.evStaff || S.evStaff==='__other__') { S.err='Please select who is making this edit.'; render(); return; }
+  if (!_editSvcsInited) initEditSvcs();
 
   const newSvcs = _editSvcs.filter(Boolean);
   const newEst  = (est && est.value.trim()) ? est.value.trim() : (v.pay.est||'');
+  const editedBy = S.evStaff;
 
   // ── Amendment: 元の記録はそのまま保存 ──────────────────────
   // 変更があった場合のみ、amendmentを追加
@@ -1487,6 +1518,7 @@ async function saveEditVisit() {
   const amendment = {
     date:       v.date,
     staff:      v.staff,
+    editedBy:   editedBy,
     invoiceNo:  inv.value.trim(),
     jobOrderNo: job.value.trim(),
     svcs:       newSvcs,
@@ -1502,6 +1534,8 @@ async function saveEditVisit() {
   c.visits.splice(vi+1, 0, amendment);
 
   _editSvcs = [];
+  _editSvcsInited = false;
+  S.err = '';
 
   // ローカルキャッシュ更新
   const ci = S.cx.findIndex(function(cx){ return cx.id===c.id; });
@@ -1523,6 +1557,7 @@ async function saveEditVisit() {
         newServices:    amendment.svcs.join(', '),
         newEstimate:    newEst,
         amendedAt:      amendment.amendedAt,
+        editedBy:       editedBy,
         fn: c.fn, ln: c.ln, date: v.date
       });
     } catch(e) {}
