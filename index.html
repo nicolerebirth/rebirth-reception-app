@@ -1494,6 +1494,11 @@ async function saveEditVisit() {
   v.hasAmendment = true;
 
   // 新しいamendmentレコードを作成（元の隣に追加）
+  // 見積額(est)が変わった場合、残金(balance)・ステータスも新しい見積額を基準に再計算する
+  const oldDep = parseFloat((v.pay&&v.pay.dep)||0);
+  const newBalNum = Math.max(0, parseFloat(newEst||0) - oldDep);
+  const newStatus = (newBalNum<=0 && parseFloat(newEst||0)>0) ? 'completed'
+    : (oldDep>0 ? 'deposit' : ((v.pay&&v.pay.status)||'pending'));
   const amendment = {
     date:       v.date,
     staff:      v.staff,
@@ -1506,7 +1511,7 @@ async function saveEditVisit() {
     visitType:  'Amendment',
     amendedAt:  new Date().toISOString().slice(0,10),
     originalIdx: vi,
-    pay: Object.assign({}, v.pay, {est: newEst})
+    pay: Object.assign({}, v.pay, {est: newEst, final: newEst, balance: String(newBalNum), status: newStatus})
   };
 
   // visitsにamendmentを挿入（元の直後）
@@ -1533,6 +1538,7 @@ async function saveEditVisit() {
         newJobOrderNo:  amendment.jobOrderNo,
         newServices:    amendment.svcs.join(', '),
         newEstimate:    newEst,
+        existingDeposit: oldDep,
         amendedAt:      amendment.amendedAt,
         editedBy:       editedBy,
         fn: c.fn, ln: c.ln, date: v.date
