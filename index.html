@@ -200,6 +200,20 @@ const spf      = (k,v) => { S.f.pay[k]=v; };
 const svpf     = (k,v) => { S.vf.pay[k]=v; };
 const ppf      = (k,v) => { S.pf[k]=v; };
 const getSvcs  = svs => svs.filter(s=>s.on).map(s => { const d=SVC.find(x=>x.id===s.id); return d.n+(s.opt?' ('+s.opt+')':''); });
+// visitのサービス文字列配列（例:"PPF — Motec (6.5mil)"）を、svcPickが扱えるsvs形式(on/opt)に変換する
+function svcStringsToSvs(svcStrings) {
+  var svs = ms();
+  (svcStrings||[]).forEach(function(str){
+    var idx = SVC.findIndex(function(def){ return !def.hdr && str.indexOf(def.n) === 0; });
+    if (idx>=0) {
+      svs[idx].on = true;
+      var rest = str.slice(SVC[idx].n.length).trim();
+      var m = rest.match(/\(([^)]+)\)/);
+      svs[idx].opt = m ? m[1] : (SVC[idx].opts && SVC[idx].opts.length ? SVC[idx].opts[0] : '');
+    }
+  });
+  return svs;
+}
 const crow     = (l,v) => v ? '<div class="crow"><span class="clbl">'+l+'</span><span class="cval">'+esc(v)+'</span></div>' : '';
 
 function stepsBar(ls, cur) {
@@ -353,8 +367,10 @@ function cardDots(used) {
 }
 
 function pBadge(vn) {
-  const fr = vn===4;
-  return '<div style="margin-top:7px;padding:8px 12px;border-radius:8px;border:1.5px solid '+(fr?'#d97706':'#fbbf24')+';background:'+(fr?'#d97706':'#fffbeb')+';font-size:13px;font-weight:700;color:'+(fr?'#fff':'#92400e')+'">🃏 Prepaid card — visit '+vn+' of 4'+(fr?' ★ FREE VISIT ★':'')+'</div>';
+  const n = parseInt(vn, 10);
+  const safeVn = (!isNaN(n) && n>=1 && n<=4) ? n : '?'; // 想定外の値(日付等)が来ても表示を壊さない
+  const fr = safeVn===4;
+  return '<div style="margin-top:7px;padding:8px 12px;border-radius:8px;border:1.5px solid '+(fr?'#d97706':'#fbbf24')+';background:'+(fr?'#d97706':'#fffbeb')+';font-size:13px;font-weight:700;color:'+(fr?'#fff':'#92400e')+'">🃏 Prepaid card — visit '+safeVn+' of 4'+(fr?' ★ FREE VISIT ★':'')+'</div>';
 }
 
 function payBadge(pay) {
@@ -463,8 +479,8 @@ function profScr() {
         +'</div>'
         +(isAmend&&v.editedBy?'<div style="font-size:11px;color:#b45309;margin-bottom:6px">✏️ Edited by: <strong>'+esc(v.editedBy)+'</strong> on '+esc(v.amendedAt||'')+'</div>':'')
         +(v.invoiceNo||v.jobOrderNo?'<div style="margin-bottom:6px">'
-          +(v.invoiceNo?'<span style="font-size:11px;font-weight:700;background:#eff6ff;color:#1d4ed8;border-radius:6px;padding:2px 8px;margin-right:4px">📋 '+esc(v.invoiceNo)+'</span>':'')
-          +(v.jobOrderNo?'<span style="font-size:11px;font-weight:700;background:#f0fdf4;color:#166534;border-radius:6px;padding:2px 8px">🔧 '+esc(v.jobOrderNo)+'</span>':'')
+          +(v.invoiceNo?'<span style="font-size:11px;font-weight:700;background:#eff6ff;color:#1d4ed8;border-radius:6px;padding:2px 8px;margin-right:4px">📋 Invoice No.: '+esc(v.invoiceNo)+'</span>':'')
+          +(v.jobOrderNo?'<span style="font-size:11px;font-weight:700;background:#f0fdf4;color:#166534;border-radius:6px;padding:2px 8px">🔧 Job Order No.: '+esc(v.jobOrderNo)+'</span>':'')
           +'</div>':'')
         +(v.svcs||[]).map(s=>'<div style="font-size:13px;color:#16a34a;margin-bottom:2px">✓ '+esc(s)+'</div>').join('')
         +(v.usedCard&&v.prepaidVisitNum?pBadge(v.prepaidVisitNum):'')
@@ -1396,8 +1412,8 @@ async function startEditVisit(cxId, vidx) {
   S.editVidx = vidx;
   S.evStaff = '';
   S.err = '';
-  _editSvcsInited = false;
-  initEditSvcs();
+  S.vf = S.vf || {};
+  S.vf.svs = svcStringsToSvs(vs[vidx].svcs);
   go('editVisit');
 }
 
@@ -1422,19 +1438,7 @@ function editVisitScr() {
     +'</div></div>'
     +'<div class="card">'
     +'<div class="sec">Services</div>'
-    +SVC.map(function(def,idx){
-      if (def.hdr) return '<div class="svc-hdr">'+def.hdr+'</div>';
-      const cur = _editSvcs.find(s=>s===def.n||(s&&s.startsWith(def.n)));
-      const on = !!cur;
-      const curOpt = cur && def.opts && def.opts.length ? cur.replace(def.n,'').replace(/[^a-zA-Z0-9 ()]/g,'').trim() : '';
-      return '<div class="svc-row" onclick="toggleEditSvc('+idx+')">'
-        +'<div class="chk'+(on?' chk-on':'')+'"></div>'
-        +'<div class="svc-name">'+esc(def.n)+'</div>'
-        +(on&&def.opts&&def.opts.length?'<select class="inp" style="max-width:160px;color:#111" onclick="event.stopPropagation()" onchange="setEditOpt('+idx+',this.value)">'
-          +def.opts.map(o=>'<option value="'+o+'"'+(o===curOpt?' selected':'')+'>'+o+'</option>').join('')
-          +'</select>':'')
-        +'</div>';
-    }).join('')
+    +svcPick(S.vf.svs, true)
     +'</div>'
     +'<div class="card">'
     +'<div class="sec">Estimate</div>'
@@ -1456,30 +1460,6 @@ function editVisitScr() {
     +'</div></div>';
 }
 
-var _editSvcs = [];
-var _editSvcsInited = false;
-function initEditSvcs() {
-  // Initialize from current visit
-  const c = S.sel; if (!c) return;
-  const v = (c.visits||[])[parseInt(S.editVidx)]; if (!v) return;
-  _editSvcs = (v.svcs||[]).slice();
-  _editSvcsInited = true;
-}
-function toggleEditSvc(idx) {
-  if (!_editSvcsInited) initEditSvcs();
-  const def = SVC[idx]; if (!def||def.hdr) return;
-  const i = _editSvcs.findIndex(s=>s&&(s===def.n||s.startsWith(def.n)));
-  if (i>=0) _editSvcs.splice(i,1);
-  else _editSvcs.push(def.n+(def.opts&&def.opts.length?' '+def.opts[0]:''));
-  render();
-}
-function setEditOpt(idx, opt) {
-  if (!_editSvcsInited) initEditSvcs();
-  const def = SVC[idx]; if (!def) return;
-  const i = _editSvcs.findIndex(s=>s&&s.startsWith(def.n));
-  if (i>=0) _editSvcs[i] = def.n+' '+opt;
-  render();
-}
 async function saveEditVisit() {
   const c = S.sel; if (!c) return;
   const vi = parseInt(S.editVidx);
@@ -1495,9 +1475,8 @@ async function saveEditVisit() {
   if (!inv||!inv.value.trim()) { S.err='Invoice No. is required.'; render(); return; }
   if (!job||!job.value.trim()) { S.err='Job Order No. is required.'; render(); return; }
   if (!S.evStaff || S.evStaff==='__other__') { S.err='Please select who is making this edit.'; render(); return; }
-  if (!_editSvcsInited) initEditSvcs();
 
-  const newSvcs = _editSvcs.filter(Boolean);
+  const newSvcs = getSvcs(S.vf.svs||ms());
   const newEst  = (est && est.value.trim()) ? est.value.trim() : (v.pay.est||'');
   const editedBy = S.evStaff;
 
@@ -1533,8 +1512,6 @@ async function saveEditVisit() {
   // visitsにamendmentを挿入（元の直後）
   c.visits.splice(vi+1, 0, amendment);
 
-  _editSvcs = [];
-  _editSvcsInited = false;
   S.err = '';
 
   // ローカルキャッシュ更新
