@@ -479,8 +479,8 @@ function profScr() {
         +'</div>'
         +(isAmend&&v.editedBy?'<div style="font-size:11px;color:#b45309;margin-bottom:6px">✏️ Edited by: <strong>'+esc(v.editedBy)+'</strong> on '+esc(v.amendedAt||'')+'</div>':'')
         +(v.invoiceNo||v.jobOrderNo?'<div style="margin-bottom:6px">'
-          +(v.invoiceNo?'<span style="font-size:11px;font-weight:700;background:#eff6ff;color:#1d4ed8;border-radius:6px;padding:2px 8px;margin-right:4px">📋 Invoice No.: '+esc(v.invoiceNo)+'</span>':'')
-          +(v.jobOrderNo?'<span style="font-size:11px;font-weight:700;background:#f0fdf4;color:#166534;border-radius:6px;padding:2px 8px">🔧 Job Order No.: '+esc(v.jobOrderNo)+'</span>':'')
+          +(v.invoiceNo?'<div style="font-size:12px;color:#1d4ed8;font-weight:600;margin-bottom:2px">📋 Invoice No. / '+esc(v.invoiceNo)+'</div>':'')
+          +(v.jobOrderNo?'<div style="font-size:12px;color:#166534;font-weight:600">🔧 Job Order No. / '+esc(v.jobOrderNo)+'</div>':'')
           +'</div>':'')
         +(v.svcs||[]).map(s=>'<div style="font-size:13px;color:#16a34a;margin-bottom:2px">✓ '+esc(s)+'</div>').join('')
         +(v.usedCard&&v.prepaidVisitNum?pBadge(v.prepaidVisitNum):'')
