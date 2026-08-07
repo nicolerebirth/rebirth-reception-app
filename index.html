@@ -468,7 +468,7 @@ function profScr() {
         +(v.usedCard&&v.prepaidVisitNum?pBadge(v.prepaidVisitNum):'')
         +(v.memo?'<div style="font-size:12px;color:#94a3b8;margin-top:6px;background:#f1f5f9;padding:6px 9px;border-radius:6px">'+esc(v.memo)+'</div>':'')
         +(isAmend?'':'<div style="text-align:right;margin-top:6px">')
-        +(isAmend?'':'<button onclick="startEditVisit('+JSON.stringify(c.id)+','+vi+')" style="font-size:12px;padding:4px 14px;border:1.5px solid #cbd5e1;border-radius:8px;background:#f8fafc;cursor:pointer;color:#475569;font-family:inherit;font-weight:600">✏️ Edit visit</button></div>')
+        +(isAmend?'':'<button onclick="startEditVisit('+JSON.stringify(fr.id)+','+vi+')" style="font-size:12px;padding:4px 14px;border:1.5px solid #cbd5e1;border-radius:8px;background:#f8fafc;cursor:pointer;color:#475569;font-family:inherit;font-weight:600">✏️ Edit visit</button></div>')
         +(pay.est?'<div style="margin-top:8px;padding:6px 10px;border-radius:6px;background:'+(pay.status==='completed'?'#dcfce7':pay.status==='deposit'?'#dbeafe':'#fef3c7')+';display:flex;align-items:center;justify-content:space-between">'
         +'<span style="font-size:12px;font-weight:700;color:'+(pay.status==='completed'?'#166534':pay.status==='deposit'?'#1e40af':'#92400e')+'">'+payBadge(pay,vi)+'</span>'
         +(pay.status!=='Full Paid'&&pay.status!=='completed'&&Math.max(0,parseFloat(pay.est||0)-parseFloat(pay.dep||0))>0?'<button onclick="S.payVidx='+vi+';S.pf=initPay();go(\'pay\')" style="background:#C41010;color:#fff;border:none;border-radius:5px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer">💳 Pay</button>'
