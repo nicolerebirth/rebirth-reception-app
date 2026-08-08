@@ -1414,6 +1414,9 @@ async function startEditVisit(cxId, vidx) {
   S.err = '';
   S.vf = S.vf || {};
   S.vf.svs = svcStringsToSvs(vs[vidx].svcs);
+  S.evInv = vs[vidx].invoiceNo||'';
+  S.evJob = vs[vidx].jobOrderNo||'';
+  S.evEst = (vs[vidx].pay&&vs[vidx].pay.est)||'';
   go('editVisit');
 }
 
@@ -1432,9 +1435,9 @@ function editVisitScr() {
     +'<div class="sec">Job Numbers</div>'
     +'<div class="g2">'
     +'<div class="field"><label>Invoice No.<span class="req">*</span></label>'
-    +'<input class="inp" id="ev-inv" style="color:#111;background:#fff" value="'+esc(v.invoiceNo||'')+'" placeholder="e.g. 1801"></div>'
+    +'<input class="inp" id="ev-inv" style="color:#111;background:#fff" value="'+esc(S.evInv||'')+'" oninput="S.evInv=this.value" placeholder="e.g. 1801"></div>'
     +'<div class="field"><label>Job Order No.<span class="req">*</span></label>'
-    +'<input class="inp" id="ev-job" style="color:#111;background:#fff" value="'+esc(v.jobOrderNo||'')+'" placeholder="e.g. JO-001"></div>'
+    +'<input class="inp" id="ev-job" style="color:#111;background:#fff" value="'+esc(S.evJob||'')+'" oninput="S.evJob=this.value" placeholder="e.g. JO-001"></div>'
     +'</div></div>'
     +'<div class="card">'
     +'<div class="sec">Services</div>'
@@ -1443,7 +1446,7 @@ function editVisitScr() {
     +'<div class="card">'
     +'<div class="sec">Estimate</div>'
     +'<div class="field"><label>Estimate amount ₱ *</label>'
-    +'<input type="number" class="inp" id="ev-est" style="color:#111;background:#fff;font-size:20px;font-weight:700" value="'+esc(p.est||'')+'"></div>'
+    +'<input type="number" class="inp" id="ev-est" style="color:#111;background:#fff;font-size:20px;font-weight:700" value="'+esc(S.evEst||'')+'" oninput="S.evEst=this.value"></div>'
     +'</div>'
     +'<div class="card">'
     +'<div class="sec">Who is making this change?</div>'
@@ -1469,22 +1472,22 @@ async function saveEditVisit() {
     go('prof');
     return;
   }
-  const inv = document.getElementById('ev-inv');
-  const job = document.getElementById('ev-job');
-  const est = document.getElementById('ev-est');
-  if (!inv||!inv.value.trim()) { S.err='Invoice No. is required.'; render(); return; }
-  if (!job||!job.value.trim()) { S.err='Job Order No. is required.'; render(); return; }
+  const invVal = (S.evInv||'').trim();
+  const jobVal = (S.evJob||'').trim();
+  const estVal = (S.evEst!==undefined && S.evEst!==null && String(S.evEst).trim()!=='') ? String(S.evEst).trim() : '';
+  if (!invVal) { S.err='Invoice No. is required.'; render(); return; }
+  if (!jobVal) { S.err='Job Order No. is required.'; render(); return; }
   if (!S.evStaff || S.evStaff==='__other__') { S.err='Please select who is making this edit.'; render(); return; }
 
   const newSvcs = getSvcs(S.vf.svs||ms());
-  const newEst  = (est && est.value.trim()) ? est.value.trim() : (v.pay.est||'');
+  const newEst  = estVal || (v.pay.est||'');
   const editedBy = S.evStaff;
 
   // ── Amendment: 元の記録はそのまま保存 ──────────────────────
   // 変更があった場合のみ、amendmentを追加
   const changed =
-    inv.value.trim() !== (v.invoiceNo||'') ||
-    job.value.trim() !== (v.jobOrderNo||'') ||
+    invVal !== (v.invoiceNo||'') ||
+    jobVal !== (v.jobOrderNo||'') ||
     newSvcs.join(',') !== (v.svcs||[]).join(',') ||
     newEst !== (v.pay.est||'');
 
@@ -1503,8 +1506,8 @@ async function saveEditVisit() {
     date:       v.date,
     staff:      v.staff,
     editedBy:   editedBy,
-    invoiceNo:  inv.value.trim(),
-    jobOrderNo: job.value.trim(),
+    invoiceNo:  invVal,
+    jobOrderNo: jobVal,
     svcs:       newSvcs,
     memo:       v.memo||'',
     usedCard:   v.usedCard,
