@@ -787,6 +787,7 @@ function receiptScr() {
     +(c.cxId?'<div style="color:#64748b">🪪 Customer No.: <strong>'+esc(c.cxId)+'</strong></div>':'')
     +(c.phone?'<div style="color:#64748b">📞 '+esc(c.phone)+'</div>':'')
     +(c.mdl?'<div style="color:#64748b">🚗 '+esc(c.mdl)+(c.col?' ('+esc(c.col)+')':'')+(c.plt?' | 🔖 '+esc(c.plt):'')+'</div>':'')
+    +(v.invoiceNo?'<div style="color:#64748b">📋 Invoice No.: <strong>'+esc(v.invoiceNo)+'</strong></div>':'')
     +(v.jobOrderNo?'<div style="color:#64748b">🔧 Job Order No.: <strong>'+esc(v.jobOrderNo)+'</strong></div>':'')
     +'</div>'
     +'<div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#64748b;margin-bottom:6px">Services Rendered</div>'
