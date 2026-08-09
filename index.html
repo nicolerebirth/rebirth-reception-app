@@ -203,7 +203,13 @@ const getSvcs  = svs => svs.filter(s=>s.on).map(s => { const d=SVC.find(x=>x.id=
 // visitのサービス文字列配列（例:"PPF — Motec (6.5mil)"）を、svcPickが扱えるsvs形式(on/opt)に変換する
 function svcStringsToSvs(svcStrings) {
   var svs = ms();
+  var flat = [];
+  // 保存時の圧縮（3枠制限）により、複数サービスが1つの文字列にカンマ区切りで
+  // まとまっていることがある（例:"Dent repair, Maintenance Prepaid Card"）ため、まず分解する
   (svcStrings||[]).forEach(function(str){
+    (str||'').split(', ').forEach(function(piece){ if (piece.trim()) flat.push(piece.trim()); });
+  });
+  flat.forEach(function(str){
     var idx = SVC.findIndex(function(def){ return !def.hdr && str.indexOf(def.n) === 0; });
     if (idx>=0) {
       svs[idx].on = true;
