@@ -1425,6 +1425,8 @@ async function startEditVisit(cxId, vidx) {
   S.err = '';
   S.vf = S.vf || {};
   S.vf.svs = svcStringsToSvs(vs[vidx].svcs);
+  S.vf.newCardNum = '';
+  S.vf.confirmedCard = c.prepaidNum||''; // 既にカードを持っていれば、そのまま登録済み扱いにする
   S.evInv = vs[vidx].invoiceNo||'';
   S.evJob = vs[vidx].jobOrderNo||'';
   S.evEst = (vs[vidx].pay&&vs[vidx].pay.est)||'';
@@ -1436,6 +1438,7 @@ function editVisitScr() {
   const vi = parseInt(S.editVidx);
   const v = (c.visits||[])[vi]; if (!v) return '';
   const p = v.pay||{};
+  const pOn = S.vf.svs[SVC.findIndex(x=>x.id==='prepaid')]?.on;
 
   return '<div style="padding:20px">'
     +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">'
@@ -1453,11 +1456,12 @@ function editVisitScr() {
     +'<div class="card">'
     +'<div class="sec">Services</div>'
     +svcPick(S.vf.svs, true)
+    +(pOn?cardInputSec(true):'')
     +'</div>'
     +'<div class="card">'
     +'<div class="sec">Estimate</div>'
     +'<div class="field"><label>Estimate amount ₱ *</label>'
-    +'<input type="number" class="inp" id="ev-est" style="color:#111;background:#fff;font-size:20px;font-weight:700" value="'+esc(S.evEst||'')+'" oninput="S.evEst=this.value"></div>'
+    +'<input type="number" class="inp" id="ev-est" style="color:#111;background:#fff;font-size:20px;font-weight:700" value="'+esc(S.evEst||'')+'" oninput="S.evEst=this.value" onfocus="this.select()"></div>'
     +'</div>'
     +'<div class="card">'
     +'<div class="sec">Who is making this change?</div>'
@@ -1489,10 +1493,13 @@ async function saveEditVisit() {
   if (!invVal) { S.err='Invoice No. is required.'; render(); return; }
   if (!jobVal) { S.err='Job Order No. is required.'; render(); return; }
   if (!S.evStaff || S.evStaff==='__other__') { S.err='Please select who is making this edit.'; render(); return; }
+  const pOn = S.vf.svs[SVC.findIndex(x=>x.id==='prepaid')]?.on;
+  if (pOn && !S.vf.confirmedCard) { S.err='Please register the prepaid card number.'; render(); return; }
 
   const newSvcs = getSvcs(S.vf.svs||ms());
   const newEst  = estVal || (v.pay.est||'');
   const editedBy = S.evStaff;
+  const newCardNum = pOn ? (S.vf.confirmedCard||'') : (c.prepaidNum||'');
 
   // ── Amendment: 元の記録はそのまま保存 ──────────────────────
   // 変更があった場合のみ、amendmentを追加
@@ -1528,6 +1535,13 @@ async function saveEditVisit() {
     pay: Object.assign({}, v.pay, {est: newEst, final: newEst, balance: String(newBalNum), status: newStatus})
   };
 
+  // カード番号が新しく登録・変更された場合、顧客情報にも反映する
+  if (pOn && newCardNum && newCardNum !== (c.prepaidNum||'')) {
+    c.prepaidNum = newCardNum;
+    const ci0 = S.cx.findIndex(function(cx){ return cx.id===c.id; });
+    if (ci0>=0) S.cx[ci0].prepaidNum = newCardNum;
+  }
+
   // visitsにamendmentを挿入（元の直後）
   c.visits.splice(vi+1, 0, amendment);
 
@@ -1555,6 +1569,7 @@ async function saveEditVisit() {
         existingDeposit: oldDep,
         amendedAt:      amendment.amendedAt,
         editedBy:       editedBy,
+        prepaidNum:     newCardNum,
         fn: c.fn, ln: c.ln, date: v.date
       });
     } catch(e) {}
