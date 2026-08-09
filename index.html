@@ -793,10 +793,10 @@ function receiptScr() {
     +'<div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#64748b;margin-bottom:6px">Services Rendered</div>'
     +(v.svcs||[]).map(s=>'<div style="font-size:13px;padding:4px 0;border-bottom:0.5px solid #f1f5f9">✓ '+esc(s)+'</div>').join('')
     +'<div style="margin-top:14px;border-top:1.5px solid #e2e8f0;padding-top:10px;width:100%">'
-    +'<div style="overflow:hidden;font-size:14px;margin-bottom:8px"><span style="float:right;font-weight:600">'+fmt(fin)+'</span><span style="color:#64748b">Total Amount (請求総額):</span></div>'
-    +(dep>0?'<div style="overflow:hidden;font-size:14px;margin-bottom:8px"><span style="float:right;font-weight:600;color:#1d4ed8">'+fmt(dep)+'</span><span style="color:#1d4ed8">Down Payment (頭金):</span></div>':'')
-    +'<div style="overflow:hidden;font-size:14px;margin-bottom:8px"><span style="float:right;font-weight:600;color:#dc2626">'+fmt(remain)+'</span><span style="color:#dc2626">Balance Due (残金):</span></div>'
-    +'<div style="overflow:hidden;font-size:16px;font-weight:800;border-top:2px solid #111;padding-top:10px;margin-top:6px"><span style="float:right;color:#16a34a">'+fmt(remain)+'</span>Amount Paid Today (今回のお支払い):</div>'
+    +'<div style="overflow:hidden;font-size:14px;margin-bottom:8px"><span style="float:right;font-weight:600">'+fmt(fin)+'</span><span style="color:#64748b">Total Amount:</span></div>'
+    +(dep>0?'<div style="overflow:hidden;font-size:14px;margin-bottom:8px"><span style="float:right;font-weight:600;color:#1d4ed8">'+fmt(dep)+'</span><span style="color:#1d4ed8">Down Payment:</span></div>':'')
+    +'<div style="overflow:hidden;font-size:14px;margin-bottom:8px"><span style="float:right;font-weight:600;color:#dc2626">'+fmt(remain)+'</span><span style="color:#dc2626">Balance Due:</span></div>'
+    +'<div style="overflow:hidden;font-size:16px;font-weight:800;border-top:2px solid #111;padding-top:10px;margin-top:6px"><span style="float:right;color:#16a34a">'+fmt(remain)+'</span>Amount Paid Today:</div>'
     +'</div>'
     +'<div style="margin-top:12px;padding:10px 12px;background:#f0fdf4;border-radius:8px;font-size:12px">'
     +'<div><strong>Payment method:</strong> '+esc(p.payMeth||'—')+'</div>'
@@ -1024,9 +1024,9 @@ function depReceiptScr() {
 
   // Deposit details
   h.push('<div style="margin-top:16px;border-top:2px solid #e2e8f0;padding-top:12px">');
-  h.push('<div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px"><span style="color:#64748b">Total Amount (支払い総額):</span><span style="font-weight:700">' + (info.est?fmt(info.est):'—') + '</span></div>');
-  h.push('<div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px"><span style="color:#1d4ed8">'+(info.isFullPayment?'Total Paid (支払額):':'Down Payment (頭金):')+'</span><span style="font-weight:700;color:#1d4ed8">' + fmt(info.dep) + '</span></div>');
-  h.push('<div style="display:flex;justify-content:space-between;font-size:16px;font-weight:900;border-top:1.5px solid #e2e8f0;padding-top:8px;margin-top:2px"><span>Balance (残金):</span><span style="color:'+(info.balance>0?'#dc2626':'#16a34a')+'">' + fmt(info.balance) + '</span></div>');
+  h.push('<div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px"><span style="color:#64748b">Total Amount:</span><span style="font-weight:700">' + (info.est?fmt(info.est):'—') + '</span></div>');
+  h.push('<div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px"><span style="color:#1d4ed8">'+(info.isFullPayment?'Total Paid:':'Down Payment:')+'</span><span style="font-weight:700;color:#1d4ed8">' + fmt(info.dep) + '</span></div>');
+  h.push('<div style="display:flex;justify-content:space-between;font-size:16px;font-weight:900;border-top:1.5px solid #e2e8f0;padding-top:8px;margin-top:2px"><span>Balance:</span><span style="color:'+(info.balance>0?'#dc2626':'#16a34a')+'">' + fmt(info.balance) + '</span></div>');
   h.push('<div style="font-size:13px;color:#64748b;margin-top:10px"><strong>Method:</strong> ' + esc(info.depMeth||'—') + '</div>');
   h.push('<div style="font-size:13px;color:#64748b;margin-bottom:4px"><strong>Received by:</strong> ' + esc(info.depStaff||'—') + '</div>');
   if (info.depNote) h.push('<div style="font-size:13px;color:#64748b"><strong>Ref#:</strong> ' + esc(info.depNote) + '</div>');
