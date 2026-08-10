@@ -583,8 +583,9 @@ function new2Scr() {
     +'<div class="card"><div class="sec">Vehicle information</div>'
     +'<div class="g2" style="margin-bottom:14px"><div class="field"><label>Model / make<span class="req">*</span></label><input class="inp" value="'+esc(S.f.mdl)+'" placeholder="Toyota Vios..." oninput="sf(\'mdl\',this.value)"></div>'
     +'<div class="field"><label>Color</label>'+csel+'</div></div>'
-    +'<div class="field" style="margin-bottom:14px"><label>License plate</label><input class="inp" value="'+esc(S.f.plt)+'" placeholder="ABC 1234" oninput="sf(\'plt\',this.value)"></div></div>'
-    +'<div class="acts"><button class="btn-g" onclick="go(\'new1\')">Back</button><button class="btn-r" onclick="go(\'new3\')">Next: Services</button></div></div>';
+    +'<div class="field" style="margin-bottom:14px"><label>License plate<span class="req">*</span></label><input class="inp" value="'+esc(S.f.plt)+'" placeholder="ABC 1234" oninput="sf(\'plt\',this.value)"></div></div>'
+    +(S.err?'<div class="errbox">'+S.err+'</div>':'')
+    +'<div class="acts"><button class="btn-g" onclick="go(\'new1\')">Back</button><button class="btn-r" onclick="val2()">Next: Services</button></div></div>';
 }
 function new3Scr() {
   const pOn = S.f.svs[SVC.findIndex(x=>x.id==='prepaid')]?.on;
@@ -691,13 +692,15 @@ function retConfScr() {
 }
 
 function savedScr() {
-  const info = S.savedInfo||{}; const isN = info.type==='new';
+  const info = S.savedInfo||{}; const isN = info.type==='new'; const isEx = info.type==='existing';
+  const title = isEx ? 'Customer registered!' : (isN ? 'Registration complete!' : 'Visit recorded!');
+  const subtitle = isEx ? ' has been added as an existing customer.' : ' has been saved.';
   return '<div style="padding:44px 28px 36px;text-align:center">'
-    +'<div style="width:80px;height:80px;border-radius:50%;background:#16a34a;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 4px 20px rgba(22,163,74,.3)"><span style="color:#fff;font-size:40px;font-weight:900;line-height:1">✓</span></div>'
-    +'<div style="font-size:24px;font-weight:700;margin-bottom:8px">'+(isN?'Registration complete!':'Visit recorded!')+'</div>'
-    +'<div style="font-size:16px;color:#64748b;margin-bottom:24px"><strong>'+esc(info.name||'')+'</strong> has been saved.</div>'
+    +'<div style="width:80px;height:80px;border-radius:50%;background:'+(isEx?'#7c3aed':'#16a34a')+';display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 4px 20px rgba(22,163,74,.3)"><span style="color:#fff;font-size:40px;font-weight:900;line-height:1">✓</span></div>'
+    +'<div style="font-size:24px;font-weight:700;margin-bottom:8px">'+title+'</div>'
+    +'<div style="font-size:16px;color:#64748b;margin-bottom:24px"><strong>'+esc(info.name||'')+'</strong>'+subtitle+'</div>'
     +'<div style="background:#f8fafc;border:0.5px solid #e2e8f0;border-radius:12px;padding:16px 20px;margin-bottom:24px;text-align:left">'+crow('Date',info.date||'')+crow('Staff',info.staff||'')
-    +((info.svcs||[]).length?'<div class="crow"><span class="clbl">Services</span><span style="font-size:13px;font-weight:500;color:#111">'+info.svcs.map(s=>'<div>✓ '+esc(s)+'</div>').join('')+'</span></div>':'')
+    +((info.svcs||[]).length?'<div class="crow"><span class="clbl">'+(isEx?'Past services':'Services')+'</span><span style="font-size:13px;font-weight:500;color:#111">'+info.svcs.map(s=>'<div>✓ '+esc(s)+'</div>').join('')+'</span></div>':'')
     +(info.card?'<div class="crow"><span class="clbl">Prepaid card</span><span style="font-size:13px;font-weight:700;color:#92400e">🃏 #'+esc(info.card)+' registered</span></div>':'')
     +(info.useCard&&info.prepaidVisitNum?'<div class="crow"><span class="clbl">Card charged</span><span style="font-size:13px;font-weight:700;color:'+(info.prepaidVisitNum===4?'#d97706':'#92400e')+'">🃏 Visit '+info.prepaidVisitNum+' of 4'+(info.prepaidVisitNum===4?' ★ FREE':'')+'</span></div>':'')
     +'</div>'
@@ -1136,8 +1139,8 @@ function existingScr() {
     +'</div>'
 
     +(S.err?'<div class="errbox">'+S.err+'</div>':'')
-    +'<div class="acts"><button class="btn-g" onclick="go(\'home\')">Cancel</button>'
-    +'<button class="btn-r" style="background:#7c3aed;font-size:15px" onclick="btnLoading(this,submitExisting)">Register customer →</button></div></div>';
+    +'<div class="acts"><button class="btn-g" onclick="go(\'home\')" '+(S.busy?'disabled':'')+'>Cancel</button>'
+    +'<button class="btn-r" style="background:'+(S.busy?'#94a3b8':'#7c3aed')+';font-size:15px" onclick="btnLoading(this,submitExisting)" '+(S.busy?'disabled':'')+'>'+(S.busy?'⏳ Registering...':'Register customer →')+'</button></div></div>';
 }
 
 function confirmExCard() {
@@ -1196,18 +1199,19 @@ async function submitExisting() {
   try { await silentPush(); } catch(e) {}
   try { await postToSheets({
     type:'existing_customer', ...rec,
-    services: (ex.svcTypes&&ex.svcTypes.length) ? '[Past: '+(ex.svcTypes.join(', '))+(ex.svcOther?' / '+ex.svcOther:'')+']' : '[Existing customer]',
+    services: rec.visits[0].svcs.join(', '),
     estimate:'', deposit:'',
     depositMethod:'', depositStaff:'', depositNote:'',
-    memo: 'Registered from existing customer list'
-      +((ex.svcTypes&&ex.svcTypes.length)?' | Past: '+ex.svcTypes.join(', ')+(ex.svcOther?' / '+ex.svcOther:''):'')
+    memo: 'Registered from existing customer list (past service, retroactive entry)'
   }); } catch(e) { console.log('Sheets error:', e); }
 
+  S.savedInfo = {type:'existing', name:rec.fn+' '+rec.ln, date:rec.firstVisit, staff:rec.staff,
+    svcs:rec.visits[0].svcs, card:rec.prepaidNum, selId:rec.id};
   S.ex = {fn:'',ln:'',p1:'',p2:'',p3:'',addr:'',email:'',mdl:'',col:'',plt:'',staff:'',
     svcTypes:[],svcOther:'',prepaidNum:'',prepaidUsedInit:0,confirmedCard:''};
   S.err='';
-  flash('✅ '+rec.fn+' '+rec.ln+' registered!');
-  go('home');
+  _submitting = false; S.busy = false;
+  go('saved');
 }
 async function skipSignature() {
   var c = S.sel; if(!c) return;
@@ -1850,6 +1854,15 @@ function val1() {
   if (!f.jobOrderNo)               { S.err='Job Order No. is required.'; render(); return; }
   S.err = '';
   go('new2');
+}
+
+// ── 入力バリデーション：新規顧客 Step2 → Step3 ─────────────────
+function val2() {
+  var f = S.f;
+  if (!f.mdl.trim())  { S.err='Vehicle model is required.'; render(); return; }
+  if (!f.plt.trim())  { S.err='License plate is required.'; render(); return; }
+  S.err = '';
+  go('new3');
 }
 
 // ── 入力バリデーション：新規顧客 Step3 → 確認画面 ───────────────
