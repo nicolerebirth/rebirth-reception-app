@@ -277,24 +277,23 @@ function paySection(isV) {
     +(p.noPayment?'<div style="background:#dcfce7;border:2px solid #16a34a;border-radius:10px;padding:14px;margin-bottom:14px;text-align:center;color:#166534;font-weight:700">✅ No Payment — This visit is free of charge</div>':'')
     +(!p.noPayment?'<div class="field" style="margin-bottom:14px">':'<div style="display:none">')
     +'<label style="color:#166534;font-weight:600">Estimate amount ₱ <span style="color:#C41010">*</span></label>'
-    +'<input type="number" class="inp" style="color:#111;background:#fff;font-size:20px;font-weight:700;border-color:#16a34a;border-width:2px" value="'+esc(p.est)+'" placeholder="0.00" oninput="setEstimate('+(isV?1:0)+',this.value)">'
+    +'<input type="number" class="inp" style="color:#111;background:#fff;font-size:20px;font-weight:700;border-color:#16a34a;border-width:2px" value="'+esc(p.est)+'" placeholder="0.00" oninput="setEstimate('+(isV?1:0)+',this.value)" onblur="render()">'
     +'</div>'
     +(!p.noPayment?'<div class="field" style="margin-bottom:10px">'
     +'<label style="color:#166534;font-weight:600">Invoice No. <span style="font-size:11px;color:#94a3b8">(optional)</span></label>'
     +'<input class="inp" style="color:#111;background:#fff" value="'+esc(p.invoiceNo)+'" placeholder="e.g. INV-2026-001" oninput="setInvoiceNo('+(isV?1:0)+',this.value)">'
     +'</div>':'')
     +(!p.noPayment?'<button type="button" onclick="togglePayFull('+(isV?1:0)+')" class="btn-payfull'+(p.payFull?' active':'')+'">'+(p.payFull?'✅ Pay in Full':'💳 Pay in Full')+'</button>':'')
-    +'<div style="border-top:1px solid #bbf7d0;padding-top:12px;margin-bottom:12px;font-size:14px;font-weight:600;color:#166534">🏦 '+(p.payFull?'Full Payment':'Down Payment received (optional)')+'</div>'
+    +'<div style="border-top:1px solid #bbf7d0;padding-top:12px;margin-bottom:12px;font-size:14px;font-weight:600;color:#166534">🏦 '+(p.payFull?'Full Payment':(dep>0?'Down Payment received':'Down Payment received (optional)'))+'</div>'
     +'<div class="g2" style="margin-bottom:10px">'
-    +'<div class="field"><label>Down Payment ₱</label><input type="number" class="inp" style="color:#111;background:#fff" value="'+esc(p.dep)+'" placeholder="0" oninput="setDepAmt('+(isV?1:0)+',this.value)"></div>'
+    +'<div class="field"><label>Down Payment ₱</label><input type="number" class="inp" style="color:#111;background:#fff" value="'+esc(p.dep)+'" placeholder="0" oninput="setDepAmt('+(isV?1:0)+',this.value)" onblur="render()"></div>'
     +'<div class="field"><label>Date received</label><input type="date" class="inp" style="color:#111" value="'+esc(p.depDate)+'" oninput="setDepDate('+(isV?1:0)+',this.value)"></div>'
     +'</div>'
     +'<div class="g2" style="margin-bottom:10px">'
-    +'<div class="field"><label>Down Payment method</label>'
-    +'<div class="field"><label>Down Payment method</label><select class="inp" style="color:#111" onchange="setDepMeth('+(isV?1:0)+',this.value)"><option value="">Select...</option>'
+    +'<div class="field"><label>Down Payment method'+(dep>0?' <span style="color:#C41010">*</span>':'')+'</label><select class="inp" style="color:#111" onchange="setDepMeth('+(isV?1:0)+',this.value)"><option value="">Select...</option>'
     +PAY_METHODS.map(m => '<option value="'+m+'"'+(p.depMeth===m?' selected':'')+'>'+m+'</option>').join('')
     +'</select></div>'
-    +'<div class="field"><label>Received by</label>'
+    +'<div class="field"><label>Received by'+(dep>0?' <span style="color:#C41010">*</span>':'')+'</label>'
     +'<select class="inp" style="color:#111" onchange="setDepStaff('+(isV?1:0)+',this.value)"><option value="">Select...</option>'
     +STAFF.map(s => '<option value="'+s+'"'+(p.depStaff===s?' selected':'')+'>'+s+'</option>').join('')
     +'<option value="__other__"'+(p.depStaff&&!STAFF.includes(p.depStaff)?' selected':'')+'>Other (specify)...</option>'
