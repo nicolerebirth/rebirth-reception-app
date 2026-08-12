@@ -904,32 +904,46 @@ function initSignature(canvasId) {
 // ── Deposit Signature functions ────────────────────────────────
 
 async function skipDepSignature() {
+  if (_submitting) return;
+  _submitting = true;
   if (S.depInfo) {
     S.depInfo.signature = '';
     S.depInfo.signedAt = 'Skip signature';
   }
-  // Send to Sheets without signature
-  await postToSheets({
-    type:'deposit',
-    date: S.depInfo ? S.depInfo.date : '',
-    appId: S.depInfo ? S.depInfo.appId : '',
-    fn: S.depInfo ? S.depInfo.fn : '',
-    ln: S.depInfo ? S.depInfo.ln : '',
-    phone: S.depInfo ? S.depInfo.phone : '',
-    mdl: S.depInfo ? S.depInfo.mdl : '',
-    plt: S.depInfo ? S.depInfo.plt : '',
-    services: S.depInfo ? S.depInfo.services : '',
-    amount: S.depInfo ? S.depInfo.dep : 0,
-    method: S.depInfo ? S.depInfo.depMeth : '',
-    receivedBy: S.depInfo ? S.depInfo.depStaff : '',
-    note: S.depInfo ? S.depInfo.depNote : '',
-    balance: S.depInfo ? S.depInfo.balance : 0,
-    signedAt: 'Skip signature',
-    skipSignature: true,
-    signatureImage: ''
-  });
-  flash('Down Payment recorded. Please sign on final receipt.');
-  go('saved');
+  try {
+    var result = await postToSheets({
+      type:'deposit',
+      date: S.depInfo ? S.depInfo.date : '',
+      appId: S.depInfo ? S.depInfo.appId : '',
+      fn: S.depInfo ? S.depInfo.fn : '',
+      ln: S.depInfo ? S.depInfo.ln : '',
+      phone: S.depInfo ? S.depInfo.phone : '',
+      mdl: S.depInfo ? S.depInfo.mdl : '',
+      plt: S.depInfo ? S.depInfo.plt : '',
+      services: S.depInfo ? S.depInfo.services : '',
+      amount: S.depInfo ? S.depInfo.dep : 0,
+      method: S.depInfo ? S.depInfo.depMeth : '',
+      receivedBy: S.depInfo ? S.depInfo.depStaff : '',
+      note: S.depInfo ? S.depInfo.depNote : '',
+      balance: S.depInfo ? S.depInfo.balance : 0,
+      signedAt: 'Skip signature',
+      skipSignature: true,
+      signatureImage: ''
+    });
+    if (result && result.ok === false) {
+      flash('⚠️ '+(result.error||'Could not save. Please try again.'), 'err');
+      _submitting = false;
+      render();
+      return;
+    }
+    flash('Down Payment recorded. Please sign on final receipt.');
+    _submitting = false;
+    go('saved');
+  } catch(e) {
+    flash('⚠️ Connection error: '+e.message+'. Please try again.', 'err');
+    _submitting = false;
+    render();
+  }
 }
 function clearDepSignature() {
   var canvas = document.getElementById('dep-sig-canvas');
@@ -943,12 +957,17 @@ async function confirmDepSignature() {
   _submitting = true;
   document.querySelectorAll('button').forEach(function(b){b.disabled=true;b.style.opacity='0.7';});
   var canvas = document.getElementById('dep-sig-canvas');
-  if (!canvas) return;
+  if (!canvas) { _submitting=false; return; }
   var ctx = canvas.getContext('2d');
   var pixels = ctx.getImageData(0,0,canvas.width,canvas.height).data;
   var hasContent = false;
   for (var i=3; i<pixels.length; i+=4) { if(pixels[i]>0){hasContent=true;break;} }
-  if (!hasContent) { alert('Please sign before confirming.'); return; }
+  if (!hasContent) {
+    alert('Please sign before confirming.');
+    _submitting = false;
+    document.querySelectorAll('button').forEach(function(b){b.disabled=false;b.style.opacity='';});
+    return;
+  }
 
   var sigData = canvas.toDataURL('image/png');
   var now = new Date();
@@ -959,28 +978,37 @@ async function confirmDepSignature() {
     S.depInfo.signedAt = sigText;
   }
 
-  await postToSheets({
-    type:'deposit',
-    date: S.depInfo ? S.depInfo.date : '',
-    appId: S.depInfo ? S.depInfo.appId : '',
-    fn: S.depInfo ? S.depInfo.fn : '',
-    ln: S.depInfo ? S.depInfo.ln : '',
-    phone: S.depInfo ? S.depInfo.phone : '',
-    mdl: S.depInfo ? S.depInfo.mdl : '',
-    plt: S.depInfo ? S.depInfo.plt : '',
-    services: S.depInfo ? S.depInfo.services : '',
-    amount: S.depInfo ? S.depInfo.dep : 0,
-    method: S.depInfo ? S.depInfo.depMeth : '',
-    receivedBy: S.depInfo ? S.depInfo.depStaff : '',
-    note: S.depInfo ? S.depInfo.depNote : '',
-    balance: S.depInfo ? S.depInfo.balance : 0,
-    signedAt: sigText,
-    signatureImage: sigData
-  });
-
-  _submitting = false;
-  flash('Down Payment receipt signed! \u2713');
-  render();
+  try {
+    var result = await postToSheets({
+      type:'deposit',
+      date: S.depInfo ? S.depInfo.date : '',
+      appId: S.depInfo ? S.depInfo.appId : '',
+      fn: S.depInfo ? S.depInfo.fn : '',
+      ln: S.depInfo ? S.depInfo.ln : '',
+      phone: S.depInfo ? S.depInfo.phone : '',
+      mdl: S.depInfo ? S.depInfo.mdl : '',
+      plt: S.depInfo ? S.depInfo.plt : '',
+      services: S.depInfo ? S.depInfo.services : '',
+      amount: S.depInfo ? S.depInfo.dep : 0,
+      method: S.depInfo ? S.depInfo.depMeth : '',
+      receivedBy: S.depInfo ? S.depInfo.depStaff : '',
+      note: S.depInfo ? S.depInfo.depNote : '',
+      balance: S.depInfo ? S.depInfo.balance : 0,
+      signedAt: sigText,
+      signatureImage: sigData
+    });
+    if (result && result.ok === false) {
+      flash('⚠️ '+(result.error||'Could not save signature. Please try again.'), 'err');
+    } else {
+      flash('Down Payment receipt signed! \u2713');
+    }
+  } catch(e) {
+    flash('⚠️ Connection error: '+e.message+'. Please try again.', 'err');
+  } finally {
+    _submitting = false;
+    document.querySelectorAll('button').forEach(function(b){b.disabled=false;b.style.opacity='';});
+    render();
+  }
 }
 
 // ── Deposit Receipt Screen ──────────────────────────────────────
@@ -1052,7 +1080,7 @@ function depReceiptScr() {
     h.push('<button onclick="clearDepSignature()" style="flex:1;padding:10px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;cursor:pointer;font-family:inherit;font-size:14px;min-height:44px">Clear</button>');
     h.push('<button onclick="btnLoading(this,confirmDepSignature)" style="flex:2;padding:10px;background:#C41010;color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-size:14px;font-weight:700;min-height:44px">&#9989; Confirm Signature</button>');
     h.push('</div>');
-    h.push('<button onclick="skipDepSignature()" style="width:100%;padding:10px;border:1px solid #94a3b8;border-radius:8px;background:#f8fafc;cursor:pointer;font-family:inherit;font-size:13px;color:#64748b;margin-top:8px;min-height:40px">📱 Online Payment — Skip Signature</button>');
+    h.push('<button onclick="btnLoading(this,skipDepSignature)" style="width:100%;padding:10px;border:1px solid #94a3b8;border-radius:8px;background:#f8fafc;cursor:pointer;font-family:inherit;font-size:13px;color:#64748b;margin-top:8px;min-height:40px">📱 Online Payment — Skip Signature</button>');
   }
   h.push('</div>');
 
@@ -1257,18 +1285,24 @@ async function confirmSignature() {
   _submitting = true;
   document.querySelectorAll('button').forEach(function(b){b.disabled=true;b.style.opacity='0.7';});
   var canvas = document.getElementById('sig-canvas');
-  if (!canvas) return;
+  if (!canvas) { _submitting=false; return; }
   var ctx = canvas.getContext('2d');
   var pixels = ctx.getImageData(0,0,canvas.width,canvas.height).data;
   var hasContent = false;
   for (var i=3; i<pixels.length; i+=4) { if(pixels[i]>0){hasContent=true;break;} }
-  if (!hasContent) { alert('Please sign before confirming.'); return; }
+  if (!hasContent) {
+    alert('Please sign before confirming.');
+    _submitting = false;
+    document.querySelectorAll('button').forEach(function(b){b.disabled=false;b.style.opacity='';});
+    return;
+  }
 
   var sigData = canvas.toDataURL('image/png');
   var now = new Date();
   var sigText = 'Signed \u2713 ' + now.toISOString().split('T')[0] + ' ' + now.toTimeString().slice(0,5);
 
-  var c = S.sel; if(!c) return;
+  var c = S.sel;
+  if(!c) { _submitting=false; document.querySelectorAll('button').forEach(function(b){b.disabled=false;b.style.opacity='';}); return; }
   var vidx = S.payVidx!=null ? S.payVidx : (c.visits||[]).length-1;
 
   S.cx = S.cx.map(function(cx){
@@ -1280,20 +1314,29 @@ async function confirmSignature() {
   });
   S.sel = S.cx.find(function(x){return x.id===c.id;});
   await saveCx();
-  await silentPush(); // 自動バックアップ
 
-  await postToSheets({
-    type:'signature',
-    id:c.id,
-    fn:c.fn||'', ln:c.ln||'',
-    visitDate:(c.visits||[])[vidx]?c.visits[vidx].date:'',
-    signedAt:sigText,
-    signatureImage:sigData
-  });
-
-  _submitting = false;
-  flash('Signature saved! \u2713');
-  render();
+  try {
+    await silentPush(); // 自動バックアップ
+    var result = await postToSheets({
+      type:'signature',
+      id:c.id,
+      fn:c.fn||'', ln:c.ln||'',
+      visitDate:(c.visits||[])[vidx]?c.visits[vidx].date:'',
+      signedAt:sigText,
+      signatureImage:sigData
+    });
+    if (result && result.ok === false) {
+      flash('⚠️ '+(result.error||'Could not save signature. Please try again.'), 'err');
+    } else {
+      flash('Signature saved! \u2713');
+    }
+  } catch(e) {
+    flash('⚠️ Connection error: '+e.message+'. Please try again.', 'err');
+  } finally {
+    _submitting = false;
+    document.querySelectorAll('button').forEach(function(b){b.disabled=false;b.style.opacity='';});
+    render();
+  }
 }
 
 
@@ -1731,16 +1774,23 @@ const APP_PW = 'rebirth';
 async function postToSheets(payload) {
   if (!S.url) return {ok:false, error:'No Apps Script URL set'};
   try {
+    var ctrl = new AbortController();
+    // レシートPDF生成・Google Driveへのアップロードは時間がかかることがあるため、
+    // 60秒の猶予を持たせつつ、それでも応答が無い場合はタイムアウトさせて画面が固まらないようにする
+    var timer = setTimeout(function(){ ctrl.abort(); }, 60000);
     var res = await fetch(S.url, {
       method: 'POST',
       headers: {'Content-Type': 'text/plain;charset=utf-8'},
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
+      signal: ctrl.signal
     });
+    clearTimeout(timer);
     var text = await res.text();
     try { return JSON.parse(text); } catch(pe) { return {ok:true}; }
   } catch(e) {
     console.log('postToSheets error:', e);
-    return {ok:false, error:e.message};
+    var isTimeout = e && e.name === 'AbortError';
+    return {ok:false, error: isTimeout ? 'Request timed out. Please check your connection and try again.' : e.message};
   }
 }
 
