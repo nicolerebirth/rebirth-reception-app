@@ -383,16 +383,24 @@ function pBadge(vn) {
 
 function payBadge(pay) {
   if (!pay||!pay.est) return '';
-  const colors = {pending:['#fef3c7','#92400e','⏳'],deposit:['#dbeafe','#1e40af','🏦'],completed:['#dcfce7','#166534','✅']};
-  const labels = {pending:'Free','Paid Down Payment':'Paid Down Payment',deposit:'Paid Down Payment',completed:'Full Paid',paid:'Full Paid','Full Paid':'Full Paid','Free':'Free'};
+  const colors = {pending:['#fef3c7','#92400e','⏳'],deposit:['#dbeafe','#1e40af','🏦'],completed:['#dcfce7','#166534','✅'],free:['#f1f5f9','#475569','🆓']};
+  const labels = {
+    pending:'Pending', 'Pending':'Pending',
+    'Paid Down Payment':'Paid Down Payment', deposit:'Paid Down Payment',
+    completed:'Full Paid', paid:'Full Paid', 'Full Paid':'Full Paid',
+    free:'No Payment', 'Free':'No Payment', 'No Payment':'No Payment'
+  };
   const _bal = Math.max(0, parseFloat(pay.est||0)-parseFloat(pay.dep||0));
   const _payStatus = pay.status||'pending';
-  const st = (_bal===0 && parseFloat(pay.est||0)>0) ? 'Full Paid'
+  const isNoCharge = pay.noPayment || pay.est==='0' || parseFloat(pay.est||0)<=0;
+  const st = isNoCharge ? 'free'
+    : (_bal===0 && parseFloat(pay.est||0)>0) ? 'Full Paid'
     : (parseFloat(pay.dep||0)>0 && _bal>0) ? 'Paid Down Payment'
-    : (pay.noPayment||pay.est==='0') ? 'Free'
     : _payStatus;
-  const [bg,fc,ic] = colors[st]||colors.pending;
-  return '<span style="background:'+bg+';color:'+fc+';font-size:12px;font-weight:700;padding:3px 10px;border-radius:12px">'+ic+' '+labels[st]+' '+fmt(pay.final||pay.est)+'</span>';
+  const colorKey = isNoCharge ? 'free' : (colors[st]?st:'pending');
+  const [bg,fc,ic] = colors[colorKey]||colors.pending;
+  const label = labels[st]||labels.pending;
+  return '<span style="background:'+bg+';color:'+fc+';font-size:12px;font-weight:700;padding:3px 10px;border-radius:12px">'+ic+' '+label+(isNoCharge?'':' '+fmt(pay.final||pay.est))+'</span>';
 }
 
 // ══════════════════════════════════════════════════════════════
