@@ -400,7 +400,10 @@ function payBadge(pay) {
   const colorKey = isNoCharge ? 'free' : (colors[st]?st:'pending');
   const [bg,fc,ic] = colors[colorKey]||colors.pending;
   const label = labels[st]||labels.pending;
-  return '<span style="background:'+bg+';color:'+fc+';font-size:12px;font-weight:700;padding:3px 10px;border-radius:12px">'+ic+' '+label+(isNoCharge?'':' '+fmt(pay.final||pay.est))+'</span>';
+  // 表示する金額: 頭金支払い済み(まだ残金あり)の場合は「残金」を、それ以外は総額を表示する
+  // （頭金額と見積総額を混同しないように、Pay 待ちの実際の請求額を分かりやすくする）
+  const amountLabel = (st==='Paid Down Payment') ? 'Balance Due ' + fmt(_bal) : fmt(pay.final||pay.est);
+  return '<span style="background:'+bg+';color:'+fc+';font-size:12px;font-weight:700;padding:3px 10px;border-radius:12px">'+ic+' '+label+(isNoCharge?'':' · '+amountLabel)+'</span>';
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -2116,7 +2119,7 @@ async function submitVisit() {
   var svcs = getSvcs(f.svs);
   var pOn = f.svs[SVC.findIndex(x=>x.id==='prepaid')]?.on;
   var newCard = pOn ? (f.newCardNum||'') : '';
-  var useExistingCard = !!(c.prepaidNum && (c.prepaidUsed||0) < 4 && !newCard);
+  var useExistingCard = !!(pOn && c.prepaidNum && (c.prepaidUsed||0) < 4 && !newCard);
   var prepaidVisitNum = useExistingCard ? (c.prepaidUsed||0)+1 : null;
   var est = f.pay.noPayment ? 0 : parseFloat(f.pay.est||0);
   var dep = parseFloat(f.pay.dep||0);
