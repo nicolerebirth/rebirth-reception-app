@@ -1,0 +1,2330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Rebirth Car Coating Center — Reception</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f1f5f9;min-height:100vh;padding:12px}
+.app{background:#fff;border:0.5px solid #e2e8f0;border-radius:12px;overflow:hidden;width:100%;max-width:720px;margin:0 auto;box-shadow:0 2px 16px rgba(0,0,0,.08)}
+.body{min-height:540px}
+.card{background:#f8fafc;border:0.5px solid #e2e8f0;border-radius:12px;padding:20px;margin-bottom:14px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:13px;font-weight:500;color:#475569}
+.req{color:#C41010;margin-left:2px}
+.inp{border:0.5px solid #cbd5e1;border-radius:8px;padding:12px 14px;font-size:15px;font-family:inherit;background:#fff;color:#111;width:100%;min-height:50px}
+.inp:focus{outline:none;border-color:#C41010;box-shadow:0 0 0 3px rgba(196,16,16,.1)}
+.card-num-input{border:2.5px solid #d97706;border-radius:8px;padding:14px;font-size:20px;font-weight:700;letter-spacing:2px;background:#fff!important;color:#111!important;-webkit-text-fill-color:#111!important;width:100%;min-height:56px;text-align:center;font-family:inherit;margin-bottom:14px}
+.card-num-input::placeholder{color:#d97706;opacity:.6;font-weight:400;letter-spacing:0}
+.btn-r{background:#C41010;color:#fff;border:none;border-radius:8px;padding:13px 24px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;min-height:50px;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn-r:hover,.btn-r:active{background:#a50e0e}
+.btn-r:disabled{opacity:.5;cursor:not-allowed}
+.btn-g{background:none;border:0.5px solid #cbd5e1;border-radius:8px;padding:13px 20px;font-size:15px;cursor:pointer;color:#64748b;font-family:inherit;min-height:50px;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn-g:hover{background:#f1f5f9}
+.btn-amber{background:#d97706;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn-green{background:#16a34a;color:#fff;border:none;border-radius:10px;padding:16px;font-size:17px;font-weight:700;cursor:pointer;font-family:inherit;min-height:56px;display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
+.btn-del{background:none;border:2px solid #dc2626;border-radius:8px;padding:12px 20px;font-size:14px;font-weight:600;cursor:pointer;color:#dc2626;font-family:inherit;min-height:50px;display:flex;align-items:center;justify-content:center;gap:6px;width:100%}
+.btn-del-y{background:#dc2626;color:#fff;border:none;border-radius:8px;padding:13px 28px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;min-height:50px;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn-sm{background:none;border:none;color:#94a3b8;cursor:pointer;font-size:14px;display:inline-flex;align-items:center;gap:5px;padding:10px 0;min-height:44px;font-family:inherit}
+.acts{display:flex;justify-content:space-between;align-items:center}
+.steps{display:flex;align-items:flex-start;margin-bottom:22px}
+.sdot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
+.sline{flex:1;height:2px;margin:0 6px;margin-top:14px}
+.scol{display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+.slbl{font-size:10px;margin-top:4px;white-space:nowrap}
+.svc-item{border:2px solid #e2e8f0;border-radius:10px;margin-bottom:9px;overflow:hidden}
+.svc-item.on{border-color:#C41010}
+.svc-item.on-prepaid{border-color:#d97706!important}
+.svc-row{padding:13px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;background:#fff;min-height:52px;-webkit-tap-highlight-color:transparent;user-select:none}
+.svc-item.on .svc-row{background:#fff5f5}
+.svc-item.on-prepaid .svc-row{background:#fffbeb!important}
+.svc-chk{width:24px;height:24px;border-radius:5px;border:2.5px solid #94a3b8;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.svc-item.on .svc-chk{border-color:#C41010;background:#C41010}
+.svc-item.on-prepaid .svc-chk{border-color:#d97706!important;background:#d97706!important}
+.svc-n{font-size:15px;color:#111}
+.svc-item.on .svc-n{font-weight:600;color:#C41010}
+.svc-item.on-prepaid .svc-n{font-weight:600;color:#d97706!important}
+.svc-opts{padding:12px 14px 16px;background:#fff5f5;border-top:1px solid #fca5a5;display:flex;flex-wrap:wrap;gap:9px}
+.card-inp-sec{border:2.5px solid #d97706;border-radius:12px;background:#fffbeb;padding:18px;margin-top:12px}
+.cx-card{background:#fff;border:1.5px solid #e2e8f0;border-radius:12px;padding:14px;margin-bottom:10px;cursor:pointer;transition:all .15s;}
+.cx-card:hover{border-color:#C41010;background:#fef9f9;transform:translateY(-1px);box-shadow:0 2px 8px rgba(196,16,16,.1);}
+.cx-card:active{transform:translateY(0);background:#fef2f2;}
+.pay-sec{border:2px solid #16a34a;border-radius:12px;background:#f0fdf4;padding:18px;margin-top:14px}
+.btn-payfull{padding:10px 16px;border-radius:8px;border:2px solid #e2e8f0;background:#fff;color:#64748b;font-weight:700;cursor:pointer;font-family:inherit;font-size:13px;flex:1;transition:all .15s}
+.btn-payfull.active{border-color:#16a34a;background:#f0fdf4;color:#166534}
+.btn-nopay{padding:8px 16px;border-radius:8px;border:2px solid #94a3b8;background:#fff;color:#64748b;font-weight:700;cursor:pointer;font-family:inherit;font-size:13px;transition:all .15s}
+.btn-nopay.active{border-color:#16a34a;background:#16a34a;color:#fff;box-shadow:0 2px 8px rgba(22,163,74,.3)}
+.crow{display:flex;gap:10px;padding:8px 0;border-bottom:0.5px solid #e2e8f0}
+.clbl{font-size:12px;color:#94a3b8;min-width:110px;flex-shrink:0;padding-top:1px}
+.cval{font-size:14px;font-weight:500;color:#111}
+.dvdr{height:0.5px;background:#e2e8f0;margin:14px 0}
+.av{border-radius:50%;background:#111;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0}
+.visit-blk{padding:14px 0;border-bottom:0.5px solid #e2e8f0}
+.visit-blk:last-child{border-bottom:none}
+.errbox{background:#fef2f2;color:#dc2626;padding:12px 14px;border-radius:8px;font-size:14px;margin-bottom:12px}
+.stag{display:inline-block;font-size:13px;padding:5px 12px;border-radius:6px;background:#f0fdf4;color:#16a34a;margin:0 5px 6px 0}
+.tb{padding:14px 18px;font-size:14px;font-weight:500;display:flex;align-items:center;gap:8px}
+.tb-ok{background:#f0fdf4;color:#16a34a}
+.tb-err{background:#fef2f2;color:#dc2626}
+.cxrow{display:flex;align-items:center;padding:14px;border:0.5px solid #e2e8f0;border-radius:10px;cursor:pointer;margin-bottom:9px;background:#fff;gap:12px;min-height:74px;-webkit-tap-highlight-color:transparent}
+.cxrow:active{border-color:#C41010}
+.hcard{cursor:pointer;text-align:center;padding:26px 18px;border:0.5px solid #e2e8f0;border-radius:12px;background:#fff}
+.hcard:active{border-color:#C41010}
+.hico{width:54px;height:54px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 13px}
+.bv{background:#eff6ff;color:#3b82f6;font-size:12px;padding:3px 9px;border-radius:12px;display:inline-block}
+.sec{font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.07em;margin-bottom:14px}
+.del-banner{background:#fef2f2;border:2px solid #fca5a5;border-radius:12px;padding:20px;margin-top:14px;text-align:center}
+.card-amber{background:#fffbeb;border:2.5px solid #d97706;border-radius:12px;padding:18px;margin-bottom:14px}
+@media print{button{display:none!important}body{background:#fff;padding:0}
+.app{border:none;box-shadow:none;max-width:100%;margin:0}
+#receipt-box{border:none!important;box-shadow:none!important;max-width:100%!important;margin:0!important;padding:10px!important}}
+</style>
+</head>
+<body>
+<div class="app">
+<div style="background:#fff;border-top:5px solid #C41010">
+<div style="padding:12px 22px 8px;display:flex;align-items:center;gap:14px">
+<svg width="46" height="46" viewBox="0 0 46 46" fill="none">
+<circle cx="23" cy="23" r="20" stroke="#111" stroke-width="2.5"/>
+<circle cx="23" cy="23" r="7.5" stroke="#111" stroke-width="2"/>
+<line x1="23" y1="3" x2="23" y2="15.5" stroke="#111" stroke-width="2.2"/>
+<line x1="23" y1="30.5" x2="23" y2="43" stroke="#111" stroke-width="2.2"/>
+<line x1="3" y1="23" x2="15.5" y2="23" stroke="#111" stroke-width="2.2"/>
+<line x1="30.5" y1="23" x2="43" y2="23" stroke="#111" stroke-width="2.2"/>
+<line x1="8.5" y1="8.5" x2="17" y2="17" stroke="#111" stroke-width="1.7"/>
+<line x1="29" y1="29" x2="37.5" y2="37.5" stroke="#111" stroke-width="1.7"/>
+<line x1="37.5" y1="8.5" x2="29" y2="17" stroke="#111" stroke-width="1.7"/>
+<line x1="17" y1="29" x2="8.5" y2="37.5" stroke="#111" stroke-width="1.7"/>
+<circle cx="23" cy="3" r="4.5" fill="#C41010"/>
+<circle cx="23" cy="3" r="1.8" fill="white"/>
+</svg>
+<div>
+<div style="font-style:italic;font-weight:900;font-size:30px;color:#111;letter-spacing:-1px;line-height:1;font-family:Georgia,serif">REB<span style="color:#C41010">i</span>RTH</div>
+<div style="background:#C41010;color:#fff;font-size:9px;font-weight:700;letter-spacing:.25em;padding:3px 9px;display:inline-block;margin-top:4px;font-style:italic">CAR COATING CENTER</div>
+</div>
+</div>
+<div style="height:4px;background:#C41010"></div>
+</div>
+<div class="body" id="body"></div>
+</div>
+<script>
+'use strict';
+let _submitting = false;
+// ═══════════════════════════════════════════════════════════
+//  REBIRTH CAR COATING CENTER — Reception System v2.0
+// ═══════════════════════════════════════════════════════════
+
+const R = '#C41010';
+const STAFF = ['Nicole','Diane','Jho'];
+
+
+const PAY_METHODS = ['Cash','Credit Card','GCash (Acct 1)','GCash (Acct 2)','Bank Transfer'];
+
+const SVC = [
+  // ── PPF ──────────────────────────────────────────────────
+  {id:'ppf_motec', n:'PPF — Motec',            opts:['6.5mil','7.5mil','8.5mil','Warranty Replacement']},
+  {id:'ppf_stek',  n:'PPF — STEK',             opts:['DYNO','FORCE','Warranty Replacement']},
+  {id:'ppm',       n:'PPF maintenance',         opts:[]},
+  {id:'ppf_ins',   n:'PPF Free Inspection',     opts:[], free:true},
+  // ── Coating ──────────────────────────────────────────────
+  {id:'cer',       n:'Ceramic coating',         opts:['Budget','Standard','Premium','Super Premium']},
+  {id:'gra',       n:'Graphene coating',        opts:['Budget','Standard','Premium','Super Premium']},
+  {id:'dia',       n:'Diamond coating',         opts:['Standard','Premium','Super Premium']},
+  {id:'tit',       n:'Titanium coating',        opts:['Standard','Premium','Super Premium']},
+  {id:'g15',       n:'15H Ceramic guard',       opts:['Standard','Premium','Super Premium']},
+  {id:'cem',       n:'Coating maintenance',     opts:[]},
+  {id:'free_mnt',  n:'Free Maintenance',        opts:['Coating','PPF'], free:true},
+  // ── Other ─────────────────────────────────────────────────
+  {id:'pnt',       n:'Paint & body repair',     opts:['Panel','Washover & Coating','Washover & PPF']},
+  {id:'tnt',       n:'Tint',                    opts:['Action','Lunaray','Nex']},
+  {id:'wnd',       n:'Windshield protection',   opts:[]},
+  {id:'abc',       n:'Anti-bacterial coating',  opts:[]},
+  {id:'buf',       n:'Buffing / Polishing',     opts:[]},
+  {id:'dnt',       n:'Dent repair',             opts:[]},
+  {id:'rct',       n:'Re-coating',              opts:[]},
+  // ── Prepaid Card（一番下）─────────────────────────────────
+  {id:'prepaid',   n:'Maintenance Prepaid Card',opts:[]},
+];
+
+const ms   = () => SVC.map(s => ({id:s.id, on:false, opt:''}));
+const td   = () => new Date().toISOString().split('T')[0];
+const esc  = s => s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;') : '';
+const fmt  = n => n ? '₱' + parseFloat(n).toLocaleString('en-PH',{minimumFractionDigits:2}) : '₱0.00';
+const initPay = () => ({
+  est:'', dep:'', depMeth:'', depStaff:'', depDate:td(), depNote:'',
+  final:'', payMeth:'', payStaff:'', payNote:'', payDate:'', status:'pending',
+  signature:'', signedAt:'', finalSignature:'', finalSignedAt:'', noPayment:false, payFull:false
+});
+
+const pill    = (lbl,on,fn,sz=13) => `<button onclick="${fn}" style="padding:9px 18px;border-radius:24px;font-size:${sz}px;cursor:pointer;border:2.5px solid ${on?R:'#cbd5e1'};background:${on?R:'#fff'};color:${on?'#fff':'#64748b'};font-weight:${on?700:400};font-family:inherit;min-height:46px">${lbl}</button>`;
+const optPill = (lbl,on,fn) => `<button onclick="${fn}" style="padding:9px 20px;border-radius:24px;font-size:14px;cursor:pointer;border:3px solid ${on?R:'#cbd5e1'};background:${on?R:'#fff'};color:${on?'#fff':'#64748b'};font-weight:${on?800:400};font-family:inherit;min-height:48px">${on?'✓ ':''}${lbl}</button>`;
+
+// ── Storage ──────────────────────────────────────────────────────────────────
+const store = {
+  get: async k => { try { const v=localStorage.getItem('rbc_'+k); return v?{value:v}:null; } catch{ return null; } },
+  set: async (k,v) => { try { localStorage.setItem('rbc_'+k,v); } catch{} }
+};
+
+// ── App State ─────────────────────────────────────────────────────────────────
+let S = {
+  scr: 'home', cx: [], url: '',
+  f:  {fn:'',ln:'',p1:'',p2:'',p3:'',dt:td(),st:'',addr:'',email:'',mdl:'',col:'',plt:'',svd:td(),svs:ms(),m1:'',m2:'',m3:'',invoiceNo:'',jobOrderNo:'',prepaidNum:'',confirmedCard:'',prepaidUsedInit:0,prepaidUsedInitTouched:false,pay:initPay()},
+  vf: {svd:td(),st:'',svs:ms(),m1:'',m2:'',m3:'',useCard:false,newCardNum:'',confirmedCard:'',invoiceNo:'',jobOrderNo:'',prepaidUsedInit:0,prepaidUsedInitTouched:false,pay:initPay()},
+  ef: {fn:'',ln:'',p1:'',p2:'',p3:'',addr:'',email:'',mdl:'',col:'',plt:'',prepaidNum:'',prepaidUsed:0},
+  pf: initPay(), payVidx: null, depInfo: null,
+  ex:{fn:'',ln:'',p1:'',p2:'',p3:'',addr:'',email:'',mdl:'',col:'',plt:'',staff:'',svcTypes:[],svcOther:'',prepaidNum:'',prepaidUsedInit:0,prepaidUsedInitTouched:false,confirmedCard:''},
+  sel:null, selLoadErr:false, selLoading:false, prevScr:'ret', sb:'ln', sq:'', res:[], searching:false,
+  lq:'', ls:'name', lStaff:'all', sheetsResults:null, sheetSearching:false,
+  pw:'', pwErr:false, confirmDel:false, savedInfo:null,
+  toast:null, err:'', busy:false, syncing:false
+};
+
+(async () => {
+  try { const r=await store.get('cx'); if(r) S.cx=JSON.parse(r.value); } catch{}
+  try { const r=await store.get('url'); if(r) S.url=r.value; } catch{}
+  render();
+
+})();
+
+// ── Helper functions ──────────────────────────────────────────────────────────
+const saveCx   = async () => { try { await store.set('cx', JSON.stringify(S.cx)); } catch{} };
+const go       = s => { S.scr=s; S.err=''; S.confirmDel=false; render(); };
+const flash    = (msg,t='ok') => { S.toast={msg,t}; render(); setTimeout(()=>{ S.toast=null; render(); }, 3500); };
+const sf       = (k,v) => { S.f[k]=v; };
+const svf      = (k,v) => { S.vf[k]=v; };
+const sef      = (k,v) => { S.ef[k]=v; };
+const spf      = (k,v) => { S.f.pay[k]=v; };
+const svpf     = (k,v) => { S.vf.pay[k]=v; };
+const ppf      = (k,v) => { S.pf[k]=v; };
+const getSvcs  = svs => svs.filter(s=>s.on).map(s => { const d=SVC.find(x=>x.id===s.id); return d.n+(s.opt?' ('+s.opt+')':''); });
+// visitのサービス文字列配列（例:"PPF — Motec (6.5mil)"）を、svcPickが扱えるsvs形式(on/opt)に変換する
+function svcStringsToSvs(svcStrings) {
+  var svs = ms();
+  var flat = [];
+  // 保存時の圧縮（3枠制限）により、複数サービスが1つの文字列にカンマ区切りで
+  // まとまっていることがある（例:"Dent repair, Maintenance Prepaid Card"）ため、まず分解する
+  (svcStrings||[]).forEach(function(str){
+    (str||'').split(', ').forEach(function(piece){ if (piece.trim()) flat.push(piece.trim()); });
+  });
+  flat.forEach(function(str){
+    var idx = SVC.findIndex(function(def){ return !def.hdr && str.indexOf(def.n) === 0; });
+    if (idx>=0) {
+      svs[idx].on = true;
+      var rest = str.slice(SVC[idx].n.length).trim();
+      var m = rest.match(/\(([^)]+)\)/);
+      svs[idx].opt = m ? m[1] : (SVC[idx].opts && SVC[idx].opts.length ? SVC[idx].opts[0] : '');
+    }
+  });
+  return svs;
+}
+const crow     = (l,v) => v ? '<div class="crow"><span class="clbl">'+l+'</span><span class="cval">'+esc(v)+'</span></div>' : '';
+
+function stepsBar(ls, cur) {
+  const R = '#C41010';
+  var h = '<div style="display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:18px">';
+  ls.forEach((l,i) => {
+    const n=i+1, dn=n<cur, ac=n===cur;
+    h += '<div class="scol"><div class="sdot" style="background:'+(dn||ac?R:'#f1f5f9')+';color:'+(dn||ac?'#fff':'#94a3b8')+';border:'+(dn||ac?'none':'1px solid #e2e8f0')+'">'+(dn?'✓':n)+'</div>';
+    h += '<div class="slbl" style="color:'+(ac?R:'#94a3b8')+';font-weight:'+(ac?700:400)+'">'+l+'</div></div>';
+    if (i<ls.length-1) h += '<div class="sline" style="background:'+(dn?R:'#e2e8f0')+'"></div>';
+  });
+  return h+'</div>';
+}
+
+function cardInputSec(isV) {
+  const num  = isV ? S.vf.newCardNum   : S.f.prepaidNum;
+  const conf = isV ? S.vf.confirmedCard : S.f.confirmedCard;
+  const ex   = isV && S.sel ? S.sel.prepaidNum : '';
+  const exU  = isV && S.sel ? (S.sel.prepaidUsed||0) : 0;
+  const id   = isV ? 'cinp-ret' : 'cinp-new';
+  const onin = isV ? 'S.vf.newCardNum=this.value' : 'S.f.prepaidNum=this.value';
+  const st   = isV ? S.vf : S.f; // 使用済み回数の状態は新規/再来店で共通の仕組みにする
+  return '<div class="card-inp-sec">'
+    +'<div style="font-size:16px;font-weight:700;color:#92400e;margin-bottom:8px">🃏 Register card number</div>'
+    +(ex&&exU<4 ? '<div style="background:#fef3c7;border:1.5px solid #f59e0b;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:13px;color:#111"><strong>⚠️ Current: #'+esc(ex)+'</strong> ('+exU+'/4). New number will replace it.</div>' : '')
+    +'<div style="font-size:13px;color:#78350f;font-weight:500;margin-bottom:8px">① Enter the card number</div>'
+    +'<input type="text" id="'+id+'" class="card-num-input" placeholder="e.g. 12345" value="'+esc(num)+'" oninput="'+onin+'" autocomplete="off" autocorrect="off" spellcheck="false">'
+    +'<div style="font-size:13px;color:#78350f;font-weight:500;margin-bottom:8px">② Tap to confirm</div>'
+    +'<button type="button" onclick="confirmCard('+isV+')" style="width:100%;padding:16px;background:'+(conf?'#15803d':'#d97706')+';color:#fff;border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;min-height:56px;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px">'
+    +(conf ? '<span>✓</span> Card registered' : '<span>🃏</span> Register card number')
+    +'</button>'
+    +(conf ? '<div style="margin-top:14px;padding:14px;border-radius:10px;background:#f0fdf4;border:2.5px solid #16a34a;font-size:14px;font-weight:700;color:#166534">✓ Card #'+esc(conf)+' will be linked · 4 visits · visit 4 FREE ★</div>' : '')
+    +(!ex?
+      '<div style="margin-top:14px;border-top:1px solid #fde68a;padding-top:12px">'
+      +'<div style="font-size:13px;font-weight:600;color:#92400e;margin-bottom:10px">③ Times already used<span class="req">*</span></div>'
+      +'<div style="display:flex;gap:8px;flex-wrap:wrap">'
+      +[0,1,2,3].map(function(n){return '<button type="button" onclick="setPrepaidUsedInit('+isV+','+n+')" style="padding:10px 18px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;border:2.5px solid '+(st.prepaidUsedInitTouched&&st.prepaidUsedInit===n?'#d97706':'#e2e8f0')+';background:'+(st.prepaidUsedInitTouched&&st.prepaidUsedInit===n?'#d97706':'#fff')+';color:'+(st.prepaidUsedInitTouched&&st.prepaidUsedInit===n?'#fff':'#64748b')+';font-family:inherit;min-height:44px">'+n+'/4'+(n===3?' ★ next FREE':'')+'</button>';}).join('')
+      +'</div>'
+      +(st.prepaidUsedInitTouched
+        ? '<div style="margin-top:8px;font-size:12px;color:#b45309">Select how many times this card has already been used</div>'
+        : '<div style="margin-top:8px;font-size:12px;color:#dc2626;font-weight:600">⚠️ Required: please select a value above</div>')
+      +'</div>':'')
+    +'<div style="margin-top:10px;font-size:12px;color:#b45309">4 visits · Visits 1,2,3 paid · Visit 4 FREE</div>'
+    +'</div>';
+}
+
+function paySection(isV) {
+  const p   = isV ? S.vf.pay : S.f.pay;
+  const onin = isV ? 'svpf' : 'spf';
+  const fin = parseFloat(p.est||0);
+  const dep = parseFloat(p.dep||0);
+  const bal = Math.max(0, fin-dep);
+  return '<div class="pay-sec">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">'
+    +'<div style="font-size:16px;font-weight:700;color:#166534">💰 Payment</div>'
+    +'<button type="button" onclick="toggleNoPayment('+(isV?'true':'false')+')" class="btn-nopay'+(p.noPayment?' active':'')+'">'+(p.noPayment?'✅ No Payment':'🚫 No Payment')+'</button>'
+    +'</div>'
+    +(p.noPayment?'<div style="background:#dcfce7;border:2px solid #16a34a;border-radius:10px;padding:14px;margin-bottom:14px;text-align:center;color:#166534;font-weight:700">✅ No Payment — This visit is free of charge</div>':'')
+    +(!p.noPayment?'<div class="field" style="margin-bottom:14px">':'<div style="display:none">')
+    +'<label style="color:#166534;font-weight:600">Estimate amount ₱ <span style="color:#C41010">*</span></label>'
+    +'<input type="number" class="inp" style="color:#111;background:#fff;font-size:20px;font-weight:700;border-color:#16a34a;border-width:2px" value="'+esc(p.est)+'" placeholder="0.00" oninput="setEstimate('+(isV?1:0)+',this.value)" onblur="render()">'
+    +'</div>'
+    +(!p.noPayment?'<div class="field" style="margin-bottom:10px">'
+    +'<label style="color:#166534;font-weight:600">Invoice No. <span style="font-size:11px;color:#94a3b8">(optional)</span></label>'
+    +'<input class="inp" style="color:#111;background:#fff" value="'+esc(p.invoiceNo)+'" placeholder="e.g. INV-2026-001" oninput="setInvoiceNo('+(isV?1:0)+',this.value)">'
+    +'</div>':'')
+    +(!p.noPayment?'<button type="button" onclick="togglePayFull('+(isV?1:0)+')" class="btn-payfull'+(p.payFull?' active':'')+'">'+(p.payFull?'✅ Pay in Full':'💳 Pay in Full')+'</button>':'')
+    +'<div style="border-top:1px solid #bbf7d0;padding-top:12px;margin-bottom:12px;font-size:14px;font-weight:600;color:#166534">🏦 '+(p.payFull?'Full Payment':(dep>0?'Down Payment received':'Down Payment received (optional)'))+'</div>'
+    +'<div class="g2" style="margin-bottom:10px">'
+    +'<div class="field"><label>Down Payment ₱</label><input type="number" class="inp" style="color:#111;background:#fff" value="'+esc(p.dep)+'" placeholder="0" oninput="setDepAmt('+(isV?1:0)+',this.value)" onblur="render()"></div>'
+    +'<div class="field"><label>Date received</label><input type="date" class="inp" style="color:#111" value="'+esc(p.depDate)+'" oninput="setDepDate('+(isV?1:0)+',this.value)"></div>'
+    +'</div>'
+    +'<div class="g2" style="margin-bottom:10px">'
+    +'<div class="field"><label>Down Payment method'+(dep>0?' <span style="color:#C41010">*</span>':'')+'</label><select class="inp" style="color:#111" onchange="setDepMeth('+(isV?1:0)+',this.value)"><option value="">Select...</option>'
+    +PAY_METHODS.map(m => '<option value="'+m+'"'+(p.depMeth===m?' selected':'')+'>'+m+'</option>').join('')
+    +'</select></div>'
+    +'<div class="field"><label>Received by'+(dep>0?' <span style="color:#C41010">*</span>':'')+'</label>'
+    +'<select class="inp" style="color:#111" onchange="setDepStaff('+(isV?1:0)+',this.value)"><option value="">Select...</option>'
+    +STAFF.map(s => '<option value="'+s+'"'+(p.depStaff===s?' selected':'')+'>'+s+'</option>').join('')
+    +'<option value="__other__"'+(p.depStaff&&!STAFF.includes(p.depStaff)?' selected':'')+'>Other (specify)...</option>'
+    +'</select>'
+    +(p.depStaff&&!STAFF.includes(p.depStaff)?'<input class="inp" style="color:#111;background:#fff;margin-top:6px" value="'+esc(p.depStaff!=='__other__'?p.depStaff:'')+'" placeholder="Enter name..." oninput="saveDepStaff('+(isV?1:0)+',this.value)">':'')
+    +'</div>'
+    +'</div>'
+    +(p.depMeth?'<div class="field" style="margin-top:10px"><label style="font-weight:600;color:#C41010">'+refLabel(p.depMeth)+' *</label><input class="inp" style="color:#111;background:#fff;border:2px solid '+(p.depNote?'\'#16a34a\'':'\'#C41010\'')+'" value="'+esc(p.depNote)+'" placeholder="Enter ref number..." oninput="setDepNote('+(isV?1:0)+',this.value)"></div>':'')
+    +(p.est?'<div style="margin-top:12px;padding:10px 14px;background:#dcfce7;border-radius:8px;font-size:14px;font-weight:600;color:#166534">'+fmt(fin)+(dep>0?' − Deposit '+fmt(dep)+' = Balance '+fmt(bal):'')+' </div>':'')
+    +'</div>';
+}
+
+function maintPrompt(isV) {
+  const c = isV ? S.sel : null;
+  // 新規客の場合 - まだカードが確認できない
+  if (!isV) {
+    const newConf = S.f.confirmedCard;
+    if (!newConf) return '<div style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;padding:14px;margin-top:8px"><div style="font-size:13px;color:#64748b">🃏 Register a Maintenance Prepaid Card below to use it for this service.</div></div>';
+    c = {prepaidNum: newConf, prepaidUsed: parseInt(S.f.prepaidUsedInit||0)};
+  }
+  const has  = !!(c.prepaidNum && c.prepaidNum.trim());
+  const used = c.prepaidUsed||0;
+  const ok   = has && used<4;
+  const next = used+1;
+  const free = next===4;
+  if (!ok) return '<div style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;padding:14px;margin-top:8px"><div style="font-size:14px;font-weight:600;color:#64748b;margin-bottom:4px">🃏 No active prepaid card</div><div style="font-size:12px;color:#94a3b8">'+(has?'Card fully used.':'No card registered.')+' Select "Maintenance Prepaid Card" to register a new one.</div></div>';
+  return '<div style="background:#fffbeb;border:2.5px solid #d97706;border-radius:10px;padding:16px;margin-top:8px">'
+    +'<div style="font-size:15px;font-weight:700;color:#92400e;margin-bottom:6px">🃏 Use prepaid card for this maintenance?</div>'
+    +'<div style="font-size:13px;color:#b45309;margin-bottom:14px">Card #<strong>'+esc(c.prepaidNum)+'</strong> · Visit <strong>'+next+'</strong> of 4'+(free?' <span style="background:#d97706;color:#fff;padding:2px 8px;border-radius:12px;font-size:12px;margin-left:6px">★ FREE!</span>':'')+'</div>'
+    +'<div style="display:flex;gap:10px">'
+    +'<button onclick="'+(isV?'S.vf':'S.f')+'.useCard=true;render()" style="flex:1;padding:12px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;border:2.5px solid '+((isV?S.vf:S.f).useCard?'#d97706':'#cbd5e1')+';background:'+((isV?S.vf:S.f).useCard?'#d97706':'#fff')+';color:'+((isV?S.vf:S.f).useCard?'#fff':'#64748b')+';font-family:inherit;min-height:50px">'+(S.vf.useCard?'✓ ':'')+'YES — charge card</button>'
+    +'<button onclick="'+(isV?'S.vf':'S.f')+'.useCard=false;render()" style="flex:1;padding:12px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;border:2.5px solid '+(!(isV?S.vf:S.f).useCard?R:'#cbd5e1')+';background:'+(!S.vf.useCard?R:'#fff')+';color:'+(!S.vf.useCard?'#fff':'#64748b')+';font-family:inherit;min-height:50px">'+(!S.vf.useCard?'✓ ':'')+'NO — regular</button>'
+    +'</div></div>';
+}
+
+function svcPick(svs, isV) {
+  let h = '';
+  const SVC_HEADERS = {
+    'ppf_motec': '<div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#64748b;margin:6px 0 8px;padding-left:4px;border-bottom:2px solid #e2e8f0;padding-bottom:6px">🛡️ PPF</div>',
+    'cer':       '<div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#64748b;margin:14px 0 8px;padding-left:4px;border-bottom:2px solid #e2e8f0;padding-bottom:6px">✨ Coating</div>',
+    'pnt':       '<div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#64748b;margin:14px 0 8px;padding-left:4px;border-bottom:2px solid #e2e8f0;padding-bottom:6px">🔧 Other Services</div>',
+    'prepaid':   '<div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#d97706;margin:14px 0 8px;padding-left:4px;border-bottom:2px solid #fde68a;padding-bottom:6px">🃏 Maintenance Prepaid Card</div>',
+  };
+  SVC.forEach((def,i) => {
+    if (SVC_HEADERS[def.id]) h += SVC_HEADERS[def.id];
+    const s  = svs[i];
+    const ip = def.id==='prepaid';
+    const cls = ip&&s.on ? 'svc-item on-prepaid' : 'svc-item'+(s.on?' on':'');
+    h += '<div class="'+cls+'" onclick="tog('+i+','+isV+')">';
+    h += '<div class="svc-row"><div class="svc-chk">'+(s.on?'<span style="color:#fff;font-size:15px;font-weight:900">✓</span>':'')+'</div>';
+    h += '<span class="svc-n">'+def.n+'</span>';
+    if (ip && s.on) h += '<span style="margin-left:auto;font-size:12px;color:#d97706;font-weight:600">→ Enter number below</span>';
+    h += '</div>';
+    if (s.on && !ip && def.opts.length) {
+      h += '<div class="svc-opts" onclick="event.stopPropagation()"><span style="font-size:12px;color:#b91c1c;width:100%;display:block;margin-bottom:10px;font-weight:600">▼ Select option:</span>';
+      def.opts.forEach(o => { h += optPill(o, s.opt===o, 'event.stopPropagation();setOpt('+i+',\''+o+'\','+isV+')'); });
+      h += '</div>';
+    }
+    h += '</div>';
+    if (s.on && (def.id==='ppm'||def.id==='cem'||def.id==='free_mnt')) h += maintPrompt(isV);
+  });
+  return h;
+}
+
+function cardDots(used) {
+  const dots = ['1','2','3','★'].map((d,i) => {
+    const dn = i<used;
+    return '<div style="width:36px;height:36px;border-radius:50%;border:2.5px solid '+(dn?'#d97706':'#fed7aa')+';background:'+(dn?'#d97706':'#fff7ed')+';display:flex;align-items:center;justify-content:center;font-size:'+(i===3?16:14)+'px;font-weight:700;color:'+(dn?'#fff':i===3?'#d97706':'#fdba74')+'">'+(dn?'✓':d)+'</div>';
+  }).join('<div style="height:2.5px;flex:1;background:#fed7aa;align-self:center;margin:0 4px"></div>');
+  const rem = 4-used;
+  let st='', sc='#78350f';
+  if (used>=4) { st='Card complete — purchase a new card'; sc='#dc2626'; }
+  else if (used===3) { st='★ NEXT VISIT IS FREE!'; sc='#d97706'; }
+  else st = rem+' visit'+(rem!==1?'s':'')+' remaining — visit 4 FREE';
+  return '<div style="display:flex;align-items:center;margin-bottom:10px">'+dots+'</div><div style="font-size:14px;font-weight:'+(used>=3?700:500)+';color:'+sc+'">'+st+'</div>';
+}
+
+function pBadge(vn) {
+  const n = parseInt(vn, 10);
+  const safeVn = (!isNaN(n) && n>=1 && n<=4) ? n : '?'; // 想定外の値(日付等)が来ても表示を壊さない
+  const fr = safeVn===4;
+  return '<div style="margin-top:7px;padding:8px 12px;border-radius:8px;border:1.5px solid '+(fr?'#d97706':'#fbbf24')+';background:'+(fr?'#d97706':'#fffbeb')+';font-size:13px;font-weight:700;color:'+(fr?'#fff':'#92400e')+'">🃏 Prepaid card — visit '+safeVn+' of 4'+(fr?' ★ FREE VISIT ★':'')+'</div>';
+}
+
+function payBadge(pay) {
+  if (!pay||!pay.est) return '';
+  const colors = {pending:['#fef3c7','#92400e','⏳'],deposit:['#dbeafe','#1e40af','🏦'],completed:['#dcfce7','#166534','✅'],free:['#f1f5f9','#475569','🆓']};
+  const labels = {
+    pending:'Pending', 'Pending':'Pending',
+    'Paid Down Payment':'Paid Down Payment', deposit:'Paid Down Payment',
+    completed:'Full Paid', paid:'Full Paid', 'Full Paid':'Full Paid',
+    free:'No Payment', 'Free':'No Payment', 'No Payment':'No Payment'
+  };
+  const _bal = Math.max(0, parseFloat(pay.est||0)-parseFloat(pay.dep||0));
+  const _payStatus = pay.status||'pending';
+  const isNoCharge = pay.noPayment || pay.est==='0' || parseFloat(pay.est||0)<=0;
+  const st = isNoCharge ? 'free'
+    : (_bal===0 && parseFloat(pay.est||0)>0) ? 'Full Paid'
+    : (parseFloat(pay.dep||0)>0 && _bal>0) ? 'Paid Down Payment'
+    : _payStatus;
+  const colorKey = isNoCharge ? 'free' : (colors[st]?st:'pending');
+  const [bg,fc,ic] = colors[colorKey]||colors.pending;
+  const label = labels[st]||labels.pending;
+  // 表示する金額: 頭金支払い済み(まだ残金あり)の場合は「残金」を、それ以外は総額を表示する
+  // （頭金額と見積総額を混同しないように、Pay 待ちの実際の請求額を分かりやすくする）
+  const amountLabel = (st==='Paid Down Payment') ? 'Balance Due ' + fmt(_bal) : fmt(pay.final||pay.est);
+  return '<span style="background:'+bg+';color:'+fc+';font-size:12px;font-weight:700;padding:3px 10px;border-radius:12px">'+ic+' '+label+(isNoCharge?'':' · '+amountLabel)+'</span>';
+}
+
+// ══════════════════════════════════════════════════════════════
+// SCREENS
+// ══════════════════════════════════════════════════════════════
+
+function homeScr() {
+  return '<div style="padding:22px 20px">'
+    +'<div class="g2" style="margin-bottom:12px">'
+    +'<div class="hcard" onclick="S.f={fn:\'\',ln:\'\',p1:\'\',p2:\'\',p3:\'\',dt:\''+td()+'\',st:\'\',addr:\'\',email:\'\',mdl:\'\',col:\'\',plt:\'\',svd:\''+td()+'\',svs:ms(),m1:\'\',m2:\'\',m3:\'\',prepaidNum:\'\',confirmedCard:\'\',prepaidUsedInit:0,prepaidUsedInitTouched:false,pay:initPay()};go(\'new1\')">'
+    +'<div class="hico" style="background:#C41010"><svg width="28" height="28" viewBox="0 0 28 28" fill="white"><path d="M14 2C10.7 2 8 4.7 8 8s2.7 6 6 6 6-2.7 6-6-2.7-6-6-6zm0 14c-7 0-12 3.5-12 7v1h24v-1c0-3.5-5-7-12-7z"/><path d="M21 5v4m2-2h-4" stroke="white" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg></div>'
+    +'<div style="font-size:17px;font-weight:600;margin-bottom:5px">New customer</div>'
+    +'<div style="font-size:13px;color:#64748b">Register a first-time visitor</div></div>'
+    +'<div class="hcard" onclick="S.sq=\'\';S.res=[];S.sb=\'ln\';go(\'ret\')">'
+    +'<div class="hico" style="background:#111"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="12" cy="12" r="7.5" stroke="white" stroke-width="2.5"/><line x1="17.3" y1="17.3" x2="25" y2="25" stroke="white" stroke-width="2.5" stroke-linecap="round"/><path d="M17 9h3.5M18.75 7.25v3.5" stroke="#C41010" stroke-width="1.8" stroke-linecap="round"/></svg></div>'
+    +'<div style="font-size:17px;font-weight:600;margin-bottom:5px">Returning customer</div>'
+    +'<div style="font-size:13px;color:#64748b">Look up a previous visitor</div></div>'
+    +'</div>'
+    +'<div class="hcard" onclick="go(\'existing\')" style="padding:16px 20px;display:flex;align-items:center;justify-content:space-between;text-align:left;margin-bottom:12px">'
+    +'<div style="display:flex;align-items:center;gap:14px"><div class="hico" style="background:#7c3aed;width:48px;height:48px;margin:0;border-radius:12px;flex-shrink:0"><i class="ti ti-clipboard-list" style="font-size:24px;color:#fff"></i></div>'
+    +'<div><div style="font-size:16px;font-weight:600;margin-bottom:3px">Register existing customer</div><div style="font-size:13px;color:#94a3b8">Past customer not yet in system</div></div></div>'
+    +'<i class="ti ti-arrow-right" style="color:#94a3b8;font-size:20px;flex-shrink:0"></i></div>'
+    +'<div style="text-align:right"><button class="btn-g" style="font-size:13px;padding:10px 18px" onclick="openPwSettings()"><i class="ti ti-settings" style="font-size:15px"></i> Settings</button></div>'
+    +'</div>';
+}
+
+function pwListScr() {
+  return '<div style="padding:50px 28px 40px;text-align:center">'
+    +'<div style="width:68px;height:68px;border-radius:18px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;margin:0 auto 20px"><i class="ti ti-lock" style="font-size:34px;color:#64748b"></i></div>'
+    +'<div style="font-size:20px;font-weight:600;margin-bottom:7px">Customer records</div>'
+    +'<div style="font-size:14px;color:#64748b;margin-bottom:28px">Staff access only.</div>'
+    +(S.pwErr?'<div style="background:#fef2f2;color:#dc2626;padding:11px 18px;border-radius:8px;font-size:14px;margin-bottom:16px;max-width:320px;margin-left:auto;margin-right:auto">Incorrect password.</div>':'')
+    +'<input id="pw-inp" type="password" class="inp" style="max-width:300px;text-align:center;font-size:24px;letter-spacing:8px;margin:0 auto 18px;display:block" placeholder="••••••••" onkeydown="if(event.key===\'Enter\')checkPw()" oninput="S.pw=this.value">'
+    +'<button class="btn-r" style="min-width:220px;font-size:16px;margin-bottom:18px" onclick="checkPw()">Access records →</button><br>'
+    +'<button class="btn-sm" style="margin:0 auto;display:inline-flex" onclick="go(\'home\')"><i class="ti ti-arrow-left"></i> Back to home</button>'
+    +'</div>';
+}
+
+function retScr() {
+  return '<div style="padding:20px"><button class="btn-sm" onclick="go(\'home\')" style="margin-bottom:14px"><i class="ti ti-arrow-left"></i> Home</button>'
+    +'<div class="card"><div class="sec">Find a returning customer</div>'
+    +'<div style="display:flex;gap:9px;flex-wrap:wrap;margin-bottom:16px">'+[['ln','Last name'],['p4','Last 4 digits'],['em','Email'],['pl','License plate']].map(([v,l])=>pill(l,S.sb===v,'S.sb=\''+v+'\';render();if(S.sq)doSearch()')).join('')+'</div>'
+    +'<div style="display:flex;gap:9px"><input class="inp" value="'+esc(S.sq)+'" placeholder="'+(S.sb==='ln'?'Enter last name...':S.sb==='p4'?'Last 4 digits...':S.sb==='em'?'Email...':'License plate...')+'" oninput="S.sq=this.value" onkeydown="if(event.key===\'Enter\')doSearch()"><button class="btn-r" style="flex-shrink:0" onclick="doSearch()">Search</button></div></div>'
+    +(S.searching?'<div style="text-align:center;padding:30px;color:#94a3b8"><i class="ti ti-loader-2" style="font-size:20px"></i><div style="margin-top:8px;font-size:13px">Searching...</div></div>':'')
+    +(!S.searching&&S.res.length>0?'<div class="card">'
+    +'<div style="font-size:13px;color:#94a3b8;margin-bottom:12px">'+S.res.length+' result'+(S.res.length!==1?'s':'')+' found</div>'
+    +S.res.map(c=>{
+      var lastV = c.visits&&c.visits.length ? c.visits[c.visits.length-1] : null;
+      var lastDate = lastV ? lastV.date : c.lastVisitDate;
+      var lastSvc  = lastV ? (lastV.svcs||[])[0] : (c.lastVisitSvcs||[])[0];
+      var line2 = c.mdl ? '🚗 '+esc(c.mdl)+(c.plt?' · '+esc(c.plt):'') : '📞 '+esc(c.phone||'');
+      var line3 = lastDate ? '📅 '+fmtVisitDate(lastDate)+' · '+esc(lastSvc||'') : '📞 '+esc(c.phone||'');
+      return '<div class="cxrow" onclick="openCx(\''+c.id+'\',\'ret\')">'  
+        +'<div class="av" style="width:42px;height:42px;font-size:15px">'+(c.fn?c.fn[0]:'')+(c.ln?c.ln[0]:'')+' </div>'
+        +'<div style="flex:1">'
+        +'<div style="font-weight:600;font-size:15px">'+esc(c.fn)+' '+esc(c.ln)+'</div>'
+        +'<div style="font-size:12px;color:#64748b;margin-top:2px">'+line2+'</div>'
+        +'<div style="font-size:12px;color:#64748b;margin-top:1px">'+line3+'</div>'
+        +'</div>'
+        +'<i class="ti ti-arrow-right" style="color:#94a3b8;font-size:18px"></i>'
+        +'</div>';
+    }).join('')
+    +'</div>':'')
+    +(!S.searching&&S.sq&&!S.res.length?'<div style="text-align:center;padding:30px;color:#94a3b8">No customers found.</div>':'')
+    +'</div>';
+}
+
+function profScr() {
+  if (!S.sel) { go('ret'); return ''; }
+  const fr  = S.sel; // Use S.sel directly (already updated by openCxProfile)
+  const vs  = fr.visits||[];
+  const hc  = !!(fr.prepaidNum&&fr.prepaidNum.trim());
+  const used = fr.prepaidUsed||0;
+  return '<div style="padding:20px">'
+    +'<button class="btn-sm" onclick="go(\''+(S.prevScr||'ret')+'\')" style="margin-bottom:14px"><i class="ti ti-arrow-left"></i> Back</button>'
+    +(hc?'<div class="card-amber"><div style="margin-bottom:14px"><div style="font-size:16px;font-weight:700;color:#92400e;margin-bottom:4px">🃏 Maintenance Prepaid Card</div><div style="font-size:15px;font-weight:700;color:#78350f;letter-spacing:1px">#'+esc(fr.prepaidNum)+'</div></div>'+cardDots(used)+'<div style="font-size:11px;color:#92400e;margin-top:8px;padding-top:8px;border-top:1px solid #fde68a">4 visits · 1–3 paid · 4 FREE</div></div>'
+    :'<div style="border:2px dashed #d97706;border-radius:12px;padding:16px;margin-bottom:14px;background:#fffbeb"><div style="font-size:14px;font-weight:600;color:#92400e;margin-bottom:3px">🃏 No prepaid card</div><div style="font-size:12px;color:#b45309">Prepaid cards can only be registered when recording a visit (since it involves a charge). Use "+ Record new visit" below.</div></div>')
+    +'<div class="g2" style="margin-bottom:14px">'
+    +'<div class="card"><div style="display:flex;align-items:center;gap:12px;margin-bottom:14px"><div class="av" style="width:48px;height:48px;font-size:18px">'+(fr.fn?fr.fn[0]:'')+(fr.ln?fr.ln[0]:'')+'</div><div><div style="font-weight:600;font-size:17px">'+esc(fr.fn)+' '+esc(fr.ln)+'</div><div style="font-size:13px;color:#94a3b8">'+vs.length+' visit'+(vs.length!==1?'s':'')+'</div></div></div><div class="dvdr"></div>'+crow('Phone',fr.phone)+crow('Email',fr.email)+crow('Address',fr.addr)+crow('Vehicle',fr.mdl&&fr.col?fr.mdl+' · '+fr.col:fr.mdl||'')+crow('Plate',fr.plt)+'<button class="btn-g" style="width:100%;margin-top:14px" onclick="initEdit()"><i class="ti ti-edit"></i> Edit info</button></div>'
+    +'<div class="card" style="overflow-y:auto;max-height:500px"><div class="sec">Service history</div>'
+    +(S.selLoadErr?'<div style="background:#fef2f2;border:1.5px solid #fca5a5;border-radius:8px;padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:10px"><span style="font-size:13px;color:#dc2626">⚠️ Could not load the full visit history.</span><button class="btn-sm" onclick="retryOpenCx()" style="flex-shrink:0">🔄 Retry</button></div>':'')
+    +(S.selLoading&&vs.length===0?'<div style="text-align:center;padding:24px;color:#94a3b8"><i class="ti ti-loader-2" style="font-size:20px"></i><div style="margin-top:8px;font-size:13px">Loading service history...</div></div>'
+    :vs.length===0?'<div style="font-size:14px;color:#94a3b8">'+(S.selLoadErr?'':'No visits yet.')+'</div>'
+    :vs.slice().reverse().map((v,ri) => {
+      const vi = vs.length-1-ri;
+      const pay = v.pay||{};
+      const isAmend = v.visitType==='Amendment';
+      const isLatest = vi === vs.length-1;
+      return '<div class="visit-blk" style="'+(isAmend?'border-left:3px solid #f59e0b;padding-left:10px;':'')+'">'
+        +'<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:4px">'
+        +'<span style="font-weight:700;font-size:14px">'+fmtVisitDate(v.date)+'</span>'
+        +(isAmend?'<span style="font-size:10px;background:#fef3c7;color:#92400e;border-radius:4px;padding:1px 6px;font-weight:700;margin-left:6px">✏️ AMENDED</span>':v.hasAmendment?'<span style="font-size:10px;background:#f1f5f9;color:#64748b;border-radius:4px;padding:1px 6px">Original</span>':'')
+        +'<span style="font-size:11px;color:#94a3b8;background:#f1f5f9;padding:2px 9px;border-radius:12px">'+esc(v.staff||'')+'</span>'
+        +'</div>'
+        +(isAmend&&v.editedBy?'<div style="font-size:11px;color:#b45309;margin-bottom:6px">✏️ Edited by: <strong>'+esc(v.editedBy)+'</strong> on '+esc(v.amendedAt||'')+'</div>':'')
+        +(v.invoiceNo||v.jobOrderNo?'<div style="margin-bottom:6px">'
+          +(v.invoiceNo?'<div style="font-size:12px;color:#1d4ed8;font-weight:600;margin-bottom:2px">📋 Invoice No. / '+esc(v.invoiceNo)+'</div>':'')
+          +(v.jobOrderNo?'<div style="font-size:12px;color:#166534;font-weight:600">🔧 Job Order No. / '+esc(v.jobOrderNo)+'</div>':'')
+          +'</div>':'')
+        +(v.svcs||[]).map(s=>'<div style="font-size:13px;color:#16a34a;margin-bottom:2px">✓ '+esc(s)+'</div>').join('')
+        +(v.usedCard&&v.prepaidVisitNum?pBadge(v.prepaidVisitNum):'')
+        +(v.memo?'<div style="font-size:12px;color:#94a3b8;margin-top:6px;background:#f1f5f9;padding:6px 9px;border-radius:6px">'+esc(v.memo)+'</div>':'')
+        +(isLatest?'<div style="text-align:right;margin-top:6px">':'')
+        +(isLatest?'<button onclick="startEditVisit(\''+fr.id+'\','+vi+')" style="font-size:12px;padding:4px 14px;border:1.5px solid #cbd5e1;border-radius:8px;background:#f8fafc;cursor:pointer;color:#475569;font-family:inherit;font-weight:600">✏️ Edit Service History</button></div>':'')
+        +(pay.est?'<div style="margin-top:8px;padding:6px 10px;border-radius:6px;background:'+(pay.status==='completed'?'#dcfce7':pay.status==='deposit'?'#dbeafe':'#fef3c7')+';display:flex;align-items:center;justify-content:space-between">'
+        +'<span style="font-size:12px;font-weight:700;color:'+(pay.status==='completed'?'#166534':pay.status==='deposit'?'#1e40af':'#92400e')+'">'+payBadge(pay,vi)+'</span>'
+        +(v.hasAmendment
+          ? '<span title="内容が変更されたため、この古い記録では支払い操作はできません" style="background:#e2e8f0;color:#94a3b8;border:none;border-radius:5px;padding:4px 10px;font-size:11px;font-weight:700;cursor:not-allowed">🔒 Pay (disabled)</span>'
+          : (pay.status!=='Full Paid'&&pay.status!=='completed'&&Math.max(0,parseFloat(pay.est||0)-parseFloat(pay.dep||0))>0
+            ?'<button onclick="S.payVidx='+vi+';S.pf=initPay();go(\'pay\')" style="background:#C41010;color:#fff;border:none;border-radius:5px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer">💳 Pay</button>'
+            :'<button onclick="S.payVidx='+vi+';go(\'receipt\')" style="background:#16a34a;color:#fff;border:none;border-radius:5px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer">🧾 Receipt</button>'))
+        +'</div>':'')
+        +'</div>';
+    }).join(''))
+    +'</div></div>'
+    +'<button class="btn-r" style="width:100%;padding:15px;font-size:16px;margin-bottom:12px" onclick="S.vf={svd:\''+td()+'\',st:\'\',svs:ms(),m1:\'\',m2:\'\',m3:\'\',useCard:false,newCardNum:\'\',confirmedCard:\'\',invoiceNo:\'\',jobOrderNo:\'\',prepaidUsedInit:0,prepaidUsedInitTouched:false,pay:initPay()};go(\'retVisit\')">+ Record new visit for '+esc(fr.fn)+' '+esc(fr.ln)+'</button>'
+    +(S.confirmDel
+    ?'<div class="del-banner"><div style="font-size:22px;margin-bottom:10px">🗑️</div><div style="font-weight:700;font-size:16px;color:#dc2626;margin-bottom:6px">Delete '+esc(fr.fn)+' '+esc(fr.ln)+'?</div><div style="font-size:13px;color:#64748b;margin-bottom:18px;line-height:1.6">All visit history ('+vs.length+') will be permanently removed.<br><strong>This cannot be undone.</strong></div><div style="display:flex;gap:12px;justify-content:center"><button class="btn-g" style="min-width:120px" onclick="S.confirmDel=false;render()">Cancel</button><button class="btn-del-y" style="min-width:150px" onclick="deleteCustomer()"><i class="ti ti-trash"></i> Yes, delete</button></div></div>'
+    :'<button class="btn-del" onclick="S.confirmDel=true;render()"><i class="ti ti-trash" style="font-size:16px"></i>Delete this customer</button>')
+    +'</div>';
+}
+
+function editScr() {
+  var ef = S.ef;
+  var co2 = ['White','Black','Silver','Red','Blue','Gray'];
+  var ioE = ef.col === '__other__' || (ef.col && !co2.includes(ef.col));
+  var colValE = (ioE && ef.col !== '__other__') ? ef.col : '';
+  var cselE = '<select class="inp" style="color:#111" oninput="var v=this.value;if(v===\'__other__\'){sef(\'col\',\'__other__\');render();}else{sef(\'col\',v);}">'+'<option value="">Select color...</option>'+co2.map(function(c){return '<option value="'+c+'"'+(ef.col===c?' selected':'')+'>'+c+'</option>';}).join('')+'<option value="__other__"'+(ioE?' selected':'')+'>Other (type below)</option></select>'+(ioE?'<input class="inp" style="color:#111;background:#fff;margin-top:8px" value="'+esc(colValE)+'" placeholder="Enter color here..." oninput="sef(\'col\',this.value)">':'');
+  return '<div style="padding:20px"><button class="btn-sm" onclick="go(\'prof\')" style="margin-bottom:14px"><i class="ti ti-arrow-left"></i> Back</button>'
+    +'<div class="card"><div class="sec">Customer information</div>'
+    +'<div class="g2" style="margin-bottom:14px"><div class="field"><label>First name<span class="req">*</span></label><input class="inp" value="'+esc(ef.fn)+'" oninput="sef(\'fn\',this.value)"></div><div class="field"><label>Last name<span class="req">*</span></label><input class="inp" value="'+esc(ef.ln)+'" oninput="sef(\'ln\',this.value)"></div></div>'
+    +'<div class="field" style="margin-bottom:14px"><label>Phone<span class="req">*</span></label><div style="display:flex;gap:8px;align-items:center"><input class="inp" style="width:94px;text-align:center" maxlength="4" value="'+esc(ef.p1)+'" oninput="sef(\'p1\',this.value)"><span style="color:#94a3b8;font-size:20px">-</span><input class="inp" style="width:74px;text-align:center" maxlength="3" value="'+esc(ef.p2)+'" oninput="sef(\'p2\',this.value)"><span style="color:#94a3b8;font-size:20px">-</span><input class="inp" style="width:84px;text-align:center" maxlength="4" value="'+esc(ef.p3)+'" oninput="sef(\'p3\',this.value)"></div></div>'
+    +'<div class="field" style="margin-bottom:14px"><label>Address</label><input class="inp" value="'+esc(ef.addr)+'" oninput="sef(\'addr\',this.value)" placeholder="Street, City, Province"></div>'
+    +'<div class="field"><label>Email</label><input type="email" class="inp" value="'+esc(ef.email)+'" oninput="sef(\'email\',this.value)"></div>'
+    +'<div class="dvdr"></div><div class="sec">Vehicle</div>'
+    +'<div class="g2" style="margin-bottom:14px"><div class="field"><label>Model</label><input class="inp" value="'+esc(ef.mdl)+'" oninput="sef(\'mdl\',this.value)" placeholder="Toyota Vios..."></div>'
+    +'<div class="field"><label>Color<span class="req">*</span></label>'+cselE+'</div></div>'
+    +'<div class="field"><label>License plate<span class="req">*</span></label><input class="inp" value="'+esc(ef.plt)+'" oninput="sef(\'plt\',this.value)" placeholder="ABC 1234"></div></div>'
+    +(S.err?'<div class="errbox">'+S.err+'</div>':'')
+    +'<div class="acts"><button class="btn-g" onclick="go(\'prof\')">Cancel</button><button class="btn-r" onclick="submitEdit()">Save changes</button></div></div>';
+}
+function new1Scr() {
+  return '<div style="padding:20px">'+stepBar(1)
+    +'<div class="card"><div class="sec">Customer information</div>'
+    +'<div class="g2" style="margin-bottom:14px"><div class="field"><label>First name<span class="req">*</span></label><input class="inp" value="'+esc(S.f.fn)+'" oninput="sf(\'fn\',this.value)" placeholder="Juan"></div><div class="field"><label>Last name<span class="req">*</span></label><input class="inp" value="'+esc(S.f.ln)+'" oninput="sf(\'ln\',this.value)" placeholder="dela Cruz"></div></div>'
+    +'<div class="field" style="margin-bottom:14px"><label>Phone<span class="req">*</span></label><div style="display:flex;gap:8px;align-items:center"><input class="inp" id="p1" style="width:94px;text-align:center" maxlength="4" value="'+esc(S.f.p1)+'" placeholder="0912" oninput="sf(\'p1\',this.value.replace(/\\D/g,\'\'));if(this.value.length===4)document.getElementById(\'p2\').focus()"><span style="color:#94a3b8;font-size:22px">–</span><input class="inp" id="p2" style="width:74px;text-align:center" maxlength="3" value="'+esc(S.f.p2)+'" placeholder="345" oninput="sf(\'p2\',this.value.replace(/\\D/g,\'\'));if(this.value.length===3)document.getElementById(\'p3\').focus()"><span style="color:#94a3b8;font-size:22px">–</span><input class="inp" id="p3" style="width:84px;text-align:center" maxlength="4" value="'+esc(S.f.p3)+'" placeholder="6789" oninput="sf(\'p3\',this.value.replace(/\\D/g,\'\'))"></div></div>'
+    +'<div class="g2" style="margin-bottom:14px">'
+    +'<div class="field"><label>Visit date<span class="req">*</span></label>'
+    +'<input type="date" class="inp" value="'+S.f.dt+'" oninput="sf(\'dt\',this.value)">'
+    +'</div>'
+    +'<div class="field"><label>Staff<span class="req">*</span></label>'
+    +'<select id="new1-staff-sel" class="inp" style="color:#111" onchange="sf(\'st\',this.value);render()">'
+    +'<option value="">Select staff...</option>'
+    +STAFF.map(s=>'<option value="'+s+'"'+(S.f.st===s?' selected':'')+'>'+s+'</option>').join('')
+    +'<option value="__other__"'+(S.f.st&&!STAFF.includes(S.f.st)?' selected':'')+'>Other (specify)...</option>'
+    +'</select>'
+    +(S.f.st&&!STAFF.includes(S.f.st)?'<input class="inp" style="color:#111;background:#fff;margin-top:6px" value="'+esc(S.f.st!=='__other__'?S.f.st:'')+'" placeholder="Enter name..." oninput="saveStaffName(\'new_st\',this.value)">':'')
+    +'</div></div>'
+    +'<div class="dvdr"></div><div style="font-size:13px;color:#94a3b8;margin-bottom:12px">Optional</div>'
+    +'<div class="field" style="margin-bottom:12px"><label>Address</label><input class="inp" value="'+esc(S.f.addr)+'" placeholder="Street, City, Province" oninput="sf(\'addr\',this.value)"></div>'
+    +'<div class="field"><label>Email</label><input type="email" class="inp" value="'+esc(S.f.email)+'" placeholder="email@example.com" oninput="sf(\'email\',this.value)"></div></div>'
+    +(S.err?'<div class="errbox">'+S.err+'</div>':'')
+    +'<div class="card" style="margin-bottom:12px">'
+    +'<div class="sec">📋 Job Numbers</div>'
+    +'<div class="g2" style="margin-bottom:0">'
+    +'<div class="field"><label>Invoice No.<span class="req">*</span></label>'
+    +'<input id="new1-invoice" class="inp" style="color:#111;background:#fff" value="'+esc(S.f.invoiceNo)+'" placeholder="e.g. 1801" oninput="S.f.invoiceNo=this.value">'
+    +'</div>'
+    +'<div class="field"><label>Job Order No.<span class="req">*</span></label>'
+    +'<input id="new1-joborder" class="inp" style="color:#111;background:#fff" value="'+esc(S.f.jobOrderNo)+'" placeholder="e.g. JO-001" oninput="S.f.jobOrderNo=this.value">'
+    +'</div></div></div>'
+    +'<div class="acts"><button class="btn-g" onclick="go(\'home\')">Cancel</button><button class="btn-r" onclick="val1()">Next: Vehicle →</button></div></div>';
+}
+
+function new2Scr() {
+  var co = ['White','Black','Silver','Red','Blue','Gray'];
+  var ioN = S.f.col === '__other__' || (S.f.col && !co.includes(S.f.col));
+  var colVal = (ioN && S.f.col !== '__other__') ? S.f.col : '';
+  var csel = '<select class="inp" style="color:#111" oninput="var v=this.value;if(v===\'__other__\'){sf(\'col\',\'__other__\');render();}else{sf(\'col\',v);}">'+'<option value="">Select color...</option>'+co.map(function(c){return '<option value="'+c+'"'+(S.f.col===c?' selected':'')+'>'+c+'</option>';}).join('')+'<option value="__other__"'+(ioN?' selected':'')+'>Other (type below)</option></select>'+(ioN?'<input class="inp" style="color:#111;background:#fff;margin-top:8px" value="'+esc(colVal)+'" placeholder="Enter color here..." oninput="sf(\'col\',this.value)">':'');
+  return '<div style="padding:20px">'+stepBar(2)
+    +'<div class="card"><div class="sec">Vehicle information</div>'
+    +'<div class="g2" style="margin-bottom:14px"><div class="field"><label>Model / make<span class="req">*</span></label><input class="inp" value="'+esc(S.f.mdl)+'" placeholder="Toyota Vios..." oninput="sf(\'mdl\',this.value)"></div>'
+    +'<div class="field"><label>Color</label>'+csel+'</div></div>'
+    +'<div class="field" style="margin-bottom:14px"><label>License plate<span class="req">*</span></label><input class="inp" value="'+esc(S.f.plt)+'" placeholder="ABC 1234" oninput="sf(\'plt\',this.value)"></div></div>'
+    +(S.err?'<div class="errbox">'+S.err+'</div>':'')
+    +'<div class="acts"><button class="btn-g" onclick="go(\'new1\')">Back</button><button class="btn-r" onclick="val2()">Next: Services</button></div></div>';
+}
+function new3Scr() {
+  const pOn = S.f.svs[SVC.findIndex(x=>x.id==='prepaid')]?.on;
+  return '<div style="padding:20px">'+stepBar(3)
+    +'<div class="card">'
+    +'<div class="g2" style="margin-bottom:18px"><div class="field"><label>Date of service<span class="req">*</span></label><input type="date" class="inp" value="'+S.f.svd+'" oninput="sf(\'svd\',this.value)"></div></div>'
+    +'<div class="sec">Services</div>'+svcPick(S.f.svs,false)
+    +(pOn?cardInputSec(false):'')
+    +'<div class="dvdr"></div><div style="font-size:13px;font-weight:500;color:#64748b;margin-bottom:10px">Notes</div>'
+    +'<div style="display:flex;flex-direction:column;gap:9px"><input class="inp" value="'+esc(S.f.m1)+'" placeholder="Note 1..." oninput="sf(\'m1\',this.value)"><input class="inp" value="'+esc(S.f.m2)+'" placeholder="Note 2..." oninput="sf(\'m2\',this.value)"><input class="inp" value="'+esc(S.f.m3)+'" placeholder="Note 3..." oninput="sf(\'m3\',this.value)"></div>'
+    +paySection(false)
+    +'</div>'
+    +(S.err?'<div class="errbox">'+S.err+'</div>':'')
+    +'<div class="acts"><button class="btn-g" onclick="go(\'new2\')">← Back</button><button class="btn-r" onclick="val3()">Review & confirm →</button></div></div>';
+}
+
+function newConfScr() {
+  const svcs = getSvcs(S.f.svs);
+  const pOn  = S.f.svs[SVC.findIndex(x=>x.id==='prepaid')]?.on;
+  const pay  = S.f.pay;
+  return '<div style="padding:20px">'+stepBar(4)
+    +'<div style="background:#f0fdf4;border:2px solid #16a34a;border-radius:12px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:10px"><i class="ti ti-circle-check" style="font-size:22px;color:#16a34a;flex-shrink:0"></i><div><div style="font-size:15px;font-weight:700;color:#166534">Please confirm the details</div><div style="font-size:13px;color:#15803d">Tap "Register now" to save.</div></div></div>'
+    +'<div class="card">'+crow('Name',S.f.fn+' '+S.f.ln)+crow('Phone',S.f.p1+'-'+S.f.p2+'-'+S.f.p3)+crow('Date',S.f.dt)+crow('Staff',S.f.st)+crow('Address',S.f.addr)+crow('Email',S.f.email)
+    +'<div class="dvdr"></div>'+crow('Model',S.f.mdl)+crow('Color',S.f.col)+crow('Plate',S.f.plt)
+    +'<div class="dvdr"></div><div style="margin-bottom:8px">'+svcs.map(s=>'<span class="stag">✓ '+esc(s)+'</span>').join('')+'</div>'
+    +(pOn&&S.f.prepaidNum?'<div style="background:#fffbeb;border:2px solid #d97706;border-radius:8px;padding:10px 14px;font-size:14px;font-weight:700;color:#92400e;margin-bottom:8px">🃏 Card #'+esc(S.f.prepaidNum)+' will be registered</div>':'')
+    +([S.f.m1,S.f.m2,S.f.m3].filter(Boolean).length?'<div class="dvdr"></div><div style="background:#f1f5f9;border-radius:8px;padding:10px 12px;font-size:13px;color:#475569">📝 '+[S.f.m1,S.f.m2,S.f.m3].filter(Boolean).map(m=>esc(m)).join('<br>')+'</div>':'')
+    +(pay.est?'<div class="dvdr"></div><div style="background:#dcfce7;border:1px solid #16a34a;border-radius:8px;padding:10px 14px;font-size:14px;font-weight:700;color:#166534">💰 Estimate: '+fmt(pay.est)+(parseFloat(pay.dep||0)>0?' | Deposit: '+fmt(pay.dep)+' via '+esc(pay.depMeth||''):'')+'</div>':'')
+    +'</div>'
+    +'<div class="acts"><button class="btn-g" onclick="go(\'new3\')">← Edit</button><button class="btn-r" style="font-size:16px;padding:14px 28px" onclick="btnLoading(this,submitNew)" '+(S.busy?'disabled':'')+'>'+(S.busy?'Saving...':'<i class="ti ti-check" style="font-size:18px"></i> Register now')+'</button></div></div>';
+}
+
+function retVisitScr() {
+  const c = S.sel; if(!c) return '';
+  const pOn  = S.vf.svs[SVC.findIndex(x=>x.id==='prepaid')]?.on;
+  const used = c.prepaidUsed||0;
+  const hasCard = !!(c.prepaidNum&&c.prepaidNum.trim()&&used<4);
+  const custHeader = '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:14px">'
+    +'<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">'
+    +'<div class="av" style="width:44px;height:44px;font-size:17px">'+(c.fn?c.fn[0]:'')+(c.ln?c.ln[0]:'')+'</div>'
+    +'<div><div style="font-weight:700;font-size:17px">'+esc(c.fn)+' '+esc(c.ln)+'</div><div style="font-size:13px;color:#64748b">📞 '+esc(c.phone||'')+'</div></div></div>'
+    +(c.mdl?'<div style="font-size:13px;color:#475569;margin-bottom:8px">🚗 '+esc(c.mdl)+(c.col?' ('+esc(c.col)+')':'')+(c.plt?' | 🔖 '+esc(c.plt):'')+'</div>':'')
+    +(c.prepaidNum?'<div style="padding:8px 12px;background:'+(hasCard?'#fffbeb':'#fef2f2')+';border:1.5px solid '+(hasCard?'#d97706':'#fca5a5')+';border-radius:8px;font-size:13px;font-weight:600;color:'+(hasCard?'#92400e':'#dc2626')+'">'
+    +'🃏 Card #'+esc(c.prepaidNum)+' — Used: '+used+'/4'+(hasCard?' — Next: <strong>Visit '+(used+1)+' of 4</strong>'+(used+1===4?' ★ FREE!':''):' — Card complete')+'</div>'
+    :'<div style="font-size:12px;color:#94a3b8">🃏 No prepaid card</div>')
+    +'</div>';
+  return '<div style="padding:20px"><button class="btn-sm" onclick="go(\'prof\')" style="margin-bottom:14px"><i class="ti ti-arrow-left"></i> Back</button>'
+    +custHeader
+    +'<div class="card">'
+    +'<div class="g2" style="margin-bottom:16px">'
+    +'<div class="field"><label>Service date<span class="req">*</span></label>'
+    +'<input type="date" class="inp" value="'+S.vf.svd+'" oninput="svf(\'svd\',this.value)">'
+    +'</div>'
+    +'<div class="field"><label>Staff<span class="req">*</span></label>'
+    +'<select id="vf-staff-sel" class="inp" style="color:#111" onchange="svf(\'st\',this.value);render()">'
+    +'<option value="">Select...</option>'
+    +STAFF.map(s=>'<option value="'+s+'"'+(S.vf.st===s?' selected':'')+'>'+s+'</option>').join('')
+    +'<option value="__other__"'+(S.vf.st&&!STAFF.includes(S.vf.st)?' selected':'')+'>Other (specify)...</option>'
+    +'</select>'
+    +(S.vf.st&&!STAFF.includes(S.vf.st)?'<input class="inp" style="color:#111;background:#fff;margin-top:6px" value="'+esc(S.vf.st!=='__other__'?S.vf.st:'')+'" placeholder="Enter name..." oninput="saveStaffName(\'ret_st\',this.value)">':'')
+    +'</div></div>'
+    +'<div class="card" style="margin-bottom:12px">'
+    +'<div class="sec">📋 Job Numbers</div>'
+    +'<div class="g2" style="margin-bottom:0">'
+    +'<div class="field"><label>Invoice No.<span class="req">*</span></label>'
+    +'<input id="retvisit-invoice" class="inp" style="color:#111;background:#fff" value="'+esc(S.vf.invoiceNo)+'" placeholder="e.g. 1801" oninput="S.vf.invoiceNo=this.value">'
+    +'</div>'
+    +'<div class="field"><label>Job Order No.<span class="req">*</span></label>'
+    +'<input id="retvisit-joborder" class="inp" style="color:#111;background:#fff" value="'+esc(S.vf.jobOrderNo)+'" placeholder="e.g. JO-001" oninput="S.vf.jobOrderNo=this.value">'
+    +'</div></div></div>'
+    +'<div class="card">'
+    +'<div class="sec">Services performed</div>'+svcPick(S.vf.svs,true)
+    +(pOn?cardInputSec(true):'')
+    +'<div class="dvdr"></div><div style="font-size:13px;font-weight:500;color:#64748b;margin-bottom:10px">Notes</div>'
+    +'<div style="display:flex;flex-direction:column;gap:9px"><input class="inp" value="'+esc(S.vf.m1)+'" placeholder="Note 1..." oninput="svf(\'m1\',this.value)"><input class="inp" value="'+esc(S.vf.m2)+'" placeholder="Note 2..." oninput="svf(\'m2\',this.value)"><input class="inp" value="'+esc(S.vf.m3)+'" placeholder="Note 3..." oninput="svf(\'m3\',this.value)"></div>'
+    +paySection(true)
+    +'</div>'
+    +(S.err?'<div class="errbox">'+S.err+'</div>':'')
+    +'<div class="acts"><button class="btn-g" onclick="go(\'prof\')">Cancel</button><button class="btn-r" onclick="valVf()">Review & confirm →</button></div></div>';
+}
+
+function retConfScr() {
+  const c = S.sel; if(!c) return '';
+  const uc = S.vf.useCard && c.prepaidNum;
+  const bc = !!(S.vf.svs[SVC.findIndex(x=>x.id==='prepaid')]?.on) && S.vf.newCardNum;
+  const nx = (c.prepaidUsed||0)+1;
+  const pay = S.vf.pay;
+  return '<div style="padding:20px">'
+    +'<div style="background:#f0fdf4;border:2px solid #16a34a;border-radius:12px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:10px"><i class="ti ti-circle-check" style="font-size:22px;color:#16a34a;flex-shrink:0"></i><div><div style="font-size:15px;font-weight:700;color:#166534">Please confirm the visit details</div><div style="font-size:13px;color:#15803d">Tap "Save visit" to record.</div></div></div>'
+    +'<div class="card">'
+    +'<div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #e2e8f0">'
+    +'<div style="display:flex;align-items:center;gap:12px;margin-bottom:8px"><div class="av" style="width:44px;height:44px;font-size:16px">'+(c.fn?c.fn[0]:'')+(c.ln?c.ln[0]:'')+'</div><div><div style="font-weight:700;font-size:16px">'+esc(c.fn)+' '+esc(c.ln)+'</div><div style="font-size:13px;color:#64748b">📞 '+esc(c.phone)+'</div></div></div>'
+    +(c.mdl?'<div style="font-size:13px;color:#475569;margin-bottom:6px">🚗 '+esc(c.mdl)+(c.col?' ('+esc(c.col)+')':'')+(c.plt?' | 🔖 '+esc(c.plt):'')+'</div>':'')
+    +(c.prepaidNum?'<div style="padding:6px 10px;background:#fffbeb;border:1.5px solid #d97706;border-radius:6px;font-size:13px;font-weight:600;color:#92400e">🃏 Card #'+esc(c.prepaidNum)+' — Used: '+(c.prepaidUsed||0)+'/4'+(uc?' → This is <strong>Visit '+nx+' of 4</strong>'+(nx===4?' ★ FREE!':''):'')+'</div>':'')
+    +'</div>'
+    +crow('Service date',S.vf.svd)+crow('Staff',S.vf.st)+crow('Invoice No.',S.vf.invoiceNo)+crow('Job Order No.',S.vf.jobOrderNo)
+    +'<div style="margin-top:12px">'+getSvcs(S.vf.svs).map(s=>'<span class="stag">✓ '+esc(s)+'</span>').join('')+'</div>'
+    +(uc?'<div style="margin-top:10px;padding:12px 14px;border-radius:8px;background:'+(nx===4?'#d97706':'#fffbeb')+';border:2px solid #d97706;font-size:15px;font-weight:700;color:'+(nx===4?'#fff':'#92400e')+'">🃏 Prepaid card — Visit '+nx+' of 4'+(nx===4?' ★ FREE VISIT ★':'')+'</div>':'')
+    +(bc?'<div style="margin-top:10px;padding:10px 14px;border-radius:8px;background:#f0fdf4;border:1.5px solid #16a34a;font-size:14px;font-weight:700;color:#166534">🃏 New card #'+esc(S.vf.newCardNum)+' will be registered</div>':'')
+    +([S.vf.m1,S.vf.m2,S.vf.m3].filter(Boolean).length?'<div style="margin-top:10px;background:#f1f5f9;border-radius:8px;padding:10px 12px;font-size:13px;color:#475569">📝 '+[S.vf.m1,S.vf.m2,S.vf.m3].filter(Boolean).map(m=>esc(m)).join('<br>')+'</div>':'')
+    +(pay.est?'<div style="margin-top:10px;background:#dcfce7;border:1px solid #16a34a;border-radius:8px;padding:10px 14px;font-size:14px;font-weight:700;color:#166534">💰 Estimate: '+fmt(pay.est)+(parseFloat(pay.dep||0)>0?' | Deposit: '+fmt(pay.dep):'')+'</div>':'')
+    +'</div>'
+    +'<div class="acts"><button class="btn-g" onclick="go(\'retVisit\')">← Edit</button><button class="btn-r" style="font-size:16px;padding:14px 28px" onclick="btnLoading(this,submitVisit)" '+(S.busy?'disabled':'')+'>'+(S.busy?'Saving...':'<i class="ti ti-check" style="font-size:18px"></i> Save visit')+'</button></div></div>';
+}
+
+function savedScr() {
+  const info = S.savedInfo||{}; const isN = info.type==='new'; const isEx = info.type==='existing';
+  const isDepSkip = info.type==='depositSkipped'; const isPaySkip = info.type==='paymentSkipped';
+  const title = isEx ? 'Customer registered!'
+    : isDepSkip ? 'Down Payment recorded!'
+    : isPaySkip ? 'Payment recorded!'
+    : (isN ? 'Registration complete!' : 'Visit recorded!');
+  const subtitle = isEx ? ' has been added as an existing customer.'
+    : (isDepSkip||isPaySkip) ? ' — signature was skipped (online/remote payment).'
+    : ' has been saved.';
+  const iconBg = isEx ? '#7c3aed' : (isDepSkip||isPaySkip) ? '#0891b2' : '#16a34a';
+  return '<div style="padding:44px 28px 36px;text-align:center">'
+    +'<div style="width:80px;height:80px;border-radius:50%;background:'+iconBg+';display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 4px 20px rgba(22,163,74,.3)"><span style="color:#fff;font-size:40px;font-weight:900;line-height:1">✓</span></div>'
+    +'<div style="font-size:24px;font-weight:700;margin-bottom:8px">'+title+'</div>'
+    +'<div style="font-size:16px;color:#64748b;margin-bottom:24px"><strong>'+esc(info.name||'')+'</strong>'+subtitle+'</div>'
+    +'<div style="background:#f8fafc;border:0.5px solid #e2e8f0;border-radius:12px;padding:16px 20px;margin-bottom:24px;text-align:left">'+crow('Date',info.date||'')+crow('Staff',info.staff||'')
+    +(info.amount!=null?'<div class="crow"><span class="clbl">Amount</span><span style="font-size:13px;font-weight:700;color:#111">₱'+num(info.amount)+(info.method?' ('+esc(info.method)+')':'')+'</span></div>':'')
+    +((info.svcs||[]).length?'<div class="crow"><span class="clbl">'+(isEx?'Past services':'Services')+'</span><span style="font-size:13px;font-weight:500;color:#111">'+info.svcs.map(s=>'<div>✓ '+esc(s)+'</div>').join('')+'</span></div>':'')
+    +(info.card?'<div class="crow"><span class="clbl">Prepaid card</span><span style="font-size:13px;font-weight:700;color:#92400e">🃏 #'+esc(info.card)+' registered</span></div>':'')
+    +(info.useCard&&info.prepaidVisitNum?'<div class="crow"><span class="clbl">Card charged</span><span style="font-size:13px;font-weight:700;color:'+(info.prepaidVisitNum===4?'#d97706':'#92400e')+'">🃏 Visit '+info.prepaidVisitNum+' of 4'+(info.prepaidVisitNum===4?' ★ FREE':'')+'</span></div>':'')
+    +'</div>'
+    +'<button class="btn-green" onclick="S.savedInfo=null;go(\'home\')"><svg width="22" height="22" viewBox="0 0 22 22" fill="white"><path d="M9 2L2 9l7 7V11h6V9H9V2z"/></svg>Back to home</button>'
+    +(!isN&&info.selId?'<button class="btn-g" style="width:100%;margin-top:12px" onclick="openCx(\''+info.selId+'\',\'saved\')">View customer profile →</button>':'')
+    +'</div>';
+}
+
+function payScr() {
+  const c = S.sel; if(!c) return '';
+  const vidx = S.payVidx;
+  const vs = c.visits||[];
+  const v = vs[vidx]; if(!v) { go('prof'); return ''; }
+  const p = v.pay||{};
+  const pf = S.pf;
+  const dep = parseFloat(p.dep||0);
+  const fin = parseFloat(pf.final||p.est||0);
+  const remain = Math.max(0, fin-dep);
+  return '<div style="padding:20px">'
+    +'<button class="btn-sm" onclick="go(\'prof\')" style="margin-bottom:14px"><i class="ti ti-arrow-left"></i> Back</button>'
+    +'<div style="background:#f0fdf4;border:2px solid #16a34a;border-radius:12px;padding:14px 18px;margin-bottom:16px">'
+    +'<div style="font-size:17px;font-weight:700;color:#166534">💰 Complete Payment</div>'
+    +'<div style="font-size:13px;color:#15803d">'+esc(c.fn)+' '+esc(c.ln)+' — Service date: '+fmtVisitDate(v.date)+'</div>'
+    +'</div>'
+    +'<div class="card">'
+    +'<div style="font-size:12px;font-weight:600;text-transform:uppercase;color:#94a3b8;margin-bottom:10px">📋 Services</div>'
+    +'<div style="margin-bottom:10px">'+(v.svcs||[]).map(s=>'<span class="stag">✓ '+esc(s)+'</span>').join('')+'</div>'
+    +'<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:16px">'
+    +'<div style="text-align:center;padding:8px 0 14px">'
+    +'<div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:#64748b;margin-bottom:4px">Balance to pay</div>'
+    +'<div style="font-size:44px;font-weight:900;color:#C41010">'+fmt(remain)+'</div>'
+    +'</div>'
+    +'<div style="height:1px;background:#e2e8f0;margin:4px 0 12px"></div>'
+    +'<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">'
+    +'<span style="color:#64748b">Estimate:</span>'
+    +'<span style="font-weight:600">'+fmt(fin)+'</span></div>'
+    +(dep>0?'<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;color:#1d4ed8"><span>Down Payment'+(p.depMeth?' ('+esc(p.depMeth)+')':'')+' :</span><span style="font-weight:600">&#8722; '+fmt(dep)+'</span></div>':'')
+    +'</div>'
+    +(remain>0?
+    '<div class="g2" style="margin-bottom:12px">'
+    +'<div class="field"><label style="font-weight:600">Payment method <span style="color:#C41010">*</span></label>'
+    +'<select class="inp" style="color:#111" onchange="ppf(\'payMeth\',this.value)"><option value="">Select...</option>'
+    +PAY_METHODS.map(m=>'<option value="'+m+'"'+(pf.payMeth===m?' selected':'')+'>'+m+'</option>').join('')
+    +'</select></div>'
+    +'<div class="field"><label style="font-weight:600">Received by <span style="color:#C41010">*</span></label>'
+    +'<select class="inp" style="color:#111" onchange="ppf(\'payStaff\',this.value);render()"><option value="">Select...</option>'
+    +STAFF.map(s=>'<option value="'+s+'"'+(pf.payStaff===s?' selected':'')+'>'+s+'</option>').join('')
+    +'<option value="__other__"'+(pf.payStaff&&!STAFF.includes(pf.payStaff)?' selected':'')+'>Other (specify)...</option>'
+    +'</select>'
+    +(pf.payStaff&&!STAFF.includes(pf.payStaff)?'<input class="inp" style="color:#111;background:#fff;margin-top:6px" value="'+esc(pf.payStaff!=='__other__'?pf.payStaff:'')+'" placeholder="Enter name..." oninput="saveStaffName(\'payStaff\',this.value)">':'')
+    +'</div></div>':'')
+    +(remain>0?'<div class="field"><label style="font-weight:600;color:#C41010">'+refLabel(pf.payMeth)+' *</label><input class="inp" style="color:#111;background:#fff;border:2px solid '+(pf.payNote?'#16a34a':'#C41010')+'" value="'+esc(pf.payNote||'')+'" placeholder="Enter ref number..." oninput="ppf(\'payNote\',this.value)"></div>':'')
+    +(S.err?'<div class="errbox" style="margin-top:12px">'+S.err+'</div>':'')
+    +'</div>'
+    +'<div class="acts"><button class="btn-g" onclick="go(\'prof\')">Cancel</button><button class="btn-r" style="font-size:16px;padding:14px 28px" onclick="btnLoading(this,completePayment)"><i class="ti ti-check" style="font-size:18px"></i> Mark as PAID</button></div></div>';
+}
+
+function receiptScr() {
+  const c = S.sel; if(!c) return '';
+  const vs   = c.visits||[];
+  const vidx = S.payVidx!=null ? S.payVidx : vs.length-1;
+  const v    = vs[vidx]||{}; if(!v.svcs) return '';
+  const p    = v.pay||{};
+  const dep  = parseFloat(p.dep||0);
+  const fin  = parseFloat(p.final||p.est||0);
+  const remain = Math.max(0, fin-dep);
+  const rcpNo = 'RBC-'+c.id.slice(-6)+'-'+(vidx+1);
+  return '<div style="padding:16px">'
+    +'<button style="width:100%;padding:13px;background:#16a34a;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:10px;font-family:inherit" onclick="go(\'home\')"><i clas">&#127968; Back to home</button>'
+    +'<div style="display:flex;gap:10px;margin-bottom:16px">'
+    +'<button class="btn-g" onclick="go(\'prof\')"><i class="ti ti-arrow-left"></i> Back</button>'
+    +(p.signedAt?'<button class="btn-r" style="flex:1" onclick="window.print()"><i class="ti ti-printer"></i> Print Receipt</button>':'<button disabled style="flex:1;padding:10px 16px;background:#94a3b8;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;font-family:inherit">Sign first to print</button>')
+    +'</div>'
+    +'<div id="receipt-box" style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;max-width:400px;margin:0 auto;font-family:Arial,sans-serif">'
+    +'<div style="text-align:center;margin-bottom:16px;padding-bottom:16px;border-bottom:2px solid #111">'
+    +'<div style="font-style:italic;font-weight:900;font-size:28px;color:#111;letter-spacing:-1px;font-family:Georgia,serif">REB<span style="color:#C41010">i</span>RTH</div>'
+    +'<div style="background:#C41010;color:#fff;font-size:8px;font-weight:700;letter-spacing:.25em;padding:2px 10px;display:inline-block;margin:4px 0;font-style:italic">CAR COATING CENTER INC.</div>'
+    +'<div style="font-size:11px;color:#64748b;line-height:1.6;margin-top:6px">4A Naga Road Pulang Lupa Dos Las Pinas City Metro Manila<br>Tel: (02) 3986472</div>'
+    +'</div>'
+    +'<div style="text-align:center;margin-bottom:14px">'
+    +'<div style="font-size:16px;font-weight:700;color:#111;text-transform:uppercase;letter-spacing:2px">Official Receipt</div>'
+    +'<div style="font-size:11px;color:#64748b">'+(v.invoiceNo?'Invoice No.: '+esc(v.invoiceNo):'Receipt No.: '+rcpNo)+'</div>'
+    +'<div style="font-size:11px;color:#64748b">Date: '+esc(p.payDate||v.date||'')+' '+esc(p.payTime||'')+'</div>'
+    +'</div>'
+    +'<div style="background:#f8fafc;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px">'
+    +'<div style="font-weight:700;font-size:14px;margin-bottom:4px">'+esc(c.fn)+' '+esc(c.ln)+'</div>'
+    +(c.cxId?'<div style="color:#64748b">🪪 Customer No.: <strong>'+esc(c.cxId)+'</strong></div>':'')
+    +(c.phone?'<div style="color:#64748b">📞 '+esc(c.phone)+'</div>':'')
+    +(c.mdl?'<div style="color:#64748b">🚗 '+esc(c.mdl)+(c.col?' ('+esc(c.col)+')':'')+(c.plt?' | 🔖 '+esc(c.plt):'')+'</div>':'')
+    +(v.invoiceNo?'<div style="color:#64748b">📋 Invoice No.: <strong>'+esc(v.invoiceNo)+'</strong></div>':'')
+    +(v.jobOrderNo?'<div style="color:#64748b">🔧 Job Order No.: <strong>'+esc(v.jobOrderNo)+'</strong></div>':'')
+    +'</div>'
+    +'<div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#64748b;margin-bottom:6px">Services Rendered</div>'
+    +(v.svcs||[]).map(s=>'<div style="font-size:13px;padding:4px 0;border-bottom:0.5px solid #f1f5f9">✓ '+esc(s)+'</div>').join('')
+    +'<div style="margin-top:14px;border-top:1.5px solid #e2e8f0;padding-top:10px;width:100%">'
+    +'<div style="overflow:hidden;font-size:14px;margin-bottom:8px"><span style="float:right;font-weight:600">'+fmt(fin)+'</span><span style="color:#64748b">Total Amount:</span></div>'
+    +(dep>0?'<div style="overflow:hidden;font-size:14px;margin-bottom:8px"><span style="float:right;font-weight:600;color:#1d4ed8">'+fmt(dep)+'</span><span style="color:#1d4ed8">Down Payment:</span></div>':'')
+    +'<div style="overflow:hidden;font-size:14px;margin-bottom:8px"><span style="float:right;font-weight:600;color:#dc2626">'+fmt(remain)+'</span><span style="color:#dc2626">Balance Due:</span></div>'
+    +'<div style="overflow:hidden;font-size:16px;font-weight:800;border-top:2px solid #111;padding-top:10px;margin-top:6px"><span style="float:right;color:#16a34a">'+fmt(remain)+'</span>Amount Paid Today:</div>'
+    +'</div>'
+    +'<div style="margin-top:12px;padding:10px 12px;background:#f0fdf4;border-radius:8px;font-size:12px">'
+    +'<div><strong>Payment method:</strong> '+esc(p.payMeth||'—')+'</div>'
+    +'<div><strong>Received by:</strong> '+esc(p.payStaff||'—')+'</div>'
+    +(dep>0&&p.depMeth?'<div style="color:#64748b;margin-top:4px">Down Payment via '+esc(p.depMeth)+(p.depStaff?' by '+esc(p.depStaff):'')+(p.depDate?' on '+esc(p.depDate):'')+'</div>':'')
+    +(p.depNote?'<div style="color:#64748b">Deposit ref: '+esc(p.depNote)+'</div>':'')
+    +(p.payNote?'<div style="color:#64748b">Payment ref: '+esc(p.payNote)+'</div>':'')
+    +'</div>'
+    +(v.usedCard&&v.prepaidVisitNum?'<div style="margin-top:8px;padding:8px 12px;background:#fffbeb;border-radius:8px;font-size:12px;color:#92400e">🃏 Prepaid card used — Visit '+v.prepaidVisitNum+' of 4'+(v.prepaidVisitNum===4?' ★ FREE':'')+'</div>':'')
+    // Signature section
+    +(p.finalSignedAt
+      ? '<div style="margin-top:16px;padding-top:14px;border-top:2px dashed #e2e8f0">'
+        +'<div style="font-size:12px;font-weight:700;color:#166534;margin-bottom:8px">✅ Customer Signature</div>'
+        +(p.finalSignature?'<img src="'+p.finalSignature+'" style="width:100%;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc">':'')
+        +'<div style="font-size:11px;color:#64748b;margin-top:6px">'+esc(p.finalSignedAt)+'</div>'
+        +'</div>'
+      : '<div style="margin-top:16px;padding-top:14px;border-top:2px dashed #C41010">'
+        +'<div style="font-size:14px;font-weight:700;color:#C41010;margin-bottom:10px">✍️ Customer Signature (Required)</div>'
+        +'<canvas id="sig-canvas" width="380" height="150" style="width:100%;height:150px;border:2px solid #cbd5e1;border-radius:8px;background:#fff;touch-action:none;display:block;margin-bottom:10px"></canvas>'
+        +'<div style="display:flex;gap:10px">'
+        +'<button onclick="clearSignature()" style="flex:1;padding:10px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;cursor:pointer;font-family:inherit;font-size:14px;min-height:44px">Clear</button>'
+        +'<button onclick="btnLoading(this,confirmSignature)" style="flex:2;padding:10px;background:#C41010;color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-size:14px;font-weight:700;min-height:44px">✅ Confirm Signature</button>'
+        +'</div>'
+        +'<button onclick="btnLoading(this,skipSignature)" style="width:100%;padding:10px;border:1px solid #94a3b8;border-radius:8px;background:#f8fafc;cursor:pointer;font-family:inherit;font-size:13px;color:#64748b;margin-top:8px;min-height:40px">📱 Online Payment — Skip Signature</button>'
+        +'</div>'
+    )
+    +'<div style="text-align:center;margin-top:16px;padding-top:12px;border-top:1px dashed #e2e8f0;font-size:11px;color:#94a3b8">Thank you for choosing Rebirth Car Coating Center!<br>We look forward to serving you again.</div>'
+    +'</div></div>';
+}
+
+function pwSettingsScr() {
+  return '<div style="padding:50px 28px 40px;text-align:center">'
+    +'<div style="width:68px;height:68px;border-radius:18px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;margin:0 auto 20px"><i class="ti ti-settings" style="font-size:34px;color:#64748b"></i></div>'
+    +'<div style="font-size:20px;font-weight:600;margin-bottom:7px">Settings</div>'
+    +'<div style="font-size:14px;color:#64748b;margin-bottom:28px">Staff access only.</div>'
+    +(S.pwErr?'<div style="background:#fef2f2;color:#dc2626;padding:11px 18px;border-radius:8px;font-size:14px;margin-bottom:16px">Incorrect password.</div>':'')
+    +'<input id="pw-set-inp" type="password" class="inp" style="max-width:300px;text-align:center;font-size:24px;letter-spacing:8px;margin:0 auto 18px;display:block" placeholder="..." onkeydown="if(event.key===\'Enter\')checkPwSettings()" oninput="S.pw=this.value">'
+    +'<button class="btn-r" style="min-width:220px;font-size:16px;margin-bottom:18px" onclick="checkPwSettings()">Open Settings</button><br>'
+    +'<button class="btn-sm" style="margin:0 auto;display:inline-flex" onclick="go(\'home\')"><i class="ti ti-arrow-left"></i> Back to home</button>'
+    +'</div>';
+}
+function settingsScr() {
+  return '<div style="padding:20px"><button class="btn-sm" onclick="go(\'home\')" style="margin-bottom:14px"><i class="ti ti-arrow-left"></i> Home</button>'
+    +'<div class="card"><div class="sec">Google Sheets sync</div>'
+    +'<div style="background:#eff6ff;color:#1d4ed8;border:0.5px solid #bfdbfe;border-radius:8px;padding:12px 14px;font-size:13px;margin-bottom:16px"><strong>Push</strong>: app → Sheets &nbsp;|&nbsp; <strong>Pull</strong>: Sheets → app</div>'
+    +'<div style="display:flex;gap:10px;margin-bottom:14px"><button class="btn-r" style="flex:1" onclick="pushToSheets()" '+(S.syncing?'disabled':'')+'><i class="ti ti-upload"></i> '+(S.syncing?'Syncing...':'Push to Sheets')+'</button><button class="btn-g" style="flex:1" onclick="pullFromSheets()" '+(S.syncing?'disabled':'')+'><i class="ti ti-download"></i> '+(S.syncing?'Syncing...':'Pull from Sheets')+'</button></div>'
+    +'<div class="field" style="margin-bottom:12px"><label>Apps Script URL</label><input class="inp" style="color:#111" value="'+esc(S.url)+'" placeholder="https://script.google.com/macros/s/..." oninput="S.url=this.value"></div>'
+    +'<div style="text-align:right"><button class="btn-r" onclick="saveUrl()">Save URL</button></div>'
+    +'</div></div>';
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function refLabel(method) {
+  if (!method) return 'Ref #';
+  var m = method.toLowerCase();
+  if (m.indexOf('gcash') >= 0) return 'GCash Ref #';
+  if (m.indexOf('bank') >= 0) return 'Bank Ref #';
+  if (m.indexOf('credit') >= 0 || m.indexOf('card') >= 0) return 'Card Ref #';
+  return 'OR #';
+}
+
+// ── Signature functions ────────────────────────────────────────
+function initSignature(canvasId) {
+  var id = canvasId || 'sig-canvas';
+  var canvas = document.getElementById(id);
+  if (!canvas || canvas._initialized) return;
+  canvas._initialized = true;
+  canvas._id = id;
+  var ctx = canvas.getContext('2d');
+  ctx.strokeStyle = '#111';
+  ctx.lineWidth = 2.5;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  var drawing = false;
+
+  function getPos(e) {
+    var rect = canvas.getBoundingClientRect();
+    var touch = e.touches ? e.touches[0] : e;
+    return {
+      x: (touch.clientX - rect.left) * (canvas.width / rect.width),
+      y: (touch.clientY - rect.top) * (canvas.height / rect.height)
+    };
+  }
+  canvas.addEventListener('touchstart', function(e){
+    e.preventDefault(); drawing=true;
+    var p=getPos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y);
+  },{passive:false});
+  canvas.addEventListener('touchmove', function(e){
+    e.preventDefault(); if(!drawing)return;
+    var p=getPos(e); ctx.lineTo(p.x,p.y); ctx.stroke();
+  },{passive:false});
+  canvas.addEventListener('touchend', function(){drawing=false;});
+  canvas.addEventListener('mousedown', function(e){
+    drawing=true; var p=getPos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y);
+  });
+  canvas.addEventListener('mousemove', function(e){
+    if(!drawing)return; var p=getPos(e); ctx.lineTo(p.x,p.y); ctx.stroke();
+  });
+  canvas.addEventListener('mouseup', function(){drawing=false;});
+  canvas.addEventListener('mouseleave', function(){drawing=false;});
+}
+
+// ── Deposit Signature functions ────────────────────────────────
+
+async function skipDepSignature() {
+  if (_submitting) return;
+  _submitting = true;
+  if (S.depInfo) {
+    S.depInfo.signature = '';
+    S.depInfo.signedAt = 'Skip signature';
+  }
+  try {
+    var result = await postToSheets({
+      type:'deposit',
+      date: S.depInfo ? S.depInfo.date : '',
+      appId: S.depInfo ? S.depInfo.appId : '',
+      fn: S.depInfo ? S.depInfo.fn : '',
+      ln: S.depInfo ? S.depInfo.ln : '',
+      phone: S.depInfo ? S.depInfo.phone : '',
+      mdl: S.depInfo ? S.depInfo.mdl : '',
+      plt: S.depInfo ? S.depInfo.plt : '',
+      services: S.depInfo ? S.depInfo.services : '',
+      amount: S.depInfo ? S.depInfo.dep : 0,
+      method: S.depInfo ? S.depInfo.depMeth : '',
+      receivedBy: S.depInfo ? S.depInfo.depStaff : '',
+      note: S.depInfo ? S.depInfo.depNote : '',
+      balance: S.depInfo ? S.depInfo.balance : 0,
+      signedAt: 'Skip signature',
+      skipSignature: true,
+      signatureImage: ''
+    });
+    if (result && result.ok === false) {
+      flash('⚠️ '+(result.error||'Could not save. Please try again.'), 'err');
+      _submitting = false;
+      render();
+      return;
+    }
+    flash('Down Payment recorded. Please sign on final receipt.');
+    _submitting = false;
+    S.savedInfo = {
+      type:'depositSkipped',
+      name: (S.depInfo?S.depInfo.fn:'')+' '+(S.depInfo?S.depInfo.ln:''),
+      date: S.depInfo?S.depInfo.date:'',
+      amount: S.depInfo?S.depInfo.dep:0,
+      method: S.depInfo?S.depInfo.depMeth:'',
+      staff: S.depInfo?S.depInfo.depStaff:'',
+      selId: S.depInfo?S.depInfo.appId:''
+    };
+    go('saved');
+  } catch(e) {
+    flash('⚠️ Connection error: '+e.message+'. Please try again.', 'err');
+    _submitting = false;
+    render();
+  }
+}
+function clearDepSignature() {
+  var canvas = document.getElementById('dep-sig-canvas');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+async function confirmDepSignature() {
+  if (_submitting) return;
+  _submitting = true;
+  document.querySelectorAll('button').forEach(function(b){b.disabled=true;b.style.opacity='0.7';});
+  var canvas = document.getElementById('dep-sig-canvas');
+  if (!canvas) { _submitting=false; return; }
+  var ctx = canvas.getContext('2d');
+  var pixels = ctx.getImageData(0,0,canvas.width,canvas.height).data;
+  var hasContent = false;
+  for (var i=3; i<pixels.length; i+=4) { if(pixels[i]>0){hasContent=true;break;} }
+  if (!hasContent) {
+    alert('Please sign before confirming.');
+    _submitting = false;
+    document.querySelectorAll('button').forEach(function(b){b.disabled=false;b.style.opacity='';});
+    return;
+  }
+
+  var sigData = canvas.toDataURL('image/png');
+  var now = new Date();
+  var sigText = 'Signed \u2713 ' + now.toISOString().split('T')[0] + ' ' + now.toTimeString().slice(0,5);
+
+  if (S.depInfo) {
+    S.depInfo.signature = sigData;
+    S.depInfo.signedAt = sigText;
+  }
+
+  try {
+    var result = await postToSheets({
+      type:'deposit',
+      date: S.depInfo ? S.depInfo.date : '',
+      appId: S.depInfo ? S.depInfo.appId : '',
+      fn: S.depInfo ? S.depInfo.fn : '',
+      ln: S.depInfo ? S.depInfo.ln : '',
+      phone: S.depInfo ? S.depInfo.phone : '',
+      mdl: S.depInfo ? S.depInfo.mdl : '',
+      plt: S.depInfo ? S.depInfo.plt : '',
+      services: S.depInfo ? S.depInfo.services : '',
+      amount: S.depInfo ? S.depInfo.dep : 0,
+      method: S.depInfo ? S.depInfo.depMeth : '',
+      receivedBy: S.depInfo ? S.depInfo.depStaff : '',
+      note: S.depInfo ? S.depInfo.depNote : '',
+      balance: S.depInfo ? S.depInfo.balance : 0,
+      signedAt: sigText,
+      signatureImage: sigData
+    });
+    if (result && result.ok === false) {
+      flash('⚠️ '+(result.error||'Could not save signature. Please try again.'), 'err');
+    } else {
+      flash('Down Payment receipt signed! \u2713');
+    }
+  } catch(e) {
+    flash('⚠️ Connection error: '+e.message+'. Please try again.', 'err');
+  } finally {
+    _submitting = false;
+    document.querySelectorAll('button').forEach(function(b){b.disabled=false;b.style.opacity='';});
+    render();
+  }
+}
+
+// ── Deposit Receipt Screen ──────────────────────────────────────
+function depReceiptScr() {
+  var info = S.depInfo;
+  if (!info) { go('home'); return ''; }
+  var h = [];
+  h.push('<div style="padding:16px">');
+  h.push('<div class="no-print" style="display:flex;gap:8px;margin-bottom:14px">');
+  h.push('<button onclick="go(\'saved\')" style="background:#16a34a;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">&#127968; Skip & Home</button>');
+  if (info.signedAt && info.signedAt !== 'Pending - to sign on final receipt') {
+    h.push('<button onclick="window.print()" style="background:#C41010;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;flex:1">&#128424; Print Down Payment Receipt</button>');
+  }
+  h.push('</div>');
+
+  h.push('<div id="dep-receipt-box" style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;max-width:420px;margin:0 auto;font-family:Arial,sans-serif">');
+
+  // Header
+  h.push('<div style="text-align:center;margin-bottom:16px;padding-bottom:16px;border-bottom:2px solid #111">');
+  h.push('<div style="font-style:italic;font-weight:900;font-size:28px;color:#111;letter-spacing:-1px;font-family:Georgia,serif">REB<span style="color:#C41010">i</span>RTH</div>');
+  h.push('<div style="background:#C41010;color:#fff;font-size:8px;font-weight:700;letter-spacing:.25em;padding:2px 10px;display:inline-block;margin:4px 0;font-style:italic">CAR COATING CENTER INC.</div>');
+  h.push('<div style="font-size:11px;color:#64748b;line-height:1.6;margin-top:6px">4A Naga Road Pulang Lupa Dos Las Pinas City Metro Manila<br>Tel: (02) 3986472</div>');
+  h.push('</div>');
+
+  // Title
+  h.push('<div style="text-align:center;margin-bottom:14px">');
+  h.push('<div style="font-size:15px;font-weight:700;color:#111;text-transform:uppercase;letter-spacing:2px">'+(info.isFullPayment?'Full Payment Receipt':'Down Payment Receipt')+'</div>');
+  h.push('<div style="font-size:11px;color:#64748b;margin-top:4px">Date: ' + esc(info.date||'') + '</div>');
+  h.push('</div>');
+
+  // Customer info
+  h.push('<div style="background:#f8fafc;border-radius:8px;padding:10px 14px;margin-bottom:14px">');
+  h.push('<div style="font-weight:700;font-size:15px;margin-bottom:4px">' + esc(info.fn||'') + ' ' + esc(info.ln||'') + '</div>');
+  if (info.cxId) h.push('<div style="font-size:12px;color:#64748b">&#128273; Customer No.: <strong>' + esc(info.cxId) + '</strong></div>');
+  if (info.phone) h.push('<div style="font-size:12px;color:#64748b">&#128222; ' + esc(info.phone) + '</div>');
+  if (info.mdl) h.push('<div style="font-size:12px;color:#64748b">&#128663; ' + esc(info.mdl) + (info.plt?' | &#128278; '+esc(info.plt):'') + '</div>');
+  if (info.invoiceNo) h.push('<div style="font-size:12px;color:#64748b">&#128203; Invoice No.: <strong>' + esc(info.invoiceNo) + '</strong></div>');
+  if (info.jobOrderNo) h.push('<div style="font-size:12px;color:#64748b">&#128295; Job Order No.: <strong>' + esc(info.jobOrderNo) + '</strong></div>');
+  h.push('</div>');
+
+  // Services
+  h.push('<div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#64748b;margin-bottom:6px">Services</div>');
+  var svcs = (info.services||'').split(', ');
+  svcs.forEach(function(s){ if(s) h.push('<div style="font-size:13px;padding:4px 0;border-bottom:1px solid #f1f5f9">&#10003; ' + esc(s) + '</div>'); });
+
+  // Deposit details
+  h.push('<div style="margin-top:16px;border-top:2px solid #e2e8f0;padding-top:12px">');
+  h.push('<div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px"><span style="color:#64748b">Total Amount:</span><span style="font-weight:700">' + (info.est?fmt(info.est):'—') + '</span></div>');
+  h.push('<div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px"><span style="color:#1d4ed8">'+(info.isFullPayment?'Total Paid:':'Down Payment:')+'</span><span style="font-weight:700;color:#1d4ed8">' + fmt(info.dep) + '</span></div>');
+  h.push('<div style="display:flex;justify-content:space-between;font-size:16px;font-weight:900;border-top:1.5px solid #e2e8f0;padding-top:8px;margin-top:2px"><span>Balance:</span><span style="color:'+(info.balance>0?'#dc2626':'#16a34a')+'">' + fmt(info.balance) + '</span></div>');
+  h.push('<div style="font-size:13px;color:#64748b;margin-top:10px"><strong>Method:</strong> ' + esc(info.depMeth||'—') + '</div>');
+  h.push('<div style="font-size:13px;color:#64748b;margin-bottom:4px"><strong>Received by:</strong> ' + esc(info.depStaff||'—') + '</div>');
+  if (info.depNote) h.push('<div style="font-size:13px;color:#64748b"><strong>Ref#:</strong> ' + esc(info.depNote) + '</div>');
+  h.push('</div>');
+
+  // Signature
+  h.push('<div style="margin-top:16px;padding-top:14px;border-top:2px dashed ' + (info.signedAt?'#16a34a':'#C41010') + '">');
+  if (info.signedAt) {
+    h.push('<div style="font-size:12px;font-weight:700;color:#166534;margin-bottom:8px">&#9989; Customer Signature</div>');
+    if (info.signature) h.push('<img src="' + info.signature + '" style="width:100%;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc">');
+    h.push('<div style="font-size:11px;color:#64748b;margin-top:6px">' + esc(info.signedAt) + '</div>');
+    h.push('<div style="margin-top:14px;text-align:center">');
+    h.push('<button onclick="go(\'saved\')" style="background:#16a34a;color:#fff;border:none;border-radius:8px;padding:14px 28px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;width:100%">&#10003; Done - Back to Home</button>');
+    h.push('</div>');
+  } else {
+    h.push('<div style="font-size:14px;font-weight:700;color:#64748b;margin-bottom:10px">&#9997;&#65039; '+(info.isFullPayment?'Customer Signature':'Customer Signature ')+'</div>');
+    h.push('<canvas id="dep-sig-canvas" width="380" height="150" style="width:100%;height:150px;border:2px solid #cbd5e1;border-radius:8px;background:#fff;touch-action:none;display:block;margin-bottom:10px"></canvas>');
+    h.push('<div style="display:flex;gap:10px">');
+    h.push('<button onclick="clearDepSignature()" style="flex:1;padding:10px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;cursor:pointer;font-family:inherit;font-size:14px;min-height:44px">Clear</button>');
+    h.push('<button onclick="btnLoading(this,confirmDepSignature)" style="flex:2;padding:10px;background:#C41010;color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-size:14px;font-weight:700;min-height:44px">&#9989; Confirm Signature</button>');
+    h.push('</div>');
+    h.push('<button onclick="btnLoading(this,skipDepSignature)" style="width:100%;padding:10px;border:1px solid #94a3b8;border-radius:8px;background:#f8fafc;cursor:pointer;font-family:inherit;font-size:13px;color:#64748b;margin-top:8px;min-height:40px">📱 Online Payment — Skip Signature</button>');
+  }
+  h.push('</div>');
+
+  h.push('<div style="text-align:center;margin-top:16px;padding-top:12px;border-top:1px dashed #e2e8f0;font-size:11px;color:#94a3b8">Thank you for choosing Rebirth Car Coating Center!</div>');
+  h.push('</div>');
+  h.push('</div>');
+  return h.join('');
+}
+// ── Register Existing Customer ─────────────────────────────────
+function existingScr() {
+  var ex = S.ex;
+  var svcOpts = ['PPF','Ceramic Coating','Tint','Paint & Body','Other'];
+  var colOpts = ['White','Black','Silver','Red','Blue','Gray'];
+  var isOtherCol = ex.col && !colOpts.includes(ex.col);
+  var colVal = (isOtherCol && ex.col !== '__other__') ? ex.col : '';
+  var colSel = '<select class="inp" style="color:#111" onchange="var v=this.value;if(v===\'__other__\'){S.ex.col=\'__other__\';render();}else{S.ex.col=v;}">'
+    +'<option value="">Select color...</option>'
+    +colOpts.map(function(c){return '<option value="'+c+'"'+(ex.col===c?' selected':'')+'>'+c+'</option>';}).join('')
+    +'<option value="__other__"'+(isOtherCol?' selected':'')+'>Other (type below)</option></select>'
+    +(isOtherCol?'<input class="inp" style="color:#111;background:#fff;margin-top:8px" value="'+esc(colVal)+'" placeholder="Enter color..." oninput="S.ex.col=this.value">':'');
+
+  var hasPrepaid = ex.prepaidNum && ex.confirmedCard;
+
+  return '<div style="padding:20px">'
+    +'<button class="btn-sm" onclick="go(\'home\')" style="margin-bottom:14px"><i class="ti ti-arrow-left"></i> Back</button>'
+    +'<div style="background:#f3f0ff;border:2px solid #7c3aed;border-radius:12px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:10px">'
+    +'<i class="ti ti-clipboard-list" style="font-size:22px;color:#7c3aed;flex-shrink:0"></i>'
+    +'<div><div style="font-size:15px;font-weight:700;color:#5b21b6">Register Existing Customer</div>'
+    +'<div style="font-size:13px;color:#7c3aed">Past customer not yet in system</div></div></div>'
+
+    // Customer Info
+    +'<div class="card"><div class="sec">Customer information</div>'
+    +'<div class="g2" style="margin-bottom:14px"><div class="field"><label>First name<span class="req">*</span></label><input class="inp" value="'+esc(ex.fn)+'" placeholder="Juan" oninput="S.ex.fn=this.value"></div>'
+    +'<div class="field"><label>Last name<span class="req">*</span></label><input class="inp" value="'+esc(ex.ln)+'" placeholder="dela Cruz" oninput="S.ex.ln=this.value"></div></div>'
+    +'<div class="field" style="margin-bottom:14px"><label>Phone<span class="req">*</span></label>'
+    +'<div style="display:flex;gap:8px;align-items:center">'
+    +'<input class="inp" id="ex-p1" style="width:94px;text-align:center" maxlength="4" value="'+esc(ex.p1)+'" placeholder="0912" oninput="S.ex.p1=this.value.replace(/\\D/g,\'\');if(this.value.length===4)document.getElementById(\'ex-p2\').focus()">'
+    +'<span style="color:#94a3b8;font-size:22px">–</span>'
+    +'<input class="inp" id="ex-p2" style="width:74px;text-align:center" maxlength="3" value="'+esc(ex.p2)+'" placeholder="345" oninput="S.ex.p2=this.value.replace(/\\D/g,\'\');if(this.value.length===3)document.getElementById(\'ex-p3\').focus()">'
+    +'<span style="color:#94a3b8;font-size:22px">–</span>'
+    +'<input class="inp" id="ex-p3" style="width:84px;text-align:center" maxlength="4" value="'+esc(ex.p3)+'" placeholder="6789" oninput="S.ex.p3=this.value.replace(/\\D/g,\'\')"></div></div>'
+    +'<div class="field" style="margin-bottom:0"><label>Registered by<span class="req">*</span></label><select class="inp" style="color:#111" onchange="S.ex.staff=this.value;render()"><option value="">Select staff...</option>'+STAFF.map(function(s){return '<option value="'+s+'"'+(S.ex.staff===s?' selected':'')+'>'+s+'</option>';}).join('')+'<option value="__other__"'+(S.ex.staff&&!STAFF.includes(S.ex.staff)?' selected':'')+'>Other (specify)...</option></select>'+(S.ex.staff&&!STAFF.includes(S.ex.staff)?'<input class="inp" style="color:#111;background:#fff;margin-top:6px" value="'+(S.ex.staff!=='__other__'?esc(S.ex.staff):'')+'"\'  placeholder="Enter name..." oninput="S.ex.staff=this.value">':'')+'</div></div>'
+    +'<div class="g2"><div class="field" style="margin-bottom:12px"><label>Email</label><input type="email" class="inp" value="'+esc(ex.email)+'" placeholder="email@example.com" oninput="S.ex.email=this.value"></div>'
+    +'<div class="field"><label>Address</label><input class="inp" value="'+esc(ex.addr)+'" placeholder="City, Province" oninput="S.ex.addr=this.value"></div></div>'
+
+    // Vehicle Info
+    +'<div class="card"><div class="sec">Vehicle information</div>'
+    +'<div class="g2" style="margin-bottom:14px"><div class="field"><label>Model / make<span class="req">*</span></label><input class="inp" value="'+esc(ex.mdl)+'" placeholder="Toyota Vios..." oninput="S.ex.mdl=this.value"></div>'
+    +'<div class="field"><label>Color<span class="req">*</span></label>'+colSel+'</div></div>'
+    +'<div class="field"><label>License plate<span class="req">*</span></label><input class="inp" value="'+esc(ex.plt)+'" placeholder="ABC 1234" oninput="S.ex.plt=this.value"></div></div>'
+
+    // Past Service
+    +'<div class="card"><div class="sec">Past service type <span style=\"color:#C41010\">*</span></div>'
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">'
++['PPF','Ceramic Coating','Tint','Paint & Body','Other'].map(function(s){
+      var on = (S.ex.svcTypes||[]).includes(s);
+      return '<button type="button" onclick="(function(){var ts=S.ex.svcTypes||[];var idx=ts.indexOf(\''+s+'\');if(idx>=0)ts.splice(idx,1);else ts.push(\''+s+'\');S.ex.svcTypes=ts;render();})()" style="padding:10px 16px;border-radius:8px;font-size:14px;cursor:pointer;border:2.5px solid '+(on?'\'#7c3aed\'':'\'#e2e8f0\'')+';background:'+(on?'\'#7c3aed\'':'\'#fff\'')+';color:'+(on?'\'#fff\'':'\'#64748b\'')+';font-weight:'+(on?700:400)+';font-family:inherit;min-height:44px">'
+        +(on?'✓ ':'')+s+'</button>';
+    }).join('')
+    +'</div>'
+    +((S.ex.svcTypes||[]).includes('Other')?
+      '<div class="field" style="margin-top:4px">'
+      +'<label style="font-size:13px;color:#7c3aed;font-weight:600">Other (please specify)</label>'
+      +'<input class="inp" value="'+esc(S.ex.svcOther||'')+'" placeholder="Describe the past service..." oninput="S.ex.svcOther=this.value">'
+      +'</div>':'')  
+    +'<div style="font-size:12px;color:#94a3b8;margin-top:8px">Multiple selection OK</div></div>'
+
+    // Prepaid Card
+    +'<div class="card-amber"><div style="font-size:16px;font-weight:700;color:#92400e;margin-bottom:4px">🃏 Maintenance Prepaid Card</div>'
+    +'<div style="font-size:12px;color:#b45309;margin-bottom:14px">Leave blank if customer has no card</div>'
+    +'<div style="font-size:13px;color:#78350f;font-weight:500;margin-bottom:8px">① Card number (if any)</div>'
+    +'<input type="text" id="cinp-ex" class="card-num-input" placeholder="e.g. 12345" value="'+esc(ex.prepaidNum)+'" oninput="S.ex.prepaidNum=this.value" autocomplete="off">'
+    +'<button type="button" onclick="confirmExCard()" style="width:100%;padding:14px;background:'+(hasPrepaid?'#15803d':'#d97706')+';color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;min-height:52px;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px">'
+    +(hasPrepaid?'<span>✓</span> Card registered':'<span>🃏</span> Register card number')+'</button>'
+    +(hasPrepaid?'<div style="margin-top:10px;padding:10px 14px;border-radius:8px;background:#f0fdf4;border:2px solid #16a34a;font-size:13px;font-weight:700;color:#166534">✓ Card #'+esc(ex.confirmedCard)+' registered</div>':'')
+
+    // Times used
+    +(ex.confirmedCard?'<div style="margin-top:14px;border-top:1px solid #fde68a;padding-top:12px">'
+    +'<div style="font-size:13px;font-weight:600;color:#92400e;margin-bottom:10px">② Times already used<span class="req">*</span></div>'
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap">'
+    +[0,1,2,3].map(function(n){
+      var on = ex.prepaidUsedInitTouched && ex.prepaidUsedInit===n;
+      return '<button type="button" onclick="setPrepaidUsedInitEx('+n+')" style="padding:10px 18px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;border:2.5px solid '+(on?'#d97706':'#e2e8f0')+';background:'+(on?'#d97706':'#fff')+';color:'+(on?'#fff':'#64748b')+';font-family:inherit;min-height:44px">'+n+'/4'+(n===3?' ★':'')+'</button>';
+    }).join('')+'</div>'
+    +(!ex.prepaidUsedInitTouched?'<div style="margin-top:8px;font-size:12px;color:#dc2626;font-weight:600">⚠️ Required: please select a value above</div>':'')
+    +'</div>':'')
+    +'</div>'
+
+    +(S.err?'<div class="errbox">'+S.err+'</div>':'')
+    +'<div class="acts"><button class="btn-g" onclick="go(\'home\')" '+(S.busy?'disabled':'')+'>Cancel</button>'
+    +'<button class="btn-r" style="background:'+(S.busy?'#94a3b8':'#7c3aed')+';font-size:15px" onclick="btnLoading(this,submitExisting)" '+(S.busy?'disabled':'')+'>'+(S.busy?'⏳ Registering...':'Register customer →')+'</button></div></div>';
+}
+
+function confirmExCard() {
+  var el = document.getElementById('cinp-ex');
+  var val = (el?el.value:'').trim();
+  if (!val) { alert('Please enter a card number first.'); return; }
+  S.ex.prepaidNum = val;
+  S.ex.confirmedCard = val;
+  render();
+}
+
+async function submitExisting() {
+  if (_submitting) return;
+  _submitting = true; S.busy=true; render();
+  var ex = S.ex;
+  if (!ex.fn.trim()||!ex.ln.trim()) { S.err='First and last name required.'; _submitting=false; S.busy=false; render(); return; }
+  if (!ex.p1||!ex.p2||!ex.p3)      { S.err='Phone number required.'; _submitting=false; S.busy=false; render(); return; }
+  if (!ex.staff)                    { S.err='Please select staff.'; _submitting=false; S.busy=false; render(); return; }
+  if (!ex.mdl.trim())               { S.err='Vehicle model is required.'; _submitting=false; S.busy=false; render(); return; }
+  // Color: read from DOM if not set
+  var colEl = document.querySelector('select[onchange*="S.ex.col"]');
+  if (colEl && colEl.value) S.ex.col = colEl.value;
+  var colInp = document.querySelector('input[placeholder*="color"], input[placeholder*="Color"]');
+  if (colInp && colInp.value.trim()) S.ex.col = colInp.value.trim();
+  if (!(ex.col||'').trim())         { S.err='Vehicle color is required.'; _submitting=false; S.busy=false; render(); return; }
+  if (!ex.plt.trim())               { S.err='License plate is required.'; _submitting=false; S.busy=false; render(); return; }
+  if (!ex.svcTypes||!ex.svcTypes.some(function(s){return s;})) { S.err='Please select at least one past service.'; _submitting=false; S.busy=false; render(); return; }
+  if (ex.confirmedCard && !ex.prepaidUsedInitTouched) { S.err='Please select how many times the card has already been used.'; _submitting=false; S.busy=false; render(); return; }
+
+  var rec = {
+    id: Date.now()+'',
+    fn:ex.fn, ln:ex.ln,
+    p1:ex.p1, p2:ex.p2, p3:ex.p3,
+    phone: ex.p1+'-'+ex.p2+'-'+ex.p3,
+    firstVisit: td(),
+    staff: ex.staff||'',
+    addr: ex.addr||'',
+    email: ex.email||'',
+    mdl: ex.mdl||'',
+    col: ex.col||'',
+    plt: ex.plt||'',
+    prepaidNum: ex.confirmedCard||'',
+    prepaidUsed: ex.confirmedCard ? (ex.prepaidUsedInit||0) : 0,
+    visits: [{
+      date: td(),
+      staff: ex.staff||'',
+      svcs: (ex.svcTypes||[]).filter(function(s){return s;}).concat(ex.svcOther?[ex.svcOther]:[]),
+      memo: 'Past service (Existing customer registration)',
+      usedCard: false,
+      prepaidVisitNum: null,
+      pay: {est:'', dep:'', depMeth:'', status:'existing', signedAt:'', signature:''}
+    }]
+  };
+
+  S.cx.push(rec);
+  await saveCx();
+  try { await silentPush(); } catch(e) {}
+  try { await postToSheets({
+    type:'existing_customer', ...rec,
+    services: rec.visits[0].svcs.join(', '),
+    estimate:'', deposit:'',
+    depositMethod:'', depositStaff:'', depositNote:'',
+    memo: 'Registered from existing customer list (past service, retroactive entry)'
+  }); } catch(e) { console.log('Sheets error:', e); }
+
+  S.savedInfo = {type:'existing', name:rec.fn+' '+rec.ln, date:rec.firstVisit, staff:rec.staff,
+    svcs:rec.visits[0].svcs, card:rec.prepaidNum, selId:rec.id};
+  S.ex = {fn:'',ln:'',p1:'',p2:'',p3:'',addr:'',email:'',mdl:'',col:'',plt:'',staff:'',
+    svcTypes:[],svcOther:'',prepaidNum:'',prepaidUsedInit:0,prepaidUsedInitTouched:false,confirmedCard:''};
+  S.err='';
+  _submitting = false; S.busy = false;
+  go('saved');
+}
+async function skipSignature() {
+  if (_submitting) return;
+  _submitting = true;
+  var c = S.sel; if(!c) { _submitting=false; return; }
+  var vidx = S.payVidx!=null ? S.payVidx : (c.visits||[]).length-1;
+  var now = new Date();
+  var skipText = 'Skipped (online) ' + now.toISOString().split('T')[0];
+  S.cx = S.cx.map(function(cx){
+    if(cx.id!==c.id) return cx;
+    return Object.assign({},cx,{visits:cx.visits.map(function(v,i){
+      if(i!==vidx) return v;
+      return Object.assign({},v,{pay:Object.assign({},v.pay,{signedAt:skipText})});
+    })});
+  });
+  S.sel = S.cx.find(function(x){return x.id===c.id;});
+  await saveCx();
+  await silentPush();
+  // 署名スキップの場合も、頭金と同様にバックエンドへ通知し、
+  // レシートPDFの生成・03_Payments/Flat_Records/担当者シートの更新を行う
+  try {
+    var result = await postToSheets({
+      type:'signature',
+      id:c.id,
+      fn:c.fn||'', ln:c.ln||'',
+      visitDate:(c.visits||[])[vidx]?c.visits[vidx].date:'',
+      signedAt:skipText,
+      signatureImage:''
+    });
+    if (result && result.ok === false) {
+      flash('⚠️ '+(result.error||'Could not save signature. Please try again.'), 'err');
+      _submitting = false;
+      document.querySelectorAll('button').forEach(function(b){b.disabled=false;b.style.opacity='';});
+      render();
+      return;
+    }
+    var v = (c.visits||[])[vidx];
+    var pay = v ? v.pay||{} : {};
+    S.savedInfo = {
+      type:'paymentSkipped',
+      name: (c.fn||'')+' '+(c.ln||''),
+      date: v?v.date:'',
+      amount: pay.final||pay.est||0,
+      staff: v?v.staff:'',
+      selId: c.id
+    };
+    _submitting = false;
+    document.querySelectorAll('button').forEach(function(b){b.disabled=false;b.style.opacity='';});
+    go('saved');
+  } catch(e) {
+    flash('⚠️ Connection error: '+e.message+'. Please try again.', 'err');
+    _submitting = false;
+    document.querySelectorAll('button').forEach(function(b){b.disabled=false;b.style.opacity='';});
+    render();
+  }
+}
+
+function clearSignature() {
+  var canvas = document.getElementById('sig-canvas');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+async function confirmSignature() {
+  if (_submitting) return;
+  _submitting = true;
+  document.querySelectorAll('button').forEach(function(b){b.disabled=true;b.style.opacity='0.7';});
+  var canvas = document.getElementById('sig-canvas');
+  if (!canvas) { _submitting=false; return; }
+  var ctx = canvas.getContext('2d');
+  var pixels = ctx.getImageData(0,0,canvas.width,canvas.height).data;
+  var hasContent = false;
+  for (var i=3; i<pixels.length; i+=4) { if(pixels[i]>0){hasContent=true;break;} }
+  if (!hasContent) {
+    alert('Please sign before confirming.');
+    _submitting = false;
+    document.querySelectorAll('button').forEach(function(b){b.disabled=false;b.style.opacity='';});
+    return;
+  }
+
+  var sigData = canvas.toDataURL('image/png');
+  var now = new Date();
+  var sigText = 'Signed \u2713 ' + now.toISOString().split('T')[0] + ' ' + now.toTimeString().slice(0,5);
+
+  var c = S.sel;
+  if(!c) { _submitting=false; document.querySelectorAll('button').forEach(function(b){b.disabled=false;b.style.opacity='';}); return; }
+  var vidx = S.payVidx!=null ? S.payVidx : (c.visits||[]).length-1;
+
+  S.cx = S.cx.map(function(cx){
+    if(cx.id!==c.id) return cx;
+    return Object.assign({},cx,{visits:cx.visits.map(function(v,i){
+      if(i!==vidx) return v;
+      return Object.assign({},v,{pay:Object.assign({},v.pay,{finalSignature:sigData,finalSignedAt:sigText})});
+    })});
+  });
+  S.sel = S.cx.find(function(x){return x.id===c.id;});
+  await saveCx();
+
+  try {
+    await silentPush(); // 自動バックアップ
+    var result = await postToSheets({
+      type:'signature',
+      id:c.id,
+      fn:c.fn||'', ln:c.ln||'',
+      visitDate:(c.visits||[])[vidx]?c.visits[vidx].date:'',
+      signedAt:sigText,
+      signatureImage:sigData
+    });
+    if (result && result.ok === false) {
+      flash('⚠️ '+(result.error||'Could not save signature. Please try again.'), 'err');
+    } else {
+      flash('Signature saved! \u2713');
+    }
+  } catch(e) {
+    flash('⚠️ Connection error: '+e.message+'. Please try again.', 'err');
+  } finally {
+    _submitting = false;
+    document.querySelectorAll('button').forEach(function(b){b.disabled=false;b.style.opacity='';});
+    render();
+  }
+}
+
+
+
+
+
+function setDepStaff(isV, v) {
+  if (isV) { S.vf.pay.depStaff = v; } else { S.f.pay.depStaff = v; }
+  render();
+}
+function saveDepStaff(isV, v) {
+  if (isV) { S.vf.pay.depStaff = v; } else { S.f.pay.depStaff = v; }
+}
+function setEstimate(isV, v) {
+  if (isV) { S.vf.pay.est=v; if(S.vf.pay.payFull) S.vf.pay.dep=v; }
+  else      { S.f.pay.est=v;  if(S.f.pay.payFull)  S.f.pay.dep=v;  }
+  // render() は呼ばない → タイプ中に画面上部に飛ばない
+}
+function setDepAmt(isV, v) {
+  if (isV) S.vf.pay.dep=v; else S.f.pay.dep=v;
+}
+function setDepDate(isV, v) {
+  if (isV) S.vf.pay.depDate=v; else S.f.pay.depDate=v;
+}
+function setDepMeth(isV, v) {
+  if (isV) S.vf.pay.depMeth=v; else S.f.pay.depMeth=v;
+  render();
+}
+function setDepNote(isV, v) {
+  if (isV) S.vf.pay.depNote=v; else S.f.pay.depNote=v;
+}
+function togglePayFull(isV) {
+  var p = isV ? S.vf.pay : S.f.pay;
+  p.payFull = !p.payFull;
+  if (p.payFull) {
+    p.dep = p.est;
+  } else {
+    p.dep = '';
+    p.depMeth = '';
+  }
+  render();
+}
+function saveStaffName(field, v) {
+  if (field === 'new_st')   S.f.st = v;
+  if (field === 'ret_st')   S.vf.st = v;
+  if (field === 'payStaff') S.pf.payStaff = v;
+  if (field === 'ex_staff') S.ex.staff = v;
+  if (field === 'ev_staff') S.evStaff = v;
+}
+function fmtVisitDate(d) {
+  if (!d) return '';
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  // ISO format "2026-07-31"
+  if (/^\d{4}-\d{2}-\d{2}/.test(d)) {
+    var parts = d.split('-');
+    return months[parseInt(parts[1])-1] + ' ' + parseInt(parts[2]) + ', ' + parts[0];
+  }
+  // "2026/07/31"
+  if (/^\d{4}\/\d{2}\/\d{2}/.test(d)) {
+    var p2 = d.split('/');
+    return months[parseInt(p2[1])-1] + ' ' + parseInt(p2[2]) + ', ' + p2[0];
+  }
+  // "Fri Jul 28 2026 ..." or similar with year
+  var dt = new Date(d);
+  if (!isNaN(dt.getTime()) && dt.getFullYear() > 2000) {
+    return months[dt.getMonth()] + ' ' + dt.getDate() + ', ' + dt.getFullYear();
+  }
+  return d; // unknown format, show as-is
+}
+function setInvoiceNo(isV, v) {
+  if (isV) S.vf.pay.invoiceNo = v; else S.f.pay.invoiceNo = v;
+}
+function toggleNoPayment(isV) {
+  var p = isV ? S.vf.pay : S.f.pay;
+  p.noPayment = !p.noPayment;
+  if (p.noPayment) { p.est = '0'; p.dep = ''; p.depMeth = ''; }
+  render();
+}
+function renderList() {
+  S.lq = S.lq||'';
+  var el = document.getElementById('cx-search');
+  var pos = el ? el.selectionStart : null;
+  render();
+  // Restore focus and cursor position
+  setTimeout(function() {
+    var el2 = document.getElementById('cx-search');
+    if (el2) {
+      el2.focus();
+      if (pos !== null) {
+        try { el2.setSelectionRange(pos, pos); } catch(e){}
+      }
+    }
+  }, 0);
+}
+// ── Sheets-First: シートから顧客を取得 ───────────────────────────
+async function fetchCxFromSheets(q, by) {
+  if (!S.url) return null;
+  try {
+    var url = S.url + '?action=search&q=' + encodeURIComponent(q||'') + '&by=' + encodeURIComponent(by||'ln');
+    var ctrl2 = new AbortController();
+    var timer2 = setTimeout(function(){ ctrl2.abort(); }, 10000); // 10秒タイムアウト
+    var r = await fetch(url, {signal: ctrl2.signal});
+    clearTimeout(timer2);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    var text = await r.text();
+    var d;
+    try { d = JSON.parse(text); } catch(pe) { throw new Error('Invalid JSON: ' + text.slice(0,100)); }
+    if (d.ok === false && d.error) {
+      flash('GS Error: ' + d.error, 'err');
+      return null;
+    }
+    if (!Array.isArray(d.customers) && d.ok === true && !d.count) {
+      flash('⚠️ Apps Script not updated. Please redeploy with NEW VERSION.', 'err');
+      return null;
+    }
+    return d.customers || []; // 本当に0件ならここで空配列
+  } catch(e) {
+    flash('Connection error: ' + e.message, 'err');
+    return null; // 通信失敗はnull（0件とは区別する）
+  }
+}
+
+async function fetchOneCxFromSheets(appId, _isRetry) {
+  if (!S.url) return null;
+  try {
+    var ctrl = new AbortController();
+    var timer = setTimeout(function(){ ctrl.abort(); }, 15000); // 15秒タイムアウト
+    var r = await fetch(S.url+'?action=getCx&appId='+encodeURIComponent(appId),
+      {signal: ctrl.signal});
+    clearTimeout(timer);
+    var d = await r.json();
+    return d.customer || null;
+  } catch(e) {
+    if (!_isRetry) return fetchOneCxFromSheets(appId, true); // 1回だけ自動リトライ
+    return null;
+  }
+}
+async function startEditVisit(cxId, vidx) {
+  const c = S.sel; if (!c) return;
+  const vs = c.visits||[];
+  if (parseInt(vidx) !== vs.length-1) {
+    flash('Only the most recent service history can be edited.', 'err');
+    return;
+  }
+  S.editVidx = vidx;
+  S.evStaff = '';
+  S.err = '';
+  S.vf = S.vf || {};
+  S.vf.svs = svcStringsToSvs(vs[vidx].svcs);
+  S.vf.newCardNum = '';
+  S.vf.confirmedCard = c.prepaidNum||''; // 既にカードを持っていれば、そのまま登録済み扱いにする
+  S.evInv = vs[vidx].invoiceNo||'';
+  S.evJob = vs[vidx].jobOrderNo||'';
+  S.evEst = (vs[vidx].pay&&vs[vidx].pay.est)||'';
+  go('editVisit');
+}
+
+function editVisitScr() {
+  const c = S.sel; if (!c) return '';
+  const vi = parseInt(S.editVidx);
+  const v = (c.visits||[])[vi]; if (!v) return '';
+  const p = v.pay||{};
+  const pOn = S.vf.svs[SVC.findIndex(x=>x.id==='prepaid')]?.on;
+
+  return '<div style="padding:20px">'
+    +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">'
+    +'<button class="btn-g" onclick="go(\'prof\')">← Back</button>'
+    +'<div style="font-size:16px;font-weight:700">✏️ Edit Service History</div>'
+    +'</div>'
+    +'<div class="card">'
+    +'<div class="sec">Job Numbers</div>'
+    +'<div class="g2">'
+    +'<div class="field"><label>Invoice No.<span class="req">*</span></label>'
+    +'<input class="inp" id="ev-inv" style="color:#111;background:#fff" value="'+esc(S.evInv||'')+'" oninput="S.evInv=this.value" placeholder="e.g. 1801"></div>'
+    +'<div class="field"><label>Job Order No.<span class="req">*</span></label>'
+    +'<input class="inp" id="ev-job" style="color:#111;background:#fff" value="'+esc(S.evJob||'')+'" oninput="S.evJob=this.value" placeholder="e.g. JO-001"></div>'
+    +'</div></div>'
+    +'<div class="card">'
+    +'<div class="sec">Services</div>'
+    +svcPick(S.vf.svs, true)
+    +(pOn?cardInputSec(true):'')
+    +'</div>'
+    +'<div class="card">'
+    +'<div class="sec">Estimate</div>'
+    +'<div class="field"><label>Estimate amount ₱ *</label>'
+    +'<input type="number" class="inp" id="ev-est" style="color:#111;background:#fff;font-size:20px;font-weight:700" value="'+esc(S.evEst||'')+'" oninput="S.evEst=this.value" onfocus="this.select()"></div>'
+    +'</div>'
+    +'<div class="card">'
+    +'<div class="sec">Who is making this change?</div>'
+    +'<div class="field"><label>Edited by<span class="req">*</span></label>'
+    +'<select class="inp" style="color:#111" onchange="saveStaffName(\'ev_staff\',this.value);render()"><option value="">Select staff...</option>'
+    +STAFF.map(s=>'<option value="'+s+'"'+(S.evStaff===s?' selected':'')+'>'+s+'</option>').join('')
+    +'<option value="__other__"'+(S.evStaff&&!STAFF.includes(S.evStaff)?' selected':'')+'>Other (specify)...</option>'
+    +'</select>'
+    +(S.evStaff&&!STAFF.includes(S.evStaff)?'<input class="inp" style="color:#111;background:#fff;margin-top:6px" value="'+esc(S.evStaff!=='__other__'?S.evStaff:'')+'" placeholder="Enter name..." oninput="saveStaffName(\'ev_staff\',this.value)">':'')
+    +'</div></div>'
+    +(S.err?'<div class="errbox" style="margin:12px 0">'+S.err+'</div>':'')
+    +'<div style="margin-top:16px">'
+    +'<button class="btn-r" style="width:100%;font-size:16px" onclick="saveEditVisit()">💾 Save Changes</button>'
+    +'</div></div>';
+}
+
+async function saveEditVisit() {
+  const c = S.sel; if (!c) return;
+  const vi = parseInt(S.editVidx);
+  const v = (c.visits||[])[vi]; if (!v) return;
+  if (vi !== (c.visits||[]).length-1) {
+    flash('Only the most recent service history can be edited.', 'err');
+    go('prof');
+    return;
+  }
+  const invVal = (S.evInv||'').trim();
+  const jobVal = (S.evJob||'').trim();
+  const estVal = (S.evEst!==undefined && S.evEst!==null && String(S.evEst).trim()!=='') ? String(S.evEst).trim() : '';
+  if (!invVal) { S.err='Invoice No. is required.'; render(); return; }
+  if (!jobVal) { S.err='Job Order No. is required.'; render(); return; }
+  if (!S.evStaff || S.evStaff==='__other__') { S.err='Please select who is making this edit.'; render(); return; }
+  const pOn = S.vf.svs[SVC.findIndex(x=>x.id==='prepaid')]?.on;
+  if (pOn && !S.vf.confirmedCard) { S.err='Please register the prepaid card number.'; render(); return; }
+
+  const newSvcs = getSvcs(S.vf.svs||ms());
+  const newEst  = estVal || (v.pay.est||'');
+  const editedBy = S.evStaff;
+  const newCardNum = pOn ? (S.vf.confirmedCard||'') : (c.prepaidNum||'');
+
+  // ── Amendment: 元の記録はそのまま保存 ──────────────────────
+  // 変更があった場合のみ、amendmentを追加
+  const changed =
+    invVal !== (v.invoiceNo||'') ||
+    jobVal !== (v.jobOrderNo||'') ||
+    newSvcs.join(',') !== (v.svcs||[]).join(',') ||
+    newEst !== (v.pay.est||'');
+
+  if (!changed) { go('prof'); return; }
+
+  // 元の記録にamendment参照を追加
+  v.hasAmendment = true;
+
+  // 新しいamendmentレコードを作成（元の隣に追加）
+  // 見積額(est)が変わった場合、残金(balance)・ステータスも新しい見積額を基準に再計算する
+  const oldDep = parseFloat((v.pay&&v.pay.dep)||0);
+  const newBalNum = Math.max(0, parseFloat(newEst||0) - oldDep);
+  const newStatus = (newBalNum<=0 && parseFloat(newEst||0)>0) ? 'completed'
+    : (oldDep>0 ? 'deposit' : ((v.pay&&v.pay.status)||'pending'));
+  const amendment = {
+    date:       v.date,
+    staff:      v.staff,
+    editedBy:   editedBy,
+    invoiceNo:  invVal,
+    jobOrderNo: jobVal,
+    svcs:       newSvcs,
+    memo:       v.memo||'',
+    usedCard:   v.usedCard,
+    visitType:  'Amendment',
+    amendedAt:  new Date().toISOString().slice(0,10),
+    originalIdx: vi,
+    pay: Object.assign({}, v.pay, {est: newEst, final: newEst, balance: String(newBalNum), status: newStatus})
+  };
+
+  // カード番号が新しく登録・変更された場合、顧客情報にも反映する
+  if (pOn && newCardNum && newCardNum !== (c.prepaidNum||'')) {
+    c.prepaidNum = newCardNum;
+    const ci0 = S.cx.findIndex(function(cx){ return cx.id===c.id; });
+    if (ci0>=0) S.cx[ci0].prepaidNum = newCardNum;
+  }
+
+  // visitsにamendmentを挿入（元の直後）
+  c.visits.splice(vi+1, 0, amendment);
+
+  S.err = '';
+
+  // ローカルキャッシュ更新
+  const ci = S.cx.findIndex(function(cx){ return cx.id===c.id; });
+  if (ci>=0) S.cx[ci] = c;
+  await saveCx();
+
+  // Sheetsに追記（上書きではなく新規行として）
+  if (S.url) {
+    try {
+      await postToSheets({
+        type: 'amendment',
+        id:   c.id,
+        originalInvoiceNo:  v.invoiceNo||'',
+        originalJobOrderNo: v.jobOrderNo||'',
+        originalServices:   (v.svcs||[]).join(', '),
+        originalEstimate:   v.pay.est||'',
+        newInvoiceNo:   amendment.invoiceNo,
+        newJobOrderNo:  amendment.jobOrderNo,
+        newServices:    amendment.svcs.join(', '),
+        newEstimate:    newEst,
+        existingDeposit: oldDep,
+        amendedAt:      amendment.amendedAt,
+        editedBy:       editedBy,
+        prepaidNum:     pOn ? newCardNum : '',
+        fn: c.fn, ln: c.ln, date: v.date
+      });
+    } catch(e) {}
+  }
+
+  flash('✅ Amendment saved. Original record preserved.');
+  go('prof');
+}
+function localSearch(q, sb) {
+  if (!q) return [...S.cx];
+  const ql = (q||'').toLowerCase().trim();
+  const mode = sb||'ln';
+  return S.cx.filter(function(c) {
+    if (mode==='p4') {
+      var digits = ql.replace(/[^0-9]/g,'');
+      var last4  = (c.phone||'').replace(/[^0-9]/g,'').slice(-4);
+      return digits && last4.includes(digits);
+    }
+    if (mode==='em') return (c.email||'').toLowerCase().includes(ql);
+    if (mode==='pl') return (c.plt||'').toLowerCase().includes(ql);
+    // 'ln'（名前）: 姓・名・フルネームのみを対象にする（電話番号や車種等は含めない）
+    var haystack = [
+      c.fn||'', c.ln||'', (c.fn||'')+' '+(c.ln||''), (c.ln||'')+' '+(c.fn||'')
+    ].join(' ').toLowerCase();
+    return haystack.includes(ql);
+  });
+}
+
+let _searchSeq = 0;
+async function doSearch() {
+  const q = (S.sq||'').trim();
+  const sb = S.sb||'ln';
+  const seq = ++_searchSeq; // このリクエスト固有の連番
+  if (!q) { S.res=[]; S.searching=false; render(); return; }
+
+  // Sheetsが設定されている場合は、古いキャッシュを一瞬表示することを避けるため、
+  // 「検索中」の状態にしてサーバーからの正式な結果が届くまで待つ
+  if (S.url) {
+    S.res = [];
+    S.searching = true;
+    render();
+
+    S.busy = false;
+    try {
+      var results = await fetchCxFromSheets(q, sb);
+      if (seq !== _searchSeq) return; // 後から別の検索が始まっていたら、この古い結果は破棄
+      if (results !== null) {
+        // バックエンドから正常に応答があった場合は、その結果を正として採用する
+        S.res = results;
+        results.forEach(function(sc) {
+          var i = S.cx.findIndex(function(lc){ return lc.id===sc.id||lc.cxId===sc.cxId; });
+          if (i>=0) S.cx[i]=Object.assign(S.cx[i],sc); else S.cx.push(sc);
+        });
+      } else {
+        // 通信に失敗した場合のみ、やむを得ずローカルキャッシュにフォールバック
+        S.res = localSearch(q, sb);
+        flash('⚠️ Could not reach Sheets. Showing locally cached results.', 'err');
+      }
+    } catch(e) {
+      S.res = localSearch(q, sb);
+    }
+    S.searching = false;
+    if (seq === _searchSeq) render();
+  } else {
+    // Apps Script URL未設定の場合は、ローカル検索のみで表示する
+    S.res = localSearch(q, sb);
+    S.searching = false;
+    render();
+  }
+}
+
+let _openSeq = 0;
+async function openCx(id, from) {
+  S.prevScr = from||'ret';
+  S.confirmDel = false;
+  // キャッシュとres両方から検索
+  var cx = S.cx.find(function(c){ return c.id===id||c.cxId===id; });
+  if (!cx && S.res) cx = S.res.find(function(c){ return c.id===id||c.cxId===id; });
+  if (!cx) { flash('Customer not found','err'); return; }
+  S.sel = cx;
+  S.selLoadErr = false;
+  S.selLoading = true;
+  const seq = ++_openSeq; // この顧客オープン処理固有の連番
+  go('prof');
+  // バックグラウンドでvisitsを取得
+  if (S.url) {
+    try {
+      var full = await fetchOneCxFromSheets(id);
+      if (seq !== _openSeq) return; // 後から別の顧客が開かれていたら、この古い結果は破棄
+      if (full) {
+        if ((!full.visits||full.visits.length===0)&&(cx.visits||[]).length>0) full.visits=cx.visits;
+        S.sel = full;
+        S.selLoadErr = false;
+        var ci = S.cx.findIndex(function(c){ return c.id===full.id||c.cxId===full.cxId; });
+        if (ci>=0) S.cx[ci]=full; else S.cx.push(full);
+        S.selLoading = false;
+        if (S.scr==='prof') render();
+      } else {
+        S.selLoadErr = true;
+        S.selLoading = false;
+        if (S.scr==='prof') render();
+      }
+    } catch(e) {
+      if (seq !== _openSeq) return;
+      S.selLoadErr = true;
+      S.selLoading = false;
+      if (S.scr==='prof') render();
+    }
+  } else {
+    S.selLoading = false;
+  }
+}
+async function retryOpenCx() {
+  var c = S.sel; if (!c) return;
+  await openCx(c.id, S.prevScr);
+}
+function btnLoading(el, fn) {
+  var origBg = el.style.background;
+  var origText = el.textContent;
+  el.style.background = '#94a3b8';
+  el.style.pointerEvents = 'none';
+  el.textContent = '⏳ Processing...';
+  var result = fn();
+  // async functionの場合、エラー時にボタンを復元
+  if (result && typeof result.then === 'function') {
+    result.catch(function(e) {
+      el.style.background = origBg;
+      el.style.pointerEvents = '';
+      el.textContent = origText;
+      console.error('Submit error:', e);
+    });
+  }
+}
+// ══════════════════════════════════════════════════════════════
+// 復元された関数群（誤って削除されていたため再構築）
+// ══════════════════════════════════════════════════════════════
+
+const APP_PW = 'rebirth';
+
+// ── Sheetsへの汎用送信 ───────────────────────────────────────────
+async function postToSheets(payload) {
+  if (!S.url) return {ok:false, error:'No Apps Script URL set'};
+  try {
+    var ctrl = new AbortController();
+    // レシートPDF生成・Google Driveへのアップロードは時間がかかることがあるため、
+    // 60秒の猶予を持たせつつ、それでも応答が無い場合はタイムアウトさせて画面が固まらないようにする
+    var timer = setTimeout(function(){ ctrl.abort(); }, 60000);
+    var res = await fetch(S.url, {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      body: JSON.stringify(payload),
+      signal: ctrl.signal
+    });
+    clearTimeout(timer);
+    var text = await res.text();
+    try { return JSON.parse(text); } catch(pe) { return {ok:true}; }
+  } catch(e) {
+    console.log('postToSheets error:', e);
+    var isTimeout = e && e.name === 'AbortError';
+    return {ok:false, error: isTimeout ? 'Request timed out. Please check your connection and try again.' : e.message};
+  }
+}
+
+// ── バックグラウンド自動バックアップ（軽量ping） ───────────────────
+async function silentPush() {
+  if (!S.url) return;
+  try { await postToSheets({type:'push_all'}); } catch(e) {}
+}
+
+// ── 設定画面：手動Push/Pull ────────────────────────────────────
+async function pushToSheets() {
+  if (!S.url) { flash('Please enter and save the Apps Script URL first.', 'err'); return; }
+  S.syncing = true; render();
+  try {
+    await postToSheets({type:'push_all'});
+    flash('✅ Pushed to Sheets.');
+  } catch(e) {
+    flash('Push failed: '+e.message, 'err');
+  }
+  S.syncing = false; render();
+}
+
+async function pullFromSheets() {
+  if (!S.url) { flash('Please enter and save the Apps Script URL first.', 'err'); return; }
+  S.syncing = true; render();
+  try {
+    var r = await fetch(S.url+'?action=get');
+    var d = await r.json();
+    if (d.ok && Array.isArray(d.customers)) {
+      d.customers.forEach(function(sc) {
+        var i = S.cx.findIndex(function(lc){ return lc.id===sc.id||lc.cxId===sc.cxId; });
+        if (i>=0) S.cx[i]=Object.assign({},S.cx[i],sc); else S.cx.push(sc);
+      });
+      await saveCx();
+      flash('✅ Pulled '+d.customers.length+' customer(s) from Sheets.');
+    } else {
+      flash('Pull failed: '+(d.error||'unknown error'), 'err');
+    }
+  } catch(e) {
+    flash('Pull failed: '+e.message, 'err');
+  }
+  S.syncing = false; render();
+}
+
+async function saveUrl() {
+  try { await store.set('url', S.url||''); } catch(e) {}
+  flash('Apps Script URL saved.');
+  render();
+}
+
+// ── パスワード ───────────────────────────────────────────────
+function openPwSettings() {
+  S.pw=''; S.pwErr=false;
+  go('pwSettings');
+}
+function checkPw() {
+  if ((S.pw||'').trim() === APP_PW) {
+    S.pw=''; S.pwErr=false;
+    go('ret');
+  } else {
+    S.pwErr = true;
+    render();
+  }
+}
+function checkPwSettings() {
+  if ((S.pw||'').trim() === APP_PW) {
+    S.pw=''; S.pwErr=false;
+    go('settings');
+  } else {
+    S.pwErr = true;
+    render();
+  }
+}
+
+// ── サービス選択トグル ─────────────────────────────────────────
+function tog(i, isV) {
+  var svs = isV ? S.vf.svs : S.f.svs;
+  svs[i].on = !svs[i].on;
+  if (svs[i].on) {
+    var def = SVC[i];
+    if (def && def.opts && def.opts.length && !svs[i].opt) svs[i].opt = def.opts[0];
+  } else {
+    svs[i].opt = '';
+  }
+  render();
+}
+function setOpt(i, opt, isV) {
+  var svs = isV ? S.vf.svs : S.f.svs;
+  svs[i].opt = opt;
+  render();
+}
+
+// ── プリペイドカード確認 ────────────────────────────────────────
+function setPrepaidUsedInitEx(n) {
+  S.ex.prepaidUsedInit = n;
+  S.ex.prepaidUsedInitTouched = true;
+  render();
+}
+function setPrepaidUsedInit(isV, n) {
+  var st = isV ? S.vf : S.f;
+  st.prepaidUsedInit = n;
+  st.prepaidUsedInitTouched = true;
+  render();
+}
+function confirmCard(isV) {
+  var id = isV ? 'cinp-ret' : 'cinp-new';
+  var el = document.getElementById(id);
+  var val = (el?el.value:'').trim();
+  if (!val) { alert('Please enter a card number first.'); return; }
+  if (isV) { S.vf.newCardNum = val; S.vf.confirmedCard = val; }
+  else     { S.f.prepaidNum = val; S.f.confirmedCard = val; }
+  render();
+}
+
+// ── ステップバー（新規登録ウィザード） ─────────────────────────
+function stepBar(cur) {
+  return stepsBar(['Customer','Vehicle','Services','Confirm'], cur);
+}
+
+// ── 入力バリデーション：新規顧客 Step1 → Step2 ─────────────────
+function val1() {
+  var f = S.f;
+  var invEl = document.getElementById('new1-invoice');
+  var jobEl = document.getElementById('new1-joborder');
+  if (invEl) f.invoiceNo = invEl.value.trim();
+  if (jobEl) f.jobOrderNo = jobEl.value.trim();
+  // 注意：担当者(S.f.st)はselect/inputのonchange/oninputで既に同期されているため、
+  // ここでDOMから読み直すと「Other」入力名が上書きされて消えてしまう。読み直さない。
+
+  if (!f.fn.trim()||!f.ln.trim()) { S.err='First and last name are required.'; render(); return; }
+  if (!f.p1||!f.p2||!f.p3)        { S.err='Phone number is required.'; render(); return; }
+  if (!f.dt)                       { S.err='Visit date is required.'; render(); return; }
+  if (!f.st || f.st==='__other__') { S.err='Please select or enter staff name.'; render(); return; }
+  if (!f.invoiceNo)                { S.err='Invoice No. is required.'; render(); return; }
+  if (!f.jobOrderNo)               { S.err='Job Order No. is required.'; render(); return; }
+  S.err = '';
+  go('new2');
+}
+
+// ── 入力バリデーション：新規顧客 Step2 → Step3 ─────────────────
+function val2() {
+  var f = S.f;
+  if (!f.mdl.trim())  { S.err='Vehicle model is required.'; render(); return; }
+  if (!f.plt.trim())  { S.err='License plate is required.'; render(); return; }
+  S.err = '';
+  go('new3');
+}
+
+// ── 入力バリデーション：新規顧客 Step3 → 確認画面 ───────────────
+function val3() {
+  var f = S.f;
+  var svcs = getSvcs(f.svs);
+  if (!svcs.length) { S.err='Please select at least one service.'; render(); return; }
+  var pOn = f.svs[SVC.findIndex(x=>x.id==='prepaid')]?.on;
+  if (pOn && !f.confirmedCard) { S.err='Please register the prepaid card number.'; render(); return; }
+  if (pOn && f.confirmedCard && !f.prepaidUsedInitTouched) { S.err='Please select how many times the card has already been used.'; render(); return; }
+  if (!f.pay.noPayment && !f.pay.est) { S.err='Please enter an estimate amount, or mark as No Payment.'; render(); return; }
+  if (parseFloat(f.pay.dep||0)>0 && !f.pay.depMeth) { S.err='Please select a Down Payment method.'; render(); return; }
+  if (parseFloat(f.pay.dep||0)>0 && !f.pay.depStaff) { S.err='Please select who received the down payment.'; render(); return; }
+  if (parseFloat(f.pay.dep||0)>0 && f.pay.depMeth && !f.pay.depNote) { S.err='Please enter the reference number.'; render(); return; }
+  S.err = '';
+  go('newConf');
+}
+
+// ── 入力バリデーション：再来店visit → 確認画面 ───────────────────
+function valVf() {
+  var f = S.vf;
+  var invEl = document.getElementById('retvisit-invoice');
+  var jobEl = document.getElementById('retvisit-joborder');
+  if (invEl) f.invoiceNo = invEl.value.trim();
+  if (jobEl) f.jobOrderNo = jobEl.value.trim();
+
+  if (!f.svd) { S.err='Service date is required.'; render(); return; }
+  if (!f.st)  { S.err='Please select staff.'; render(); return; }
+  if (!f.invoiceNo)   { S.err='Invoice No. is required.'; render(); return; }
+  if (!f.jobOrderNo)  { S.err='Job Order No. is required.'; render(); return; }
+  var svcs = getSvcs(f.svs);
+  if (!svcs.length) { S.err='Please select at least one service.'; render(); return; }
+  var pOn = f.svs[SVC.findIndex(x=>x.id==='prepaid')]?.on;
+  if (pOn && !f.confirmedCard) { S.err='Please register the prepaid card number.'; render(); return; }
+  var hasExistingCard = !!(S.sel && S.sel.prepaidNum);
+  if (pOn && f.confirmedCard && !hasExistingCard && !f.prepaidUsedInitTouched) { S.err='Please select how many times the card has already been used.'; render(); return; }
+  if (!f.pay.noPayment && !f.pay.est) { S.err='Please enter an estimate amount, or mark as No Payment.'; render(); return; }
+  if (parseFloat(f.pay.dep||0)>0 && !f.pay.depMeth) { S.err='Please select a Down Payment method.'; render(); return; }
+  if (parseFloat(f.pay.dep||0)>0 && !f.pay.depStaff) { S.err='Please select who received the down payment.'; render(); return; }
+  if (parseFloat(f.pay.dep||0)>0 && f.pay.depMeth && !f.pay.depNote) { S.err='Please enter the reference number.'; render(); return; }
+  S.err = '';
+  go('retConf');
+}
+
+// ── 新規顧客登録の送信 ───────────────────────────────────────────
+async function submitNew() {
+  if (_submitting) return;
+  _submitting = true; S.busy = true; render();
+
+  var f = S.f;
+  var svcs = getSvcs(f.svs);
+  var id = 'A'+Date.now();
+  var phone = f.p1+'-'+f.p2+'-'+f.p3;
+  var pOn = f.svs[SVC.findIndex(x=>x.id==='prepaid')]?.on;
+  var cardNum = pOn ? (f.confirmedCard||'') : '';
+  var est = f.pay.noPayment ? 0 : parseFloat(f.pay.est||0);
+  var dep = parseFloat(f.pay.dep||0);
+
+  var rec = {
+    id: id, fn:f.fn, ln:f.ln, p1:f.p1, p2:f.p2, p3:f.p3, phone:phone,
+    email:f.email||'', addr:f.addr||'',
+    firstVisit: f.dt, staff:f.st||'',
+    mdl:f.mdl||'', col:f.col||'', plt:f.plt||'',
+    prepaidNum: cardNum, prepaidUsed: cardNum ? (parseInt(f.prepaidUsedInit)||0) : 0,
+    visits: [{
+      date: f.svd, staff: f.st||'', svcs: svcs,
+      memo: [f.m1,f.m2,f.m3].filter(Boolean).join(' / '),
+      usedCard:false, prepaidVisitNum:null,
+      invoiceNo: f.invoiceNo||'', jobOrderNo: f.jobOrderNo||'',
+      pay: {
+        est:String(est||''), dep:String(dep||''), depMeth:f.pay.depMeth||'',
+        status: f.pay.noPayment ? 'Free' : (dep>0 ? 'deposit' : 'pending'),
+        final:String(est||''), signedAt:'', signature:''
+      }
+    }]
+  };
+
+  S.cx.push(rec);
+  await saveCx();
+
+  var newCxId = '';
+  try {
+    var result = await postToSheets({
+      type:'new', id:id,
+      fn:f.fn, ln:f.ln, phone:phone, email:f.email||'', addr:f.addr||'',
+      firstVisit:f.dt, date:f.svd, staff:f.st||'',
+      mdl:f.mdl||'', col:f.col||'', plt:f.plt||'',
+      prepaidNum:cardNum, prepaidUsed: cardNum?(parseInt(f.prepaidUsedInit)||0):0,
+      services: svcs.join(', '),
+      estimate: est, deposit: dep,
+      depositMethod: f.pay.depMeth||'', depositStaff: f.pay.depStaff||'', depositNote: f.pay.depNote||'',
+      memo: [f.m1,f.m2,f.m3].filter(Boolean).join(' / '),
+      invoiceNo: f.invoiceNo||'', jobOrderNo: f.jobOrderNo||''
+    });
+    if (result && result.cxId) {
+      newCxId = result.cxId;
+      var newCi = S.cx.findIndex(function(x){return x.id===id;});
+      if (newCi>=0) S.cx[newCi].cxId = newCxId;
+      await saveCx();
+    }
+  } catch(e) { console.log('Sheets error:', e); }
+
+  S.savedInfo = {type:'new', name:f.fn+' '+f.ln, date:f.svd, staff:f.st, svcs:svcs, card:cardNum, selId:id};
+
+  _submitting = false; S.busy = false;
+
+  if (dep > 0 && f.pay.depMeth) {
+    S.depInfo = {
+      date: f.svd, appId: id, cxId: newCxId, fn:f.fn, ln:f.ln, phone:phone, mdl:f.mdl||'', plt:f.plt||'',
+      invoiceNo: f.invoiceNo||'', jobOrderNo: f.jobOrderNo||'',
+      services: svcs.join(', '), est: est, dep: dep, depMeth: f.pay.depMeth, depStaff: f.pay.depStaff||'',
+      depNote: f.pay.depNote||'', balance: Math.max(0, est-dep),
+      signedAt:'', signature:'', isFullPayment: (dep >= est && est>0)
+    };
+    go('depReceipt');
+  } else {
+    go('saved');
+  }
+}
+
+// ── 再来店visitの送信 ────────────────────────────────────────────
+async function submitVisit() {
+  if (_submitting) return;
+  _submitting = true; S.busy = true; render();
+
+  var c = S.sel;
+  if (!c) { _submitting=false; S.busy=false; render(); return; }
+
+  var f = S.vf;
+  var svcs = getSvcs(f.svs);
+  var pOn = f.svs[SVC.findIndex(x=>x.id==='prepaid')]?.on;
+  var newCard = pOn ? (f.newCardNum||'') : '';
+  var useExistingCard = !!(pOn && c.prepaidNum && (c.prepaidUsed||0) < 4 && !newCard);
+  var prepaidVisitNum = useExistingCard ? (c.prepaidUsed||0)+1 : null;
+  var est = f.pay.noPayment ? 0 : parseFloat(f.pay.est||0);
+  var dep = parseFloat(f.pay.dep||0);
+
+  var visit = {
+    date: f.svd, staff: f.st||'', svcs: svcs,
+    memo: [f.m1,f.m2,f.m3].filter(Boolean).join(' / '),
+    usedCard: useExistingCard, prepaidVisitNum: prepaidVisitNum,
+    invoiceNo: f.invoiceNo||'', jobOrderNo: f.jobOrderNo||'',
+    pay: {
+      est:String(est||''), dep:String(dep||''), depMeth:f.pay.depMeth||'',
+      status: f.pay.noPayment ? 'Free' : (dep>0 ? 'deposit' : 'pending'),
+      final:String(est||''), signedAt:'', signature:''
+    }
+  };
+
+  var ci = S.cx.findIndex(function(x){return x.id===c.id;});
+  if (ci>=0) {
+    S.cx[ci].visits = (S.cx[ci].visits||[]).concat([visit]);
+    if (newCard) { S.cx[ci].prepaidNum = newCard; S.cx[ci].prepaidUsed = 0; }
+    else if (useExistingCard) { S.cx[ci].prepaidUsed = prepaidVisitNum; }
+    S.sel = S.cx[ci];
+  }
+  await saveCx();
+
+  var newCxId = c.cxId || '';
+  try {
+    var result = await postToSheets({
+      type:'return', id:c.id,
+      fn:c.fn, ln:c.ln, phone:c.phone||'', mdl:c.mdl||'', plt:c.plt||'',
+      visitDate: f.svd, date: f.svd, staff: f.st||'',
+      services: svcs.join(', '),
+      estimate: est, deposit: dep,
+      depositMethod: f.pay.depMeth||'', depositStaff: f.pay.depStaff||'', depositNote: f.pay.depNote||'',
+      memo: [f.m1,f.m2,f.m3].filter(Boolean).join(' / '),
+      invoiceNo: f.invoiceNo||'', jobOrderNo: f.jobOrderNo||'',
+      prepaidNum: newCard||c.prepaidNum||'',
+      prepaidVisitNum: prepaidVisitNum,
+      isNewCard: !!newCard
+    });
+    if (result && result.cxId) {
+      newCxId = result.cxId;
+      if (ci>=0) { S.cx[ci].cxId = newCxId; S.sel = S.cx[ci]; }
+      await saveCx();
+    }
+  } catch(e) { console.log('Sheets error:', e); }
+
+  S.savedInfo = {type:'return', name:c.fn+' '+c.ln, date:f.svd, staff:f.st, svcs:svcs,
+    card:newCard, useCard:useExistingCard, prepaidVisitNum:prepaidVisitNum, selId:c.id};
+
+  _submitting = false; S.busy = false;
+
+  if (dep > 0 && f.pay.depMeth) {
+    S.depInfo = {
+      date: f.svd, appId: c.id, cxId: newCxId, fn:c.fn, ln:c.ln, phone:c.phone||'', mdl:c.mdl||'', plt:c.plt||'',
+      invoiceNo: f.invoiceNo||'', jobOrderNo: f.jobOrderNo||'',
+      services: svcs.join(', '), est: est, dep: dep, depMeth: f.pay.depMeth, depStaff: f.pay.depStaff||'',
+      depNote: f.pay.depNote||'', balance: Math.max(0, est-dep),
+      signedAt:'', signature:'', isFullPayment: (dep >= est && est>0)
+    };
+    go('depReceipt');
+  } else {
+    go('saved');
+  }
+}
+
+// ── 支払い完了（Mark as PAID） ───────────────────────────────────
+async function completePayment() {
+  var c = S.sel; if (!c) return;
+  var vidx = S.payVidx;
+  var vs = c.visits||[];
+  var v = vs[vidx]; if (!v) return;
+  var pf = S.pf;
+  var p = v.pay||{};
+  var dep = parseFloat(p.dep||0);
+  var fin = parseFloat(pf.final||p.est||0);
+  var remain = Math.max(0, fin-dep);
+
+  if (remain > 0) {
+    if (!pf.payMeth)  { S.err='Please select a payment method.'; render(); return; }
+    if (!pf.payStaff) { S.err='Please select who received the payment.'; render(); return; }
+    if (!pf.payNote)  { S.err='Please enter the reference number.'; render(); return; }
+  }
+
+  var now = new Date();
+  v.pay = Object.assign({}, v.pay, {
+    final: String(fin), status:'completed',
+    payMeth: pf.payMeth||'', payStaff: pf.payStaff||'', payNote: pf.payNote||'',
+    payDate: now.toISOString().split('T')[0]
+  });
+
+  var ci = S.cx.findIndex(function(x){return x.id===c.id;});
+  if (ci>=0) { S.cx[ci].visits[vidx] = v; S.sel = S.cx[ci]; }
+  await saveCx();
+
+  try {
+    await postToSheets({
+      type:'payment', id:c.id,
+      fn:c.fn, ln:c.ln,
+      visitDate: v.date, paymentDate: v.pay.payDate,
+      finalAmount: fin, deposit: dep,
+      paymentMethod: pf.payMeth||'', paymentStaff: pf.payStaff||'', paymentNote: pf.payNote||''
+    });
+  } catch(e) { console.log('Sheets error:', e); }
+
+  S.err = '';
+  flash('✅ Payment recorded!');
+  go('receipt');
+}
+
+// ── 顧客情報の編集 ────────────────────────────────────────────
+function initEdit() {
+  var c = S.sel; if (!c) return;
+  S.ef = {
+    fn:c.fn||'', ln:c.ln||'',
+    p1:c.p1||(c.phone?c.phone.split('-')[0]:''),
+    p2:c.p2||(c.phone?c.phone.split('-')[1]:''),
+    p3:c.p3||(c.phone?c.phone.split('-')[2]:''),
+    addr:c.addr||'', email:c.email||'',
+    mdl:c.mdl||'', col:c.col||'', plt:c.plt||'',
+    prepaidNum:c.prepaidNum||'', prepaidUsed:c.prepaidUsed||0
+  };
+  S.err = '';
+  go('edit');
+}
+
+async function submitEdit() {
+  var c = S.sel; if (!c) return;
+  var ef = S.ef;
+  if (!ef.fn.trim()||!ef.ln.trim()) { S.err='First and last name are required.'; render(); return; }
+  if (!ef.p1||!ef.p2||!ef.p3)       { S.err='Phone number is required.'; render(); return; }
+  if (!(ef.col||'').trim())          { S.err='Vehicle color is required.'; render(); return; }
+  if (!ef.plt.trim())                { S.err='License plate is required.'; render(); return; }
+
+  var phone = ef.p1+'-'+ef.p2+'-'+ef.p3;
+  var ci = S.cx.findIndex(function(x){return x.id===c.id;});
+  if (ci>=0) {
+    S.cx[ci] = Object.assign({}, S.cx[ci], {
+      fn:ef.fn, ln:ef.ln, p1:ef.p1, p2:ef.p2, p3:ef.p3, phone:phone,
+      addr:ef.addr, email:ef.email, mdl:ef.mdl, col:ef.col, plt:ef.plt,
+      prepaidNum:ef.prepaidNum, prepaidUsed:ef.prepaidUsed
+    });
+    S.sel = S.cx[ci];
+  }
+  await saveCx();
+
+  try {
+    await postToSheets({
+      type:'editCustomer', id:c.id,
+      fn:ef.fn, ln:ef.ln, phone:phone, addr:ef.addr||'', email:ef.email||'',
+      mdl:ef.mdl||'', col:ef.col||'', plt:ef.plt||'',
+      prepaidNum:ef.prepaidNum||'', prepaidUsed:ef.prepaidUsed||0
+    });
+  } catch(e) { console.log('Sheets error:', e); }
+
+  S.err = '';
+  flash('✅ Customer info updated.');
+  go('prof');
+}
+
+// ── 顧客の削除 ───────────────────────────────────────────────────
+async function deleteCustomer() {
+  var c = S.sel; if (!c) return;
+  S.busy = true; render();
+  try {
+    var result = await postToSheets({type:'delete', id:c.id});
+    if (result && result.ok === false) {
+      S.busy = false;
+      flash('Delete failed: '+(result.error||'unknown error'), 'err');
+      render();
+      return;
+    }
+    S.cx = S.cx.filter(function(x){ return x.id!==c.id; });
+    S.res = (S.res||[]).filter(function(x){ return x.id!==c.id; });
+    await saveCx();
+    S.confirmDel = false;
+    S.sel = null;
+    S.busy = false;
+    flash('🗑️ Customer deleted.');
+    go('ret');
+  } catch(e) {
+    S.busy = false;
+    flash('Delete failed: '+e.message, 'err');
+    render();
+  }
+}
+
+function render() {
+  const b = document.getElementById('body');
+  if (!b) return;
+  let h = '';
+  if (S.toast) h += '<div class="tb tb-'+S.toast.t+'">'+(S.toast.t==='ok'?'✓ ':S.toast.t==='err'?'✕ ':'')+S.toast.msg+'</div>';
+  const m = {
+    home:homeScr, pwList:pwListScr, ret:retScr,
+    prof:profScr, edit:editScr,
+    new1:new1Scr, new2:new2Scr, new3:new3Scr, newConf:newConfScr,
+    retVisit:retVisitScr, retConf:retConfScr,
+    saved:savedScr, settings:settingsScr,
+    pay:payScr, receipt:receiptScr, pwSettings:pwSettingsScr, depReceipt:depReceiptScr, existing:existingScr, editVisit:editVisitScr
+  };
+  h += (m[S.scr]||homeScr)();
+  b.innerHTML = h;
+  if (S.scr === 'receipt') { setTimeout(function(){initSignature('sig-canvas');}, 50); }
+    if (S.scr === 'depReceipt') { setTimeout(function(){initSignature('dep-sig-canvas');}, 50); }
+}
+</script>
+</body>
+</html>
