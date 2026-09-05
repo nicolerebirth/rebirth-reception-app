@@ -139,7 +139,7 @@ const SVC = [
   {id:'free_mnt',  n:'Free Maintenance',        opts:['Coating','PPF'], free:true},
   // ── Other ─────────────────────────────────────────────────
   {id:'pnt',       n:'Paint & body repair',     opts:['Panel','Washover & Coating','Washover & PPF']},
-  {id:'tnt',       n:'Tint',                    opts:['Action','Lunaray','Nex']},
+  {id:'tnt',       n:'Tint',                    opts:['Action','Lunaray','Nex','Solace']},
   {id:'wnd',       n:'Windshield protection',   opts:[]},
   {id:'abc',       n:'Anti-bacterial coating',  opts:[]},
   {id:'buf',       n:'Buffing / Polishing',     opts:[]},
@@ -1680,7 +1680,7 @@ async function saveEditVisit() {
         existingDeposit: oldDep,
         amendedAt:      amendment.amendedAt,
         editedBy:       editedBy,
-        prepaidNum:     newCardNum,
+        prepaidNum:     pOn ? newCardNum : '',
         fn: c.fn, ln: c.ln, date: v.date
       });
     } catch(e) {}
@@ -2157,7 +2157,8 @@ async function submitVisit() {
       memo: [f.m1,f.m2,f.m3].filter(Boolean).join(' / '),
       invoiceNo: f.invoiceNo||'', jobOrderNo: f.jobOrderNo||'',
       prepaidNum: newCard||c.prepaidNum||'',
-      prepaidVisitNum: prepaidVisitNum
+      prepaidVisitNum: prepaidVisitNum,
+      isNewCard: !!newCard
     });
     if (result && result.cxId) {
       newCxId = result.cxId;
