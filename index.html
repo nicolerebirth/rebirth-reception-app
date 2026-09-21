@@ -2220,6 +2220,7 @@ async function completePayment() {
       type:'payment', id:c.id,
       fn:c.fn, ln:c.ln,
       visitDate: v.date, paymentDate: v.pay.payDate,
+      invoiceNo: v.invoiceNo||'',
       finalAmount: fin, deposit: dep,
       paymentMethod: pf.payMeth||'', paymentStaff: pf.payStaff||'', paymentNote: pf.payNote||''
     });
