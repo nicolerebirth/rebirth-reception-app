@@ -933,6 +933,7 @@ async function skipDepSignature() {
       phone: S.depInfo ? S.depInfo.phone : '',
       mdl: S.depInfo ? S.depInfo.mdl : '',
       plt: S.depInfo ? S.depInfo.plt : '',
+      invoiceNo: S.depInfo ? S.depInfo.invoiceNo : '',
       services: S.depInfo ? S.depInfo.services : '',
       amount: S.depInfo ? S.depInfo.dep : 0,
       method: S.depInfo ? S.depInfo.depMeth : '',
@@ -1010,6 +1011,7 @@ async function confirmDepSignature() {
       phone: S.depInfo ? S.depInfo.phone : '',
       mdl: S.depInfo ? S.depInfo.mdl : '',
       plt: S.depInfo ? S.depInfo.plt : '',
+      invoiceNo: S.depInfo ? S.depInfo.invoiceNo : '',
       services: S.depInfo ? S.depInfo.services : '',
       amount: S.depInfo ? S.depInfo.dep : 0,
       method: S.depInfo ? S.depInfo.depMeth : '',
@@ -1292,6 +1294,7 @@ async function skipSignature() {
       id:c.id,
       fn:c.fn||'', ln:c.ln||'',
       visitDate:(c.visits||[])[vidx]?c.visits[vidx].date:'',
+      invoiceNo:(c.visits||[])[vidx]?c.visits[vidx].invoiceNo:'',
       signedAt:skipText,
       signatureImage:''
     });
@@ -1372,6 +1375,7 @@ async function confirmSignature() {
       id:c.id,
       fn:c.fn||'', ln:c.ln||'',
       visitDate:(c.visits||[])[vidx]?c.visits[vidx].date:'',
+      invoiceNo:(c.visits||[])[vidx]?c.visits[vidx].invoiceNo:'',
       signedAt:sigText,
       signatureImage:sigData
     });
