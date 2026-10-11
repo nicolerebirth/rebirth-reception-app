@@ -381,6 +381,25 @@ function pBadge(vn) {
   return '<div style="margin-top:7px;padding:8px 12px;border-radius:8px;border:1.5px solid '+(fr?'#d97706':'#fbbf24')+';background:'+(fr?'#d97706':'#fffbeb')+';font-size:13px;font-weight:700;color:'+(fr?'#fff':'#92400e')+'">🃏 Prepaid card — visit '+safeVn+' of 4'+(fr?' ★ FREE VISIT ★':'')+'</div>';
 }
 
+// 支払い状況の判定を一箇所にまとめた共通関数。
+// サーバー(02_Jobs)が管理している「実際の残金(pay.balance)」を最優先し、
+// 無い場合のみ「見積額−頭金」で計算する。
+// ※以前は「見積額−頭金」だけで残金を出していたため、頭金＋後日の残金で完済した案件でも、
+//   再読み込みすると「Balance Due」と「Pay」ボタンが再び表示されてしまっていた。
+function payState(pay) {
+  pay = pay||{};
+  const est = parseFloat(pay.est||0);
+  const dep = parseFloat(pay.dep||0);
+  const st  = String(pay.status||'').toLowerCase();
+  const noCharge = !!pay.noPayment || est<=0;
+  const hasSrvBal = pay.balance!==undefined && pay.balance!==null
+                    && String(pay.balance).trim()!=='' && !isNaN(parseFloat(pay.balance));
+  let bal = hasSrvBal ? Math.max(0,parseFloat(pay.balance)) : Math.max(0, est-dep);
+  const done = !noCharge && (st==='completed' || st==='full paid' || st==='paid' || bal<=0);
+  if (done) bal = 0;
+  return {est:est, dep:dep, bal:bal, noCharge:noCharge, done:done};
+}
+
 function payBadge(pay) {
   if (!pay||!pay.est) return '';
   const colors = {pending:['#fef3c7','#92400e','⏳'],deposit:['#dbeafe','#1e40af','🏦'],completed:['#dcfce7','#166534','✅'],free:['#f1f5f9','#475569','🆓']};
@@ -390,20 +409,18 @@ function payBadge(pay) {
     completed:'Full Paid', paid:'Full Paid', 'Full Paid':'Full Paid',
     free:'No Payment', 'Free':'No Payment', 'No Payment':'No Payment'
   };
-  const _bal = Math.max(0, parseFloat(pay.est||0)-parseFloat(pay.dep||0));
+  const ps = payState(pay);
   const _payStatus = pay.status||'pending';
-  const isNoCharge = pay.noPayment || pay.est==='0' || parseFloat(pay.est||0)<=0;
-  const st = isNoCharge ? 'free'
-    : (_bal===0 && parseFloat(pay.est||0)>0) ? 'Full Paid'
-    : (parseFloat(pay.dep||0)>0 && _bal>0) ? 'Paid Down Payment'
+  const st = ps.noCharge ? 'free'
+    : ps.done ? 'Full Paid'
+    : (ps.dep>0 && ps.bal>0) ? 'Paid Down Payment'
     : _payStatus;
-  const colorKey = isNoCharge ? 'free' : (colors[st]?st:'pending');
+  const colorKey = ps.noCharge ? 'free' : (st==='Full Paid' ? 'completed' : (colors[st]?st:'pending'));
   const [bg,fc,ic] = colors[colorKey]||colors.pending;
   const label = labels[st]||labels.pending;
   // 表示する金額: 頭金支払い済み(まだ残金あり)の場合は「残金」を、それ以外は総額を表示する
-  // （頭金額と見積総額を混同しないように、Pay 待ちの実際の請求額を分かりやすくする）
-  const amountLabel = (st==='Paid Down Payment') ? 'Balance Due ' + fmt(_bal) : fmt(pay.final||pay.est);
-  return '<span style="background:'+bg+';color:'+fc+';font-size:12px;font-weight:700;padding:3px 10px;border-radius:12px">'+ic+' '+label+(isNoCharge?'':' · '+amountLabel)+'</span>';
+  const amountLabel = (st==='Paid Down Payment') ? 'Balance Due ' + fmt(ps.bal) : fmt(pay.final||pay.est);
+  return '<span style="background:'+bg+';color:'+fc+';font-size:12px;font-weight:700;padding:3px 10px;border-radius:12px">'+ic+' '+label+(ps.noCharge?'':' · '+amountLabel)+'</span>';
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -508,11 +525,14 @@ function profScr() {
         +(v.memo?'<div style="font-size:12px;color:#94a3b8;margin-top:6px;background:#f1f5f9;padding:6px 9px;border-radius:6px">'+esc(v.memo)+'</div>':'')
         +(isLatest?'<div style="text-align:right;margin-top:6px">':'')
         +(isLatest?'<button onclick="startEditVisit(\''+fr.id+'\','+vi+')" style="font-size:12px;padding:4px 14px;border:1.5px solid #cbd5e1;border-radius:8px;background:#f8fafc;cursor:pointer;color:#475569;font-family:inherit;font-weight:600">✏️ Edit Service History</button></div>':'')
-        +(pay.est?'<div style="margin-top:8px;padding:6px 10px;border-radius:6px;background:'+(pay.status==='completed'?'#dcfce7':pay.status==='deposit'?'#dbeafe':'#fef3c7')+';display:flex;align-items:center;justify-content:space-between">'
-        +'<span style="font-size:12px;font-weight:700;color:'+(pay.status==='completed'?'#166534':pay.status==='deposit'?'#1e40af':'#92400e')+'">'+payBadge(pay,vi)+'</span>'
+        +(pay.est?'<div style="margin-top:8px;padding:6px 10px;border-radius:6px;background:'+(v.hasAmendment?'#f8fafc':payState(pay).done?'#dcfce7':payState(pay).dep>0?'#dbeafe':'#fef3c7')+';display:flex;align-items:center;justify-content:space-between">'
+        +'<span style="font-size:12px;font-weight:700;color:'+(payState(pay).done?'#166534':payState(pay).dep>0?'#1e40af':'#92400e')+'">'
+        +(v.hasAmendment
+          ? '<span style="background:#f1f5f9;color:#64748b;font-size:12px;font-weight:700;padding:3px 10px;border-radius:12px">↪ Replaced by the amended record</span>'
+          : payBadge(pay,vi))+'</span>'
         +(v.hasAmendment
           ? '<span title="内容が変更されたため、この古い記録では支払い操作はできません" style="background:#e2e8f0;color:#94a3b8;border:none;border-radius:5px;padding:4px 10px;font-size:11px;font-weight:700;cursor:not-allowed">🔒 Pay (disabled)</span>'
-          : (pay.status!=='Full Paid'&&pay.status!=='completed'&&Math.max(0,parseFloat(pay.est||0)-parseFloat(pay.dep||0))>0
+          : (!payState(pay).done&&!payState(pay).noCharge&&payState(pay).bal>0
             ?'<button onclick="S.payVidx='+vi+';S.pf=initPay();go(\'pay\')" style="background:#C41010;color:#fff;border:none;border-radius:5px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer">💳 Pay</button>'
             :'<button onclick="S.payVidx='+vi+';go(\'receipt\')" style="background:#16a34a;color:#fff;border:none;border-radius:5px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer">🧾 Receipt</button>'))
         +'</div>':'')
@@ -575,7 +595,7 @@ function new1Scr() {
     +'<div class="field"><label>Job Order No.<span class="req">*</span></label>'
     +'<input id="new1-joborder" class="inp" style="color:#111;background:#fff" value="'+esc(S.f.jobOrderNo)+'" placeholder="e.g. JO-001" oninput="S.f.jobOrderNo=this.value">'
     +'</div></div></div>'
-    +'<div class="acts"><button class="btn-g" onclick="go(\'home\')">Cancel</button><button class="btn-r" onclick="val1()">Next: Vehicle →</button></div></div>';
+    +'<div class="acts"><button class="btn-g" onclick="go(\'home\')">Cancel</button><button class="btn-r" onclick="btnLoading(this,val1)">Next: Vehicle →</button></div></div>';
 }
 
 function new2Scr() {
@@ -668,7 +688,7 @@ function retVisitScr() {
     +paySection(true)
     +'</div>'
     +(S.err?'<div class="errbox">'+S.err+'</div>':'')
-    +'<div class="acts"><button class="btn-g" onclick="go(\'prof\')">Cancel</button><button class="btn-r" onclick="valVf()">Review & confirm →</button></div></div>';
+    +'<div class="acts"><button class="btn-g" onclick="go(\'prof\')">Cancel</button><button class="btn-r" onclick="btnLoading(this,valVf)">Review & confirm →</button></div></div>';
 }
 
 function retConfScr() {
@@ -711,7 +731,7 @@ function savedScr() {
     +'<div style="font-size:24px;font-weight:700;margin-bottom:8px">'+title+'</div>'
     +'<div style="font-size:16px;color:#64748b;margin-bottom:24px"><strong>'+esc(info.name||'')+'</strong>'+subtitle+'</div>'
     +'<div style="background:#f8fafc;border:0.5px solid #e2e8f0;border-radius:12px;padding:16px 20px;margin-bottom:24px;text-align:left">'+crow('Date',info.date||'')+crow('Staff',info.staff||'')
-    +(info.amount!=null?'<div class="crow"><span class="clbl">Amount</span><span style="font-size:13px;font-weight:700;color:#111">₱'+num(info.amount)+(info.method?' ('+esc(info.method)+')':'')+'</span></div>':'')
+    +(info.amount!=null?'<div class="crow"><span class="clbl">Amount</span><span style="font-size:13px;font-weight:700;color:#111">'+fmt(info.amount)+(info.method?' ('+esc(info.method)+')':'')+'</span></div>':'')
     +((info.svcs||[]).length?'<div class="crow"><span class="clbl">'+(isEx?'Past services':'Services')+'</span><span style="font-size:13px;font-weight:500;color:#111">'+info.svcs.map(s=>'<div>✓ '+esc(s)+'</div>').join('')+'</span></div>':'')
     +(info.card?'<div class="crow"><span class="clbl">Prepaid card</span><span style="font-size:13px;font-weight:700;color:#92400e">🃏 #'+esc(info.card)+' registered</span></div>':'')
     +(info.useCard&&info.prepaidVisitNum?'<div class="crow"><span class="clbl">Card charged</span><span style="font-size:13px;font-weight:700;color:'+(info.prepaidVisitNum===4?'#d97706':'#92400e')+'">🃏 Visit '+info.prepaidVisitNum+' of 4'+(info.prepaidVisitNum===4?' ★ FREE':'')+'</span></div>':'')
@@ -780,11 +800,13 @@ function receiptScr() {
   const fin  = parseFloat(p.final||p.est||0);
   const remain = Math.max(0, fin-dep);
   const rcpNo = 'RBC-'+c.id.slice(-6)+'-'+(vidx+1);
+  // 残金の支払いがある場合は最終レシートの署名、登録時に全額払い済み(今日の支払い0)の場合は登録時の署名で「署名済み」とみなす
+  const rcptSigned = remain>0 ? !!p.finalSignedAt : !!(p.finalSignedAt||p.signedAt);
   return '<div style="padding:16px">'
     +'<button style="width:100%;padding:13px;background:#16a34a;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:10px;font-family:inherit" onclick="go(\'home\')"><i clas">&#127968; Back to home</button>'
     +'<div style="display:flex;gap:10px;margin-bottom:16px">'
     +'<button class="btn-g" onclick="go(\'prof\')"><i class="ti ti-arrow-left"></i> Back</button>'
-    +(p.signedAt?'<button class="btn-r" style="flex:1" onclick="window.print()"><i class="ti ti-printer"></i> Print Receipt</button>':'<button disabled style="flex:1;padding:10px 16px;background:#94a3b8;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;font-family:inherit">Sign first to print</button>')
+    +(rcptSigned?'<button class="btn-r" style="flex:1" onclick="window.print()"><i class="ti ti-printer"></i> Print Receipt</button>':'<button disabled style="flex:1;padding:10px 16px;background:#94a3b8;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;font-family:inherit">Sign first to print</button>')
     +'</div>'
     +'<div id="receipt-box" style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;max-width:400px;margin:0 auto;font-family:Arial,sans-serif">'
     +'<div style="text-align:center;margin-bottom:16px;padding-bottom:16px;border-bottom:2px solid #111">'
@@ -810,8 +832,10 @@ function receiptScr() {
     +'<div style="margin-top:14px;border-top:1.5px solid #e2e8f0;padding-top:10px;width:100%">'
     +'<div style="overflow:hidden;font-size:14px;margin-bottom:8px"><span style="float:right;font-weight:600">'+fmt(fin)+'</span><span style="color:#64748b">Total Amount:</span></div>'
     +(dep>0?'<div style="overflow:hidden;font-size:14px;margin-bottom:8px"><span style="float:right;font-weight:600;color:#1d4ed8">'+fmt(dep)+'</span><span style="color:#1d4ed8">Down Payment:</span></div>':'')
-    +'<div style="overflow:hidden;font-size:14px;margin-bottom:8px"><span style="float:right;font-weight:600;color:#dc2626">'+fmt(remain)+'</span><span style="color:#dc2626">Balance Due:</span></div>'
-    +'<div style="overflow:hidden;font-size:16px;font-weight:800;border-top:2px solid #111;padding-top:10px;margin-top:6px"><span style="float:right;color:#16a34a">'+fmt(remain)+'</span>Amount Paid Today:</div>'
+    +(remain>0
+      ? '<div style="overflow:hidden;font-size:14px;margin-bottom:8px"><span style="float:right;font-weight:600;color:#dc2626">'+fmt(remain)+'</span><span style="color:#dc2626">Balance Due:</span></div>'
+        +'<div style="overflow:hidden;font-size:16px;font-weight:800;border-top:2px solid #111;padding-top:10px;margin-top:6px"><span style="float:right;color:#16a34a">'+fmt(remain)+'</span>Amount Paid Today:</div>'
+      : '<div style="overflow:hidden;font-size:16px;font-weight:800;border-top:2px solid #111;padding-top:10px;margin-top:6px"><span style="float:right;color:#16a34a">'+fmt(fin)+'</span>Total Paid (in full):</div>')
     +'</div>'
     +'<div style="margin-top:12px;padding:10px 12px;background:#f0fdf4;border-radius:8px;font-size:12px">'
     +'<div><strong>Payment method:</strong> '+esc(p.payMeth||'—')+'</div>'
@@ -822,11 +846,11 @@ function receiptScr() {
     +'</div>'
     +(v.usedCard&&v.prepaidVisitNum?'<div style="margin-top:8px;padding:8px 12px;background:#fffbeb;border-radius:8px;font-size:12px;color:#92400e">🃏 Prepaid card used — Visit '+v.prepaidVisitNum+' of 4'+(v.prepaidVisitNum===4?' ★ FREE':'')+'</div>':'')
     // Signature section
-    +(p.finalSignedAt
+    +(rcptSigned
       ? '<div style="margin-top:16px;padding-top:14px;border-top:2px dashed #e2e8f0">'
         +'<div style="font-size:12px;font-weight:700;color:#166534;margin-bottom:8px">✅ Customer Signature</div>'
         +(p.finalSignature?'<img src="'+p.finalSignature+'" style="width:100%;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc">':'')
-        +'<div style="font-size:11px;color:#64748b;margin-top:6px">'+esc(p.finalSignedAt)+'</div>'
+        +'<div style="font-size:11px;color:#64748b;margin-top:6px">'+esc(p.finalSignedAt||p.signedAt||'')+'</div>'
         +'</div>'
       : '<div style="margin-top:16px;padding-top:14px;border-top:2px dashed #C41010">'
         +'<div style="font-size:14px;font-weight:700;color:#C41010;margin-bottom:10px">✍️ Customer Signature (Required)</div>'
@@ -1280,7 +1304,7 @@ async function skipSignature() {
     if(cx.id!==c.id) return cx;
     return Object.assign({},cx,{visits:cx.visits.map(function(v,i){
       if(i!==vidx) return v;
-      return Object.assign({},v,{pay:Object.assign({},v.pay,{signedAt:skipText})});
+      return Object.assign({},v,{pay:Object.assign({},v.pay,{finalSignedAt:skipText})});
     })});
   });
   S.sel = S.cx.find(function(x){return x.id===c.id;});
@@ -1513,6 +1537,22 @@ async function fetchCxFromSheets(q, by) {
   }
 }
 
+// Invoice No.が既に別の案件で使われていないかをサーバーに確認する。
+// 戻り値: 使用済みなら「使用している顧客名」(文字列)、問題なし/確認できない場合は''
+// ※通信できない場合に入力を止めてしまわないよう、失敗時は''(重複なし扱い)を返す。
+async function invoiceInUseBy(inv, appId) {
+  if (!S.url || !inv) return '';
+  try {
+    var ctrl = new AbortController();
+    var timer = setTimeout(function(){ ctrl.abort(); }, 8000);
+    var r = await fetch(S.url+'?action=invoiceExists&inv='+encodeURIComponent(inv)+'&appId='+encodeURIComponent(appId||''),
+      {signal: ctrl.signal});
+    clearTimeout(timer);
+    var d = await r.json();
+    return (d && d.ok && d.exists) ? (d.who||'another customer') : '';
+  } catch(e) { return ''; }
+}
+
 async function fetchOneCxFromSheets(appId, _isRetry) {
   if (!S.url) return null;
   try {
@@ -1589,7 +1629,7 @@ function editVisitScr() {
     +'</div></div>'
     +(S.err?'<div class="errbox" style="margin:12px 0">'+S.err+'</div>':'')
     +'<div style="margin-top:16px">'
-    +'<button class="btn-r" style="width:100%;font-size:16px" onclick="saveEditVisit()">💾 Save Changes</button>'
+    +'<button class="btn-r" style="width:100%;font-size:16px" onclick="btnLoading(this,saveEditVisit)">💾 Save Changes</button>'
     +'</div></div>';
 }
 
@@ -1610,6 +1650,11 @@ async function saveEditVisit() {
   if (!S.evStaff || S.evStaff==='__other__') { S.err='Please select who is making this edit.'; render(); return; }
   const pOn = S.vf.svs[SVC.findIndex(x=>x.id==='prepaid')]?.on;
   if (pOn && !S.vf.confirmedCard) { S.err='Please register the prepaid card number.'; render(); return; }
+  if (invVal !== (v.invoiceNo||'')) {
+    // Invoice No.を変更する場合のみ、他の案件で使われていないか確認する
+    const usedBy = await invoiceInUseBy(invVal, c.id);
+    if (usedBy) { S.err='Invoice No. '+invVal+' is already used by '+usedBy+'. Please check the number.'; render(); return; }
+  }
 
   const newSvcs = getSvcs(S.vf.svs||ms());
   const newEst  = estVal || (v.pay.est||'');
@@ -1632,9 +1677,13 @@ async function saveEditVisit() {
   // 新しいamendmentレコードを作成（元の隣に追加）
   // 見積額(est)が変わった場合、残金(balance)・ステータスも新しい見積額を基準に再計算する
   const oldDep = parseFloat((v.pay&&v.pay.dep)||0);
-  const newBalNum = Math.max(0, parseFloat(newEst||0) - oldDep);
+  // これまでに受け取った合計(見積額−残金)を基準に新しい残金を計算する。頭金だけを基準にすると、
+  // 残金を払い終えた案件の内容を変更しただけで「未払い」に戻ってしまう（サーバー側と同じ考え方）
+  const ps0 = payState(v.pay);
+  const paidSoFar = Math.max(0, ps0.est - ps0.bal) || oldDep;
+  const newBalNum = Math.max(0, parseFloat(newEst||0) - paidSoFar);
   const newStatus = (newBalNum<=0 && parseFloat(newEst||0)>0) ? 'completed'
-    : (oldDep>0 ? 'deposit' : ((v.pay&&v.pay.status)||'pending'));
+    : (paidSoFar>0 ? 'deposit' : ((v.pay&&v.pay.status)||'pending'));
   const amendment = {
     date:       v.date,
     staff:      v.staff,
@@ -1668,9 +1717,10 @@ async function saveEditVisit() {
   await saveCx();
 
   // Sheetsに追記（上書きではなく新規行として）
+  var amendSynced = true;
   if (S.url) {
     try {
-      await postToSheets({
+      var amendRes = await postToSheets({
         type: 'amendment',
         id:   c.id,
         originalInvoiceNo:  v.invoiceNo||'',
@@ -1687,10 +1737,12 @@ async function saveEditVisit() {
         prepaidNum:     pOn ? newCardNum : '',
         fn: c.fn, ln: c.ln, date: v.date
       });
-    } catch(e) {}
+      if (amendRes && amendRes.ok === false) amendSynced = false;
+    } catch(e) { amendSynced = false; }
   }
 
-  flash('✅ Amendment saved. Original record preserved.');
+  if (amendSynced) flash('✅ Amendment saved. Original record preserved.');
+  else flash('⚠️ Saved on this device only — could not reach the sheet. Please check the connection and edit again.', 'err');
   go('prof');
 }
 function localSearch(q, sb) {
@@ -1965,7 +2017,7 @@ function stepBar(cur) {
 }
 
 // ── 入力バリデーション：新規顧客 Step1 → Step2 ─────────────────
-function val1() {
+async function val1() {
   var f = S.f;
   var invEl = document.getElementById('new1-invoice');
   var jobEl = document.getElementById('new1-joborder');
@@ -1980,6 +2032,8 @@ function val1() {
   if (!f.st || f.st==='__other__') { S.err='Please select or enter staff name.'; render(); return; }
   if (!f.invoiceNo)                { S.err='Invoice No. is required.'; render(); return; }
   if (!f.jobOrderNo)               { S.err='Job Order No. is required.'; render(); return; }
+  var usedBy = await invoiceInUseBy(f.invoiceNo, '');
+  if (usedBy) { S.err='Invoice No. '+f.invoiceNo+' is already used by '+usedBy+'. Please check the number.'; render(); return; }
   S.err = '';
   go('new2');
 }
@@ -2002,6 +2056,8 @@ function val3() {
   if (pOn && !f.confirmedCard) { S.err='Please register the prepaid card number.'; render(); return; }
   if (pOn && f.confirmedCard && !f.prepaidUsedInitTouched) { S.err='Please select how many times the card has already been used.'; render(); return; }
   if (!f.pay.noPayment && !f.pay.est) { S.err='Please enter an estimate amount, or mark as No Payment.'; render(); return; }
+  if (!f.pay.noPayment && parseFloat(f.pay.est||0)<0) { S.err='Estimate amount cannot be negative.'; render(); return; }
+  if (!f.pay.noPayment && parseFloat(f.pay.dep||0)>parseFloat(f.pay.est||0)) { S.err='Down payment cannot be more than the estimate amount.'; render(); return; }
   if (parseFloat(f.pay.dep||0)>0 && !f.pay.depMeth) { S.err='Please select a Down Payment method.'; render(); return; }
   if (parseFloat(f.pay.dep||0)>0 && !f.pay.depStaff) { S.err='Please select who received the down payment.'; render(); return; }
   if (parseFloat(f.pay.dep||0)>0 && f.pay.depMeth && !f.pay.depNote) { S.err='Please enter the reference number.'; render(); return; }
@@ -2010,7 +2066,7 @@ function val3() {
 }
 
 // ── 入力バリデーション：再来店visit → 確認画面 ───────────────────
-function valVf() {
+async function valVf() {
   var f = S.vf;
   var invEl = document.getElementById('retvisit-invoice');
   var jobEl = document.getElementById('retvisit-joborder');
@@ -2028,9 +2084,15 @@ function valVf() {
   var hasExistingCard = !!(S.sel && S.sel.prepaidNum);
   if (pOn && f.confirmedCard && !hasExistingCard && !f.prepaidUsedInitTouched) { S.err='Please select how many times the card has already been used.'; render(); return; }
   if (!f.pay.noPayment && !f.pay.est) { S.err='Please enter an estimate amount, or mark as No Payment.'; render(); return; }
+  if (!f.pay.noPayment && parseFloat(f.pay.est||0)<0) { S.err='Estimate amount cannot be negative.'; render(); return; }
+  if (!f.pay.noPayment && parseFloat(f.pay.dep||0)>parseFloat(f.pay.est||0)) { S.err='Down payment cannot be more than the estimate amount.'; render(); return; }
   if (parseFloat(f.pay.dep||0)>0 && !f.pay.depMeth) { S.err='Please select a Down Payment method.'; render(); return; }
   if (parseFloat(f.pay.dep||0)>0 && !f.pay.depStaff) { S.err='Please select who received the down payment.'; render(); return; }
   if (parseFloat(f.pay.dep||0)>0 && f.pay.depMeth && !f.pay.depNote) { S.err='Please enter the reference number.'; render(); return; }
+  // 新しい来店は必ず新しいInvoice番号が必要なので、同じお客様自身の過去案件の番号も重複として扱う
+  // （appIdを渡さない＝例外なし。例外が必要なのは内容変更(Edit Service History)のときだけ）
+  var usedBy = await invoiceInUseBy(f.invoiceNo, '');
+  if (usedBy) { S.err='Invoice No. '+f.invoiceNo+' is already used by '+usedBy+'. Please check the number.'; render(); return; }
   S.err = '';
   go('retConf');
 }
@@ -2125,6 +2187,10 @@ async function submitVisit() {
   var newCard = pOn ? (f.newCardNum||'') : '';
   var useExistingCard = !!(pOn && c.prepaidNum && (c.prepaidUsed||0) < 4 && !newCard);
   var prepaidVisitNum = useExistingCard ? (c.prepaidUsed||0)+1 : null;
+  // 新しいカードを登録する場合の「登録時点の使用済み回数」。
+  // 既存のカードが無ければ画面で選択した回数、既存のカードを置き換える場合は0からスタートする。
+  // （以前はこの値がサーバーに送られず、旧カードの使用回数がそのまま引き継がれていた）
+  var newCardUsed = newCard ? ((c.prepaidNum && String(c.prepaidNum).trim()) ? 0 : (parseInt(f.prepaidUsedInit)||0)) : 0;
   var est = f.pay.noPayment ? 0 : parseFloat(f.pay.est||0);
   var dep = parseFloat(f.pay.dep||0);
 
@@ -2143,7 +2209,7 @@ async function submitVisit() {
   var ci = S.cx.findIndex(function(x){return x.id===c.id;});
   if (ci>=0) {
     S.cx[ci].visits = (S.cx[ci].visits||[]).concat([visit]);
-    if (newCard) { S.cx[ci].prepaidNum = newCard; S.cx[ci].prepaidUsed = 0; }
+    if (newCard) { S.cx[ci].prepaidNum = newCard; S.cx[ci].prepaidUsed = newCardUsed; }
     else if (useExistingCard) { S.cx[ci].prepaidUsed = prepaidVisitNum; }
     S.sel = S.cx[ci];
   }
@@ -2162,7 +2228,8 @@ async function submitVisit() {
       invoiceNo: f.invoiceNo||'', jobOrderNo: f.jobOrderNo||'',
       prepaidNum: newCard||c.prepaidNum||'',
       prepaidVisitNum: prepaidVisitNum,
-      isNewCard: !!newCard
+      isNewCard: !!newCard,
+      prepaidUsed: newCardUsed
     });
     if (result && result.cxId) {
       newCxId = result.cxId;
@@ -2264,8 +2331,8 @@ async function submitEdit() {
   if (ci>=0) {
     S.cx[ci] = Object.assign({}, S.cx[ci], {
       fn:ef.fn, ln:ef.ln, p1:ef.p1, p2:ef.p2, p3:ef.p3, phone:phone,
-      addr:ef.addr, email:ef.email, mdl:ef.mdl, col:ef.col, plt:ef.plt,
-      prepaidNum:ef.prepaidNum, prepaidUsed:ef.prepaidUsed
+      addr:ef.addr, email:ef.email, mdl:ef.mdl, col:ef.col, plt:ef.plt
+      // ※プリペイドカード情報は来店記録からのみ更新する仕様のため、ここでは触らない
     });
     S.sel = S.cx[ci];
   }
@@ -2275,8 +2342,9 @@ async function submitEdit() {
     await postToSheets({
       type:'editCustomer', id:c.id,
       fn:ef.fn, ln:ef.ln, phone:phone, addr:ef.addr||'', email:ef.email||'',
-      mdl:ef.mdl||'', col:ef.col||'', plt:ef.plt||'',
-      prepaidNum:ef.prepaidNum||'', prepaidUsed:ef.prepaidUsed||0
+      mdl:ef.mdl||'', col:ef.col||'', plt:ef.plt||''
+      // ※prepaidNum/prepaidUsedは送らない（編集画面を開いた時点の古い値で、
+      //   サーバー側の最新のカード使用回数を上書きしてしまうのを防ぐ）
     });
   } catch(e) { console.log('Sheets error:', e); }
 
